@@ -122,11 +122,13 @@ def process(self, starting_node):
                 self.rank()   # First step:Netwoek simplex algorithm
                 self.order_in_rank()    #Second step: ordering nodes within ranks
 
+
 def init_order(self, node, level):
         """Initialize orders the nodes in each rank with depth-first search
         """
 
         self._init_order(node, level, self.transitions)
+
 
 def _init_order(self, node, level, transitions):
         if not self.result[node]['y']:
@@ -264,3 +266,10 @@ class view(osv.osv):
                 'label' : labels,
                 'blank_nodes': blank_nodes,
                 'node_parent_field': _Model_Field,}
+
+
+def monkey_patch():
+    graph.process_order = process_order
+    graph.tree_order = tree_order
+    graph.init_order = init_order
+    graph._init_order = _init_order

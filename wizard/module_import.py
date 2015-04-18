@@ -14,11 +14,10 @@ class ModuleImport(models.TransientModel):
 
     @api.model
     def _get_import_types(self):
-        return get_module_importers(self.env['builder.ir.module.module'])
+        return self.env['builder.exchanger.base'].get_exchangers()
 
     import_type = fields.Selection(_get_import_types, 'Format', required=True)
     file = fields.Binary('File', required=True)
-
 
     @api.one
     def action_import(self):

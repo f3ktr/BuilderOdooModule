@@ -79,7 +79,7 @@
                                 <field name="author" class="oe_inline"/>
                             </h3>
                             <div>
-                                <button name="button_download" string="Download" type="object" class="oe_highlight"/>
+                                <button name="%(builder.act_builder_ir_module_module_generate_wizard)s" string="Download" type="action" class="oe_highlight"/>
                             </div>
                         </div>
                         <div class="oe_clear"/>

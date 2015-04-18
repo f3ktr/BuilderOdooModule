@@ -1,7 +1,5 @@
-from openerp.tools import graph
-
-__author__ = 'one'
 from openerp import api
+
 
 def simple_selection(model, value_field, label_field=None, domain=None):
     domain = domain or []

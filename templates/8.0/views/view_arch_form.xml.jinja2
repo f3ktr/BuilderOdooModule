@@ -1,4 +1,4 @@
-{% import "builder.backend.macros.xml.jinja2" as macros %}
+{% import "views/macros.xml.jinja2" as macros %}
 {% if not this.inherit_view -%}
 <form string="{{string}}" {% if not create %} create="false" {% endif %}{% if not edit %} edit="false" {% endif %}{% if not delete %} delete="false" {% endif %}>
     <sheet>

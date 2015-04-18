@@ -1,7 +1,3 @@
-from openerp.addons.builder.models.module import get_module_exporters
-
-__author__ = 'one'
-
 from openerp import models, api, fields, _
 
 
@@ -10,7 +6,7 @@ class ModelImport(models.TransientModel):
 
     @api.model
     def _get_export_types(self):
-        return get_module_exporters(self.env['builder.ir.module.module'])
+        return self.env['builder.exchanger.base'].get_exchangers()
 
     export_type = fields.Selection(_get_export_types, 'Format', required=True)
 

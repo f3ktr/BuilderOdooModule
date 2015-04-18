@@ -1,5 +1,7 @@
 from base64 import decodestring
 from collections import defaultdict
+from jinja2 import FileSystemLoader
+from jinja2 import Environment
 import re
 from string import Template
 from types import MethodType
@@ -127,8 +129,7 @@ javascript:(function(){
     script('$base_url/builder/static/src/js/snippet_loader.js');
 })();
         """
-        self.snippet_bookmarklet_url = Template(link).substitute(base_url=base_url, module=self.name,
-                                                                 db=self.env.cr.dbname)
+        self.snippet_bookmarklet_url = Template(link).substitute(base_url=base_url, module=self.name)
 
     @api.multi
     def dependencies_as_list(self):
@@ -155,14 +156,6 @@ javascript:(function(){
     @api.depends('model_ids')
     def _compute_models_count(self):
         self.models_count = len(self.model_ids)
-
-    @api.multi
-    def button_download(self):
-        return {
-            'type': 'ir.actions.act_url',
-            'url': '/builder/download/{id}'.format(id=self.id),
-            'target': 'self'
-        }
 
     @api.multi
     def action_backend_models(self):
@@ -428,151 +421,6 @@ javascript:(function(){
 
     def import_models(self, model):
         pass
-
-    @api.multi
-    def get_zipped_module(self):
-
-        def groups_attribute(groups):
-            return 'groups="{list}"'.format(list=','.join([i.xml_id for i in groups])) if len(groups) else ''
-
-        def field_options(options):
-            opts = []
-            for op in options:
-                opts.append((op.value, op.name))
-            return repr(opts)
-
-        def write_template(template_obj, zf, fname, template, d, **params):
-            i = zipfile.ZipInfo(fname)
-            i.compress_type = zipfile.ZIP_DEFLATED
-            i.external_attr = 2175008768
-            zf.writestr(i, template_obj.render_template(template, d, **params))
-
-
-        templates = self.env['document.template']
-
-        functions = {
-            'filters': {
-                'dot2dashed': lambda x: x.replace('.', '_'),
-                'dot2name': lambda x: ''.join([s.capitalize() for s in x.split('.')]),
-                'cleargroup': lambda x: x.replace('.', '_'),
-                'groups': groups_attribute,
-                'field_options': field_options,
-            },
-            'globals': {
-                'enumerate': enumerate
-            }
-        }
-
-        zfileIO = StringIO()
-
-        zfile = zipfile.ZipFile(zfileIO, 'w')
-
-        has_models = len(self.model_ids)
-        has_data = len(self.data_file_ids)
-        has_website = len(self.website_theme_ids) \
-                      or len(self.website_asset_ids) \
-                      or len(self.website_menu_ids) \
-                      or len(self.website_page_ids)
-
-        module_data = []
-
-        if has_models:
-            module_data.append('views/views.xml')
-            module_data.append('views/actions.xml')
-            module_data.append('views/menu.xml')
-
-            write_template(templates, zfile, self.name + '/__init__.py'       , 'builder.python.__init__.py.jinja2' , {'packages': ['models']}, **functions)
-            write_template(templates, zfile, self.name + '/models/__init__.py', 'builder.python.__init__.py.jinja2' , {'packages': ['models']},**functions)
-            write_template(templates, zfile, self.name + '/views/menu.xml'    , 'builder.menu.xml.jinja2'           , {'module': self, 'menus': self.menu_ids}, **functions)
-            write_template(templates, zfile, self.name + '/views/actions.xml' , 'builder.actions.xml.jinja2'        , {'module': self}, **functions)
-            write_template(templates, zfile, self.name + '/views/views.xml'   , 'builder.view.xml.jinja2'           , {'models': self.view_ids}, **functions)
-            write_template(templates, zfile, self.name + '/models/models.py'  , 'builder.models.py.jinja2'          , {'models': self.model_ids}, **functions)
-
-        if len(self.rule_ids) or len(self.group_ids):
-            module_data.append('security/security.xml')
-            write_template(templates, zfile, self.name + '/security/security.xml'       , 'builder.security.xml.jinja2' , {
-                'module': self,
-                'rules': self.rule_ids,
-                'groups': self.group_ids,
-            }, **functions)
-
-        if len(self.model_access_ids):
-            module_data.append('security/ir.model.access.csv')
-            write_template(templates, zfile, self.name + '/security/ir.model.access.csv'       , 'builder.model.access.csv.jinja2' , {
-                'module': self,
-                'model_access': self.model_access_ids,
-            }, **functions)
-
-        if len(self.cron_job_ids):
-            module_data.append('data/cron.xml')
-            write_template(templates, zfile, self.name + '/data/cron.xml'       , 'builder.cron.xml.jinja2' , {
-                'module': self,
-                'cron_jobs': self.cron_job_ids,
-            }, **functions)
-
-        if self.icon_image:
-            info = zipfile.ZipInfo(self.name + '/static/description/icon.png')
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 2175008768
-            zfile.writestr(info, base64.decodestring(self.icon_image))
-
-        if self.description_html:
-            info = zipfile.ZipInfo(self.name + '/static/description/index.html')
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 2175008768
-            zfile.writestr(info, self.description_html)
-
-
-        #website stuff
-        for data in self.data_file_ids:
-            info = zipfile.ZipInfo(posixpath.join(self.name, data.path.strip('/')))
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.external_attr = 2175008768
-            zfile.writestr(info, base64.decodestring(data.content))
-
-        for theme in self.website_theme_ids:
-            if theme.image:
-                info = zipfile.ZipInfo(self.name + '/static/themes/' + theme.asset_id.attr_id +'.png')
-                info.compress_type = zipfile.ZIP_DEFLATED
-                info.external_attr = 2175008768
-                zfile.writestr(info, base64.decodestring(theme.image))
-
-        if self.website_asset_ids:
-            module_data.append('views/website_assets.xml')
-            write_template(templates, zfile, self.name + '/views/website_assets.xml', 'builder.website_assets.xml.jinja2',
-                                {'module': self, 'assets': self.website_asset_ids},
-                                **functions)
-        if self.website_page_ids:
-            module_data.append('views/website_pages.xml')
-            write_template(templates, zfile, self.name + '/views/website_pages.xml', 'builder.website_pages.xml.jinja2',
-                                {'module': self, 'pages': self.website_page_ids, 'menus': self.website_menu_ids},
-                                **functions)
-        if self.website_theme_ids:
-            module_data.append('views/website_themes.xml')
-            write_template(templates, zfile, self.name + '/views/website_themes.xml', 'builder.website_themes.xml.jinja2',
-                                {'module': self, 'themes': self.website_theme_ids},
-                                **functions)
-
-        if self.website_snippet_ids:
-            snippet_type = defaultdict(list)
-            for snippet in self.website_snippet_ids:
-                snippet_type[snippet.is_custom_category].append(snippet)
-
-            module_data.append('views/website_snippets.xml')
-            write_template(templates, zfile, self.name + '/views/website_snippets.xml', 'builder.website_snippets.xml.jinja2',
-                                {'module': self, 'snippet_type': snippet_type},
-                                **functions)
-
-        #end website stuff
-
-
-        #this must be last to include all resources
-        write_template(templates, zfile, self.name + '/__openerp__.py', 'builder.__openerp__.py.jinja2',
-                            {'module': self, 'data': module_data}, **functions)
-
-        zfile.close()
-        zfileIO.flush()
-        return zfileIO
 
     @api.multi
     def _export_zip(self):

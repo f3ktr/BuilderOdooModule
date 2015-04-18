@@ -12,12 +12,13 @@ from ..tools.formats.json import JsonExport
 
 class MainController(http.Controller):
 
-    @http.route('/builder/download/<model("builder.ir.module.module"):module>', type='http', auth="user")
-    def download(self, module, **kwargs):
+    @http.route('/builder/generate/<model("builder.ir.module.module"):module>/<string:generator>', type='http', auth="user")
+    def download(self, module, generator, **kwargs):
 
+        generator = module.env[generator]
         filename = "{name}.{ext}".format(name=module.name, ext="zip")
 
-        zfileIO = module.get_zipped_module()
+        zfileIO = generator.get_zipped_module(module)
 
         return request.make_response(
             zfileIO.getvalue(),
