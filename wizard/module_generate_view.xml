@@ -11,6 +11,7 @@
                         <group>
                             <field name="generator"/>
                         </group>
+                        <group></group>
                     </group>
                     <footer>
                         <button name="action_generate" string="Generate" type="object" class="oe_highlight"/>
