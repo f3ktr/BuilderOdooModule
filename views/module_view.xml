@@ -69,7 +69,7 @@
                             </ul>
                         </div>
 
-                        <field name="icon_image" widget="image" class="oe_avatar oe_left"/>
+                        <field name="icon_image" widget="image" filename="icon_image_name" class="oe_avatar oe_left"/>
                         <div class="oe_title">
                             <h1>
                                 <field name="shortdesc"/>
@@ -277,7 +277,6 @@
             <field name="model">builder.ir.module.module</field>
             <field name="arch" type="xml">
                 <kanban>
-                    <field name="icon"/>
                     <field name="icon_image"/>
                     <field name="name"/>
                     <field name="summary"/>

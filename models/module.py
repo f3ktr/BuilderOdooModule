@@ -73,9 +73,9 @@ class Module(models.Model):
     ], string='License', default='AGPL-3')
 
     application = fields.Boolean('Application')
-    icon = fields.Char('Icon URL')
-    image = fields.Binary(string='Icon')
+
     icon_image = fields.Binary(string='Icon')
+    icon_image_name = fields.Char('Icon Filename')
 
     menus_by_module = fields.Text(string='Menus')
     reports_by_module = fields.Text(string='Reports')
