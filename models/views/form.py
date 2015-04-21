@@ -4,13 +4,11 @@ from openerp import models, fields, api, _
 from .base import FIELD_WIDGETS_ALL
 from collections import defaultdict
 
-__author__ = 'one'
-
 
 class FormView(models.Model):
     _name = 'builder.views.form'
 
-    _inherit = ['ir.mixin.polymorphism.subclass', 'builder.views.abstract']
+    _inherit = ['ir.mixin.polymorphism.subclass']
 
     _inherits = {
         'builder.ir.ui.view': 'view_id'
@@ -20,14 +18,13 @@ class FormView(models.Model):
     attr_create = fields.Boolean('Allow Create', default=True)
     attr_edit = fields.Boolean('Allow Edit', default=True)
     attr_delete = fields.Boolean('Allow Delete', default=True)
-    states_clickable = fields.Boolean('States Clickable')
-    show_status_bar = fields.Boolean('Show Status Bar')
+    states_clickable = fields.Boolean('States Clickable', default=False)
+    show_status_bar = fields.Boolean('Show Status Bar', default=False)
     visible_states = fields.Char('Visible States')
 
-    # buttonbar_button_ids = fields.One2many('builder.ir.model.view.config.view.buttonbar.buttons', 'view_id', 'Buttons')
     statusbar_button_ids = fields.One2many('builder.views.form.statusbar.button', 'view_id', 'Status Bar Buttons')
+    button_ids = fields.One2many('builder.views.form.button', 'view_id', 'Buttons')
     field_ids = fields.One2many('builder.views.form.field', 'view_id', 'Items')
-
 
     @api.onchange('inherit_view_id')
     def onchange_inherit_view_id(self):
@@ -67,7 +64,7 @@ class FormView(models.Model):
     @api.onchange('model_id')
     def _onchange_model_id(self):
         self.name = self.model_id.name
-        self.xml_id = "view_{snake}_form".format(snake = snake_case(self.model_id.model))
+        self.xml_id = "view_{snake}_form".format(snake=snake_case(self.model_id.model))
         self.show_status_bar = True if self.model_id.special_states_field_id.id else False
         self.model_inherit_type = self.model_id.inherit_type #shouldn`t be doing that
         self.model_name = self.model_id.model #shouldn`t be doing that
@@ -75,65 +72,36 @@ class FormView(models.Model):
         if not len(self.field_ids):
             field_list = []
             for field in self.model_id.field_ids:
-                if field.name in ['state'] or field.is_inherited: continue
+                if field.name in ['state'] or field.is_inherited:
+                    continue
                 field_list.append({'field_id': field.id, 'widget': DEFAULT_WIDGETS_BY_TYPE.get(field.ttype), 'field_ttype': field.ttype, 'model_id': self.model_id.id, 'special_states_field_id': self.model_id.special_states_field_id.id})
 
             self.field_ids = field_list
 
-    @api.onchange('custom_arch', 'name', 'field_ids', 'attr_create', 'attr_edit', 'attr_delete', 'states_clickable', 'show_status_bar', 'visible_states',
-                  'inherit_view', 'inherit_view_id', 'inherit_view_ref', 'inherit_view_type', 'inherit_view_field_id', 'inherit_view_xpath', 'inherit_view_position' )
-    def _onchange_generate_arch(self):
-        self.arch = self._get_view_arch()
+    @api.model
+    def create_instance(self, id):
+        self.create({
+            'view_id': id,
+        })
 
     @api.multi
-    def _get_view_arch(self):
-        if self.custom_arch:
-            return self.arch
-        else:
-            pages = defaultdict(list)
-            flat = []
-            for field in self.field_ids:
-                if field.page:
-                    pages[field.page].append(field)
-                else:
-                    flat.append(field)
+    def action_save(self):
+        return {'type': 'ir.actions.act_window_close'}
 
-            def fieldattrs(field):
-                attrs = []
-                if field.invisible and field.invisible_condition:
-                    attrs.append('"invisible": {cond}'.format(cond=field.invisible_condition))
+    @property
+    def flat_fields(self):
+        return [
+            field for field in self.field_ids if not field.page
+        ]
 
-                if field.required and field.required_condition:
-                    attrs.append('"required": {cond}'.format(cond=field.required_condition))
-
-                if field.readonly and field.readonly_condition:
-                    attrs.append('"readonly": {cond}'.format(cond=field.readonly_condition))
-
-                return 'attrs={' + ', '.join(attrs) + '} ' if attrs else ''
-
-            functions = {
-                'filters': {
-                    'dot2dashed': lambda x: x.replace('.', '_'),
-                    'dot2name': lambda x: ''.join([s.capitalize() for s in x.split('.')]),
-                    'cleargroup': lambda x: x.replace('.', '_'),
-                    'fieldattrs': fieldattrs
-                },
-            }
-
-            template_obj = self.env['document.template']
-            return template_obj.render_template('builder.view_arch_form.xml.jinja2', {
-                'this': self,
-                'string': self.name,
-                'fields': self.field_ids,
-                'flat_fields': flat,
-                'pages': pages,
-                'create': self.attr_create,
-                'delete': self.attr_delete,
-                'edit': self.attr_edit,
-                'states_clickable': self.states_clickable,
-                'show_status_bar': self.show_status_bar,
-                'visible_states': self.visible_states.split(',') if self.visible_states else False,
-            }, **functions)
+    @property
+    def pages(self):
+        pages = defaultdict(list)
+        [
+            pages[field.page].append(field)
+            for field in self.field_ids
+        ]
+        return pages
 
 
 DEFAULT_WIDGETS_BY_TYPE = {
@@ -147,23 +115,28 @@ class StatusBarActionButton(models.Model):
     _order = 'sequence, name'
 
     view_id = fields.Many2one('builder.views.form', string='View', ondelete='cascade')
-    model_id = fields.Many2one('builder.ir.model', string='Model')
+    model_id = fields.Many2one('builder.ir.model', string='Model', related='view_id.view_id.model_id', store=True)
     special_states_field_id = fields.Many2one('builder.ir.model.fields', related='model_id.special_states_field_id', string='States Field')
     name = fields.Char(string='Name', required=True)
     sequence = fields.Integer(string='Sequence')
     highlighted = fields.Boolean('Highlighted')
-    type = fields.Selection([('state', 'State Change'), ('action', 'Defined Action'), ('object', 'Model Action'), ('relation', 'Relation')], 'Type')
+    type = fields.Selection(
+        [
+            ('action', 'Defined Action'),
+            ('object', 'Model Action'),
+        ],
+        'Type',
+        required=True
+    )
     states = fields.Char('States')
-    change_to_state = fields.Char('Change to State')
     method_name = fields.Char('Method Name')
-    method_code = fields.Text('Method Code')
-    action_ref = fields.Char('Action')
+    action_ref = fields.Char('Action Reference')
+    domain = fields.Char('Domain')
+    context = fields.Char('Context')
 
-    @api.onchange('type')
+    @api.onchange('type', 'name')
     def _onchange_type(self):
-        if self.type == 'state' and self.change_to_state:
-            self.method_name = "action_{state}".format(state=self.change_to_state)
-        elif self.type == 'object' and self.name:
+        if self.type == 'object' and self.name:
             self.method_name = "action_{name}".format(name=snake_case(self.name.replace(' ', '.')).lower())
 
 
@@ -175,10 +148,10 @@ class FormField(models.Model):
     page = fields.Char('Page')
 
     related_field_view_type = fields.Selection([('default', 'Default'), ('defined', 'Defined'), ('custom', 'Custom')], 'View Type', required=True, default='default')
-    related_field_arch = fields.Text('Arch')
-    related_field_form_id = fields.Char('Form View ID')
-    related_field_tree_id = fields.Char('Tree View ID')
+    related_field_form_ref = fields.Char('Form View ID')
+    related_field_tree_ref = fields.Char('Tree View ID')
     domain = fields.Char('Domain')
+    context = fields.Char('Context')
     related_field_mode = fields.Selection([('tree', 'Tree'), ('form', 'Form')], 'Mode', default='tree')
     related_field_tree_editable = fields.Selection([('False', 'No Editable'), ('top', 'Top'), ('bottom', 'Bottom')], 'Tree Editable', default='bottom')
 
@@ -203,5 +176,63 @@ class FormField(models.Model):
     def _compute_field_type(self):
         if self.field_id:
             self.field_ttype = self.field_id.ttype
+
+    @property
+    def has_attrs(self):
+        return self.readonly or self.required or self.invisible
+
+
+class FormButton(models.Model):
+    _name = 'builder.views.form.button'
+
+    name = fields.Char(string='Name', required=True)
+    sequence = fields.Integer(string='Sequence')
+    view_id = fields.Many2one('builder.views.form', string='View', ondelete='cascade')
+    model_id = fields.Many2one('builder.ir.model', string='Model', related='view_id.view_id.model_id', store=True)
+
+    type = fields.Selection(
+        [
+            ('action', 'Defined Action'),
+            ('object', 'Model Action'),
+        ],
+        'Type',
+        required=True
+    )
+
+    states = fields.Char('States')
+
+    method_name = fields.Char('Method Name')
+    action_ref = fields.Char('Action Reference')
+    domain = fields.Char('Domain')
+    context = fields.Char('Context')
+
+    icon = fields.Char('Icon')
+    field_id = fields.Many2one(
+        comodel_name='builder.ir.model.fields',
+        string='Count Field',
+        ondelete='set null',
+    )
+    widget = fields.Selection(
+        [
+            ('info', 'Info'),
+            ('percent', 'Percent Pie'),
+            ('monetary', 'Monetary'),
+            ('barchart', 'Bar Chart'),
+            ('progressbar', 'Progress Bar'),
+            ('counter', 'Counter'),
+        ],
+        'Widget'
+    )
+
+    @api.onchange('name', 'type')
+    def onchange_name(self):
+        self.method_name = 'do_{name}'.format(name=self.name.lower().replace(' ', '_'))
+
+
+
+
+
+
+
 
 

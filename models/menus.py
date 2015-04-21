@@ -97,7 +97,7 @@ class IrUiMenu(models.Model):
     #             "If this field is empty, Odoo will compute visibility based on the related object's read access.")
     parent_menu_id = fields.Many2one('ir.ui.menu', 'System Menu', ondelete='set null')
     parent_ref = fields.Char('System Menu Ref', select=True)
-    parent_id = fields.Many2one('builder.ir.ui.menu', 'Parent Menu', select=True, ondelete='set null')
+    parent_id = fields.Many2one('builder.ir.ui.menu', 'Parent Menu', select=True, ondelete='cascade')
     parent_type = fields.Selection([('module', 'Module'), ('system', 'System')], 'Parent Type')
     parent_left = fields.Integer('Parent Left', select=True)
     parent_right = fields.Integer('Parent Left', select=True)

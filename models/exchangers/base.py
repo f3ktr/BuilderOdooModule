@@ -1,5 +1,5 @@
-__author__ = 'one'
-
+import json
+from ..utils.zip import ZipFile, ModuleZipFile
 from openerp import models, api, fields, _
 
 
@@ -22,3 +22,37 @@ class ExchangerBase(models.TransientModel):
             (model.model, model.name)
             for model in ms
         ]
+
+    @api.model
+    def get_version(self):
+        builders = self.env['ir.module.module'].search([
+            ('name', '=', 'builder'),
+
+        ])
+
+        return builders.installed_version if builders else None
+
+    @api.model
+    def get_extension(self, module):
+        raise NotImplementedError
+
+    @api.model
+    def export_module(self, module):
+        raise NotImplementedError
+
+    @api.model
+    def get_export_module_filename(self, module):
+        raise NotImplementedError
+
+    @api.model
+    def get_metadata(self):
+        return json.dumps({
+            'version': self.get_version()
+        })
+
+    @api.model
+    def get_exported_modules(self, modules):
+        zip_file = ZipFile()
+        zip_file.write('metadata', self.get_metadata())
+        [zip_file.write(self.get_export_module_filename(module), self.export_module(module)) for module in modules]
+        return zip_file.get_zip()

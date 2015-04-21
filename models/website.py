@@ -192,6 +192,7 @@ class WebsiteSnippet(models.Model):
             'target': 'self',
         }
 
+
 class Module(models.Model):
     _inherit = 'builder.ir.module.module'
 

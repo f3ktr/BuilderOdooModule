@@ -3,7 +3,7 @@
     <data>
 
         <act_window id="act_builder_ir_model_export_wizard"
-            name="Export Module"
+            name="Export Modules"
             src_model="builder.ir.module.module"
             res_model="builder.ir.model.export.wizard"
             view_type="form" view_mode="form"
@@ -14,7 +14,7 @@
             <field name="name">builder.ir.model.export.wizard.form</field>
             <field name="model">builder.ir.model.export.wizard</field>
             <field name="arch" type="xml">
-                <form string="Model Export">
+                <form string="Modules Export">
                     <group>
                         <group>
                             <field name="export_type" />

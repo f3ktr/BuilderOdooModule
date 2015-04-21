@@ -1,3 +1,4 @@
+from collections import defaultdict
 from openerp import models, fields, api
 from openerp.models import check_object_name
 from openerp.osv import fields as fields_old
@@ -17,7 +18,9 @@ class IrModel(models.Model):
     name = fields.Char('Description', required=True)
     model = fields.Char('Model', required=True, select=1)
     info = fields.Text('Information')
-    rec_name_field_id = fields.Many2one('builder.ir.model.fields', 'Record Name', domain=[('ttype', 'in', ['char', 'text', 'date', 'datetime', 'selection'])])
+    rec_name_field_id = fields.Many2one('builder.ir.model.fields', 'Record Name', compute='_compute_rec_name_field_id',
+                                        inverse='_inverse_rec_name_field_id',
+                                        domain=[('ttype', 'in', ['char', 'text', 'date', 'datetime', 'selection'])])
     osv_memory = fields.Boolean('Transient',
                                 help="This field specifies whether the model is transient or not (i.e. if records are automatically deleted from the database or not)")
     field_ids = fields.One2many('builder.ir.model.fields', 'model_id', 'Fields', required=True, copy=True)
@@ -28,40 +31,130 @@ class IrModel(models.Model):
     inherits_model_ids = fields.One2many('builder.ir.model.inherits', 'model_id', 'Inherits')
 
     is_inherited = fields.Boolean('Inherited', compute='_compute_inherited', store=True)
-    inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', compute='_compute_inherited', store=True)
+    inherit_type = fields.Selection(
+        [('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')],
+        'Inherit Type', compute='_compute_inherited', store=True)
 
     access_ids = fields.One2many('builder.ir.model.access', 'model_id', 'Access', copy=True)
 
     view_ids = fields.One2many('builder.ir.ui.view', 'model_id', 'Views')
     method_ids = fields.One2many('builder.ir.model.method', 'model_id', 'Models')
 
-    to_ids = fields.One2many('builder.ir.model.fields', 'relation_model_id', 'Forward Models', domain=[('ttype', 'in', ['many2one','one2many','many2many']), ('relation_model_id', '!=', False)])
-    from_ids = fields.One2many('builder.ir.model.fields', 'model_id', 'Backward Models', domain=[('ttype', 'in', ['many2one','one2many','many2many']), ('relation_model_id', '!=', False)])
+    to_ids = fields.One2many('builder.ir.model.fields', 'relation_model_id', 'Forward Models',
+                             domain=[('ttype', 'in', ['many2one', 'one2many', 'many2many']),
+                                     ('relation_model_id', '!=', False)])
+    from_ids = fields.One2many('builder.ir.model.fields', 'model_id', 'Backward Models',
+                               domain=[('ttype', 'in', ['many2one', 'one2many', 'many2many']),
+                                       ('relation_model_id', '!=', False)])
 
-    #extra fields
+    # extra fields
 
-    special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field', compute='_compute_special_fields', store=True)
-    special_active_field_id = fields.Many2one('builder.ir.model.fields', 'Active Field', compute='_compute_special_fields', store=True)
-    special_sequence_field_id = fields.Many2one('builder.ir.model.fields', 'Sequence Field', compute='_compute_special_fields', store=True)
-    special_parent_id_field_id = fields.Many2one('builder.ir.model.fields', 'Parent Field', compute='_compute_special_fields', store=True)
+    special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
+                                              compute='_compute_special_fields', store=True)
+    special_active_field_id = fields.Many2one('builder.ir.model.fields', 'Active Field',
+                                              compute='_compute_special_fields', store=True)
+    special_sequence_field_id = fields.Many2one('builder.ir.model.fields', 'Sequence Field',
+                                                compute='_compute_special_fields', store=True)
+    special_parent_id_field_id = fields.Many2one('builder.ir.model.fields', 'Parent Field',
+                                                 compute='_compute_special_fields', store=True)
 
-    groups_date_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Date Fields', compute='_compute_field_groups')
-    groups_numeric_field_ids = fields.One2many('builder.ir.model.fields','model_id', string='Numeric Fields', compute='_compute_field_groups')
-    groups_boolean_field_ids = fields.One2many('builder.ir.model.fields','model_id', string='Boolean Fields', compute='_compute_field_groups')
-    groups_relation_field_ids = fields.One2many('builder.ir.model.fields','model_id', string='Relation Fields', compute='_compute_field_groups')
-    groups_o2m_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='O2m Fields', compute='_compute_field_groups')
-    groups_m2m_field_ids = fields.One2many('builder.ir.model.fields','model_id', string='M2m Fields', compute='_compute_field_groups')
-    groups_m2o_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='M2o Fields', compute='_compute_field_groups')
-    groups_binary_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='M2o Fields', compute='_compute_field_groups')
-    groups_inherited_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Inherited Fields', compute='_compute_field_groups')
+    groups_date_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Date Fields',
+                                            compute='_compute_field_groups')
+    groups_numeric_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Numeric Fields',
+                                               compute='_compute_field_groups')
+    groups_boolean_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Boolean Fields',
+                                               compute='_compute_field_groups')
+    groups_relation_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Relation Fields',
+                                                compute='_compute_field_groups')
+    groups_o2m_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='O2M Fields',
+                                           compute='_compute_field_groups')
+    groups_m2m_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='M2M Fields',
+                                           compute='_compute_field_groups')
+    groups_m2o_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='M2O Fields',
+                                           compute='_compute_field_groups')
+    groups_binary_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='M2O Fields',
+                                              compute='_compute_field_groups')
+    groups_inherited_field_ids = fields.One2many('builder.ir.model.fields', 'model_id', string='Inherited Fields',
+                                                 compute='_compute_field_groups')
 
-    order_field_id = fields.Many2one('builder.ir.model.fields', 'Order Field')
-    order_direction = fields.Selection([('asc', 'asc'), ('desc', 'desc')], 'Order Field', default='asc')
+    order_field_ids = fields.One2many(
+        comodel_name='builder.ir.model.fields',
+        inverse_name='model_id',
+        string='Order',
+        domain=[('use_to_order', '=', True)]
+    )
+
+    status_bar_button_ids = fields.One2many(
+        comodel_name='builder.views.form.statusbar.button',
+        inverse_name='model_id',
+        domain=[('type', '=', 'object')],
+        string='Status Bar Buttons',
+    )
+
+    button_ids = fields.One2many(
+        comodel_name='builder.views.form.button',
+        inverse_name='model_id',
+        domain=[('type', '=', 'object')],
+        string='View Buttons',
+    )
+
+    @property
+    def order_string(self):
+        return ','.join(['{field} {order}'.format(field=f.name, order=f.order) for f in self.order_field_ids])
+
+    @property
+    def compute_field_methods(self):
+        result = defaultdict(list)
+        for field in self.field_ids:
+            if field.allow_compute:
+                result[field.compute_method_name].append(field.name)
+        return result
+
+    @property
+    def inverse_field_methods(self):
+        result = defaultdict(list)
+        for field in self.field_ids:
+            if field.allow_inverse:
+                result[field.inverse_method_name].append(field.name)
+        return result
+
+    @property
+    def search_field_methods(self):
+        result = defaultdict(list)
+        for field in self.field_ids:
+            if field.allow_search:
+                result[field.search_method_name].append(field.name)
+        return result
+
+    @property
+    def default_field_methods(self):
+        result = defaultdict(list)
+        for field in self.field_ids:
+            if field.allow_default:
+                result[field.default_method_name].append(field.name)
+        return result
+
+    rewrite_create_method = fields.Boolean('Rewrite Create Method')
+    rewrite_write_method = fields.Boolean('Rewrite Write Method')
+    rewrite_unlink_method = fields.Boolean('Rewrite Unlink Method')
 
     # @api.constrains('model')
     # def check_model_name(self):
-    #     if not check_object_name(self.name):
-    #         raise Warning(_('The model name is not valid.'))
+    # if not check_object_name(self.name):
+    # raise Warning(_('The model name is not valid.'))
+
+    @api.one
+    def _compute_rec_name_field_id(self):
+        self.rec_name_field_id = self.env['builder.ir.model.fields'].search([
+            ('model_id', '=', self.id),
+            ('is_rec_name', '=', True)
+        ])
+
+    @api.one
+    def _inverse_rec_name_field_id(self):
+        self.rec_name_field_id.write({
+            'is_rec_name': True
+        })
 
     @api.one
     @api.depends('inherit_model_ids', 'inherits_model_ids')
@@ -70,7 +163,7 @@ class IrModel(models.Model):
 
         self.inherit_type = False
         if len(self.inherit_model_ids):
-            if (len(self.inherit_model_ids) == 1) and ( self.inherit_model_ids[0].model_display == self.model ):
+            if (len(self.inherit_model_ids) == 1) and (self.inherit_model_ids[0].model_display == self.model):
                 self.inherit_type = 'class'
             else:
                 self.inherit_type = 'prototype'
@@ -89,7 +182,7 @@ class IrModel(models.Model):
     # @api.one
     # @api.depends('inherit_model_ids')
     # def _compute_inherit_model(self):
-    #     self.inherit_model = ','.join([m.model for m in self.inherit_model_ids])
+    # self.inherit_model = ','.join([m.model for m in self.inherit_model_ids])
 
     @api.multi
     def find_field_by_name(self, name):
@@ -120,7 +213,8 @@ class IrModel(models.Model):
         self.groups_m2m_field_ids = self.find_field_by_type(['many2many'])
         self.groups_m2o_field_ids = self.find_field_by_type(['many2one'])
         self.groups_binary_field_ids = self.find_field_by_type(['binary'])
-        self.groups_inherited_field_ids = self.env['builder.ir.model.fields'].search([('model_id', '=', self.id), ('is_inherited', '=', True)])
+        self.groups_inherited_field_ids = self.env['builder.ir.model.fields'].search(
+            [('model_id', '=', self.id), ('is_inherited', '=', True)])
 
     @api.multi
     def action_fields(self):
@@ -157,52 +251,36 @@ class IrModel(models.Model):
             },
         }
 
+    @api.model
+    def _default_sdf(self):
+        return self.env.context.get('sdf')
 
 class ModelMethod(models.Model):
     _name = 'builder.ir.model.method'
 
     model_id = fields.Many2one('builder.ir.model', 'Model', ondelete='cascade')
-    module_id = fields.Many2one('builder.ir.module.module', string='Module', related='model_id.module_id', ondelete='cascade')
-
-    reference = fields.Reference([
-                                     ('builder.ir.model.fields', 'Field'),
-    ], string='Reference')
+    module_id = fields.Many2one('builder.ir.module.module', string='Module', related='model_id.module_id',
+                                ondelete='cascade')
 
     name = fields.Char(string='Name', required=True)
     arguments = fields.Char(string='Arguments', default='')
 
-    prototype = fields.Char('Prototype', compute='_compute_prototype')
+    use_cache = fields.Boolean('Use Cache', default=False)
+    field_ids = fields.Many2many('builder.ir.model.fields',
+                                 'builder_ir_model_method_fields_rel', 'model_method_id',
+                                 'field_id', string='Fields')
 
-    sugar_is_onchange = fields.Boolean('On Change')
-    sugar_on_change_triggers = fields.Many2many('builder.ir.model.fields', 'builder_ir_model_method_on_change_trigger_rel', 'model_method_id', 'field_id', string="Onchange Fields")
+    type = fields.Selection(
+        [
+            ('simple_model', 'Model Method'),
+            ('simple_instance', 'Instance Method'),
+            ('onchange', 'On Change'),
+            ('constraint', 'Constraint'),
+        ], 'Method Type', required=True)
 
-    sugar_is_depends = fields.Boolean('Depends')
-    sugar_depends_triggers = fields.Many2many('builder.ir.model.fields', 'builder_ir_model_method_depends_trigger_rel', 'model_method_id', 'field_id', string="Depends Fields")
-
-    sugar_is_model = fields.Boolean('Model')
-
-    sugar_api_type = fields.Selection([('one', '@api.one'), ('multi', '@api.multi'), ('model', '@api.model')], 'Api Type', default='one')
-
-    sugar_is_constraint = fields.Boolean('Constraint')
-    sugar_constraint_triggers = fields.Many2many('builder.ir.model.fields', 'builder_ir_model_method_constraint_trigger_rel', 'model_method_id', 'field_id', string="Constraint Fields")
-
-    code = fields.Text('Code', required=True)
-    code_template = fields.Selection([
-                                         ('onchange', 'On Change Attributes'),
-                                         ('constraint', 'Constraint Method'),
-                                         ('create', 'Create Method Rewrite'),
-                                         ('write', 'Write Method Rewrite'),
-                                         ('unlink', 'Unlink Method Rewrite'),
-    ], 'Method Template', store=False, search=True)
-
-    @api.one
-    @api.depends('name', 'arguments')
-    def _compute_prototype(self):
-        self.prototype = "{name}({arguments})".format(name=self.name, arguments=self.arguments)
-
-    @api.onchange('code_template')
-    def _onchange_code_template(self):
-        self.code = self.code_template
+    @property
+    def field_names(self):
+        return [field.name for field in self.field_ids]
 
 
 class InheritModelTemplate(models.AbstractModel):
@@ -211,7 +289,8 @@ class InheritModelTemplate(models.AbstractModel):
 
     sequence = fields.Integer('Sequence')
     model_id = fields.Many2one('builder.ir.model', string='Model', ondelete='cascade')
-    module_id = fields.Many2one('builder.ir.module.module', string='Module', related='model_id.module_id', ondelete='cascade')
+    module_id = fields.Many2one('builder.ir.module.module', string='Module', related='model_id.module_id',
+                                ondelete='cascade')
     model_source = fields.Selection([('module', 'Module'), ('system', 'System')], 'Source', required=True)
     module_model_id = fields.Many2one('builder.ir.model', 'Model', ondelete='cascade')
     system_model_id = fields.Many2one('ir.model', 'Model', ondelete='set null')

@@ -16,6 +16,7 @@
                     </group>
                     <group>
                         <group>
+                            <field name="is_rec_name"/>
                             <field name="ttype" invisible="1"/>
                             <field name="relation_ttype" required="1" readonly="0"/>
                         </group>
@@ -29,14 +30,13 @@
                                     <field name="readonly"/>
                                     <field name="index"/>
                                     <field name="copy"/>
-                                    <field name="default"/>
-                                    <field name="groups"/>
                                     <field name="select_level"
                                            attrs="{'readonly': [('ttype','in',['binary', 'serialized'])], 'invisible': [('ttype','in',['binary', 'serialized'])]}"/>
                                     <field name="translate"
                                            attrs="{'readonly': [('ttype','not in',['char','html', 'text'])], 'invisible': [('ttype','not in',['char','html', 'text'])]}"/>
                                 </group>
                                 <group>
+                                    <field name="related"/>
                                     <field name="size"
                                            attrs="{'readonly': [('ttype','not in',['char','reference'])], 'invisible': [('ttype','not in',['char','reference'])]}"/>
 
@@ -114,25 +114,29 @@
                             </field>
                         </page>
                         <page string="Methods">
+                            <group>
                                 <group>
-                                    <group>
-                                        <field name="compute"/>
-                                        <field name="compute_method_name"
-                                               attrs="{'required': [('compute', '=', True)], 'readonly': [('compute','=',False)], 'invisible': [('compute','=',False)]}"/>
-                                        <field name="compute_method" widget="ace" style="min-height:150px" mode="python"
-                                               theme="tomorrow"
-                                               attrs="{'required': [('compute', '=', True)], 'readonly': [('compute','=',False)], 'invisible': [('compute','=',False)]}"/>
-                                    </group>
-                                    <group>
-                                        <field name="inverse"/>
-                                        <field name="inverse_method_name"
-                                               attrs="{'required': [('inverse', '=', True)], 'readonly': [('inverse','=',False)], 'invisible': [('inverse','=',False)]}"/>
-                                        <field name="inverse_method" widget="ace"
-                                               style="min-height:150px" mode="python" theme="tomorrow"
-                                               attrs="{'required': [('inverse', '=', True)], 'readonly': [('inverse','=',False)], 'invisible': [('inverse','=',False)]}"/>
-                                    </group>
+                                    <field name="allow_compute"/>
+                                    <field name="compute_method_name"
+                                           attrs="{'required': [('allow_compute', '=', True)], 'readonly': [('allow_compute','=',False)], 'invisible': [('allow_compute','=',False)]}"/>
                                 </group>
-                            </page>
+                                <group>
+                                    <field name="allow_inverse"/>
+                                    <field name="inverse_method_name"
+                                           attrs="{'required': [('allow_inverse', '=', True)], 'readonly': [('allow_inverse','=',False)], 'invisible': [('allow_inverse','=',False)]}"/>
+                                </group>
+                                <group>
+                                    <field name="allow_search"/>
+                                    <field name="search_method_name"
+                                           attrs="{'required': [('allow_search', '=', True)], 'readonly': [('allow_search','=',False)], 'invisible': [('allow_search','=',False)]}"/>
+                                </group>
+                                <group>
+                                    <field name="allow_default"/>
+                                    <field name="default_method_name"
+                                           attrs="{'required': [('allow_default', '=', True)], 'readonly': [('allow_default','=',False)], 'invisible': [('allow_default','=',False)]}"/>
+                                </group>
+                            </group>
+                        </page>
                         <page string="Groups">
                             <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
                         </page>
@@ -162,11 +166,11 @@
             <field name="model">builder.ir.model.fields</field>
             <field name="arch" type="xml">
                 <form string="Field">
-                  <sheet>
-                    <!--<div class="oe_right oe_button_box" name="buttons">
-                        <button class="oe_inline oe_stat_button" string="Options" name="action_selection_options" type="object"  icon="fa-list-ol" context="{'default_field_id': id, 'default_model_id': model_id}" attrs="{'invisible': [('ttype', 'not in', ['selection'])]}"/>
-                    </div>-->
-                      <group>
+                    <sheet>
+                        <!--<div class="oe_right oe_button_box" name="buttons">
+                            <button class="oe_inline oe_stat_button" string="Options" name="action_selection_options" type="object"  icon="fa-list-ol" context="{'default_field_id': id, 'default_model_id': model_id}" attrs="{'invisible': [('ttype', 'not in', ['selection'])]}"/>
+                        </div>-->
+                        <group>
                             <group>
                                 <field name="id" invisible="1"/>
                                 <field name="model_id" invisible="1"/>
@@ -177,6 +181,9 @@
                                 <field name="field_description"/>
                             </group>
                             <group>
+                                <field name="is_rec_name"/>
+                                <field name="use_to_order"/>
+                                <field name="order" attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
                             </group>
                         </group>
                         <group>
@@ -193,8 +200,6 @@
                                         <field name="readonly"/>
                                         <field name="index"/>
                                         <field name="copy"/>
-                                        <field name="default"/>
-                                        <field name="groups"/>
                                         <field name="select_level"
                                                attrs="{'readonly': [('ttype','in',['binary', 'serialized'])], 'invisible': [('ttype','in',['binary', 'serialized'])]}"/>
                                         <field name="translate"
@@ -281,20 +286,24 @@
                             <page string="Methods">
                                 <group>
                                     <group>
-                                        <field name="compute"/>
+                                        <field name="allow_compute"/>
                                         <field name="compute_method_name"
-                                               attrs="{'required': [('compute', '=', True)], 'readonly': [('compute','=',False)], 'invisible': [('compute','=',False)]}"/>
-                                        <field name="compute_method" widget="ace" style="min-height:150px" mode="python"
-                                               theme="tomorrow"
-                                               attrs="{'required': [('compute', '=', True)], 'readonly': [('compute','=',False)], 'invisible': [('compute','=',False)]}"/>
+                                               attrs="{'required': [('allow_compute', '=', True)], 'readonly': [('allow_compute','=',False)], 'invisible': [('allow_compute','=',False)]}"/>
                                     </group>
                                     <group>
-                                        <field name="inverse"/>
+                                        <field name="allow_inverse"/>
                                         <field name="inverse_method_name"
-                                               attrs="{'required': [('inverse', '=', True)], 'readonly': [('inverse','=',False)], 'invisible': [('inverse','=',False)]}"/>
-                                        <field name="inverse_method" widget="ace"
-                                               style="min-height:150px" mode="python" theme="tomorrow"
-                                               attrs="{'required': [('inverse', '=', True)], 'readonly': [('inverse','=',False)], 'invisible': [('inverse','=',False)]}"/>
+                                               attrs="{'required': [('allow_inverse', '=', True)], 'readonly': [('allow_inverse','=',False)], 'invisible': [('allow_inverse','=',False)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="allow_search"/>
+                                        <field name="search_method_name"
+                                               attrs="{'required': [('allow_search', '=', True)], 'readonly': [('allow_search','=',False)], 'invisible': [('allow_search','=',False)]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="allow_default"/>
+                                        <field name="default_method_name"
+                                               attrs="{'required': [('allow_default', '=', True)], 'readonly': [('allow_default','=',False)], 'invisible': [('allow_default','=',False)]}"/>
                                     </group>
                                 </group>
                             </page>
@@ -302,8 +311,8 @@
                                 <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
                             </page>
                         </notebook>
-                        </sheet>
-                    </form>
+                    </sheet>
+                </form>
             </field>
         </record>
 

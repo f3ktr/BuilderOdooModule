@@ -1,7 +1,5 @@
-from collections import defaultdict
 from openerp.addons.builder.models.fields import snake_case
-from openerp import models, fields, api, _
-from .base import FIELD_WIDGETS_ALL
+from openerp import models, fields, api
 
 __author__ = 'one'
 
@@ -9,7 +7,7 @@ __author__ = 'one'
 class SearchView(models.Model):
     _name = 'builder.views.search'
 
-    _inherit = ['ir.mixin.polymorphism.subclass', 'builder.views.abstract']
+    _inherit = ['ir.mixin.polymorphism.subclass']
 
     _inherits = {
         'builder.ir.ui.view': 'view_id'
@@ -20,49 +18,32 @@ class SearchView(models.Model):
 
     _defaults = {
         'type': 'search',
-        'custom_arch': False,
         'subclass_model': lambda s, c, u, cxt=None: s._name,
         'inherit_view_xpath': '//search'
     }
 
+    @api.model
+    def create_instance(self, id):
+        self.create({
+            'view_id': id,
+        })
+
+    @api.multi
+    def action_save(self):
+        return {'type': 'ir.actions.act_window_close'}
+
     @api.onchange('model_id')
     def _onchange_model_id(self):
-        self.name = self.model_id.name
-        self.xml_id = "view_{snake}_search".format(snake = snake_case(self.model_id.model))
-        self.model_inherit_type = self.model_id.inherit_type #shouldn`t be doing that
-        self.model_name = self.model_id.model #shouldn`t be doing that
+        model_id = self.model_id
+        self.name = model_id.name
+        self.xml_id = "view_{snake}_search".format(snake=snake_case(model_id.model))
+        self.model_inherit_type = model_id.inherit_type  # shouldn`t be doing that
+        self.model_name = model_id.model  # shouldn`t be doing that
 
     @api.multi
     def find_field_by_name(self, name):
         field_obj = self.env['builder.ir.model.fields']
         return field_obj.search([('model_id', '=', self.id), ('name', '=', name)])
-
-    @api.onchange('custom_arch', 'name', 'field_ids' )
-    def _onchange_generate_arch(self):
-        self.arch = self._get_view_arch()
-
-    @api.multi
-    def _get_view_arch(self):
-        if self.custom_arch:
-            return self.arch
-        else:
-            groups = defaultdict(list)
-            flat = []
-            for field in self.field_ids:
-                if field.group:
-                    groups[field.group].append(field)
-                else:
-                    flat.append(field)
-
-            template_obj = self.env['document.template']
-            return template_obj.render_template('builder.view_arch_search.xml.jinja2', {
-                'this': self,
-                'string': self.name,
-                'fields': self.field_ids,
-                'ungrouped_fields': flat,
-                'groups': groups,
-            })
-
 
 
 class SearchField(models.Model):
@@ -72,7 +53,8 @@ class SearchField(models.Model):
     _order = 'view_id, sequence, id'
 
     view_id = fields.Many2one('builder.views.search', string='View', ondelete='cascade')
-    type = fields.Selection([('field', 'Field'), ('filter', 'Filter'), ('separator', 'Separator')], string='Type', required=False, default='field')
+    type = fields.Selection([('field', 'Field'), ('filter', 'Filter'), ('separator', 'Separator')], string='Type',
+                            required=False, default='field')
     field_id = fields.Many2one('builder.ir.model.fields', string='Field', required=False, ondelete='cascade')
     group_field_id = fields.Many2one('builder.ir.model.fields', string='Group By', ondelete='set null')
     group = fields.Char('Group')

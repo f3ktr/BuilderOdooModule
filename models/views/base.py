@@ -1,8 +1,6 @@
 from openerp.exceptions import ValidationError
 from openerp import models, api, fields, _
 
-__author__ = 'one'
-
 FIELD_WIDGETS_ALL = [
     ('barchart', "FieldBarChart"),
     ('binary', "FieldBinaryFile"),
@@ -174,8 +172,6 @@ class View(models.Model):
         ], 'Type', required=True, default='form')
 
     name = fields.Char('View Name', required=True)
-    arch = fields.Text('Arch')
-    custom_arch = fields.Boolean('Customize', default=True)
     xml_id = fields.Char('View ID', required=True)
     priority = fields.Integer('Sequence')
 
@@ -186,41 +182,44 @@ class View(models.Model):
     inherit_view = fields.Boolean('Inherit')
     inherit_view_id = fields.Many2one('ir.ui.view', 'Inherit View')
     inherit_view_ref = fields.Char('Inherit View Ref')
-    inherit_view_type = fields.Selection([('field', 'Field'), ('xpath', 'XPath')], 'Inherit View Type', default='field')
-    inherit_view_field_id = fields.Many2one('builder.ir.model.fields', 'Inherit View Field')
-    inherit_view_xpath = fields.Char('Inherit View XPath')
-    inherit_view_position = fields.Selection([('after', 'After'), ('before', 'Before'), ('inside', 'Inside'), ('replace', 'Replace')], 'Inherit View Position', default='after')
+    inherit_change_ids = fields.One2many(
+        comodel_name='builder.ir.ui.view.inherit.change',
+        inverse_name='view_id',
+        string='Changes',
+    )
 
+    @api.onchange('type')
+    def _onchange_type(self):
+        self.subclass_model = 'builder.views.' + self.type
 
     @api.multi
     def action_open_view(self):
-        model = self.pool.get(self._name)
+        model = self._model
         action = model.get_formview_action(self.env.cr, self.env.uid, self.ids, self.env.context)
         action.update({'target': 'new'})
         return action
 
-    # @api.multi
-    # def write(self, vals):
-    # vals['custom_arch'] = True
-    # return super(View, self).write(vals)
-    #
-    #
-    # @api.model
-    # @api.returns('self', lambda value: value.id)
-    # def create(self, vals):
-    #     vals['custom_arch'] = True
-    #     return super(View, self).create(vals)
-
-    # @api.multi
-    # def _get_view_arch(self):
-    #     if self._name == self.subclass_model:
-    #         return self.arch
-    #     else:
-    #         return self.env[self.subclass_model].search(self.subclass_id)._get_view_arch()
-
     @api.multi
     def action_save(self):
         return {'type': 'ir.actions.act_window_close'}
+
+
+class InheritViewChange(models.Model):
+    _name = 'builder.ir.ui.view.inherit.change'
+
+    view_id = fields.Many2one(
+        comodel_name='builder.ir.ui.view',
+        string='View',
+        ondelete='cascade',
+    )
+    inherit_view_type = fields.Selection([('field', 'Field'), ('xpath', 'XPath')], 'Selection Type', default='field',
+                                         required=True)
+    inherit_view_target = fields.Char('Inherit Target', required=True)
+    inherit_view_position = fields.Selection([('after', 'After'), ('before', 'Before'), ('inside', 'Inside'), ('replace', 'Replace'), ('attribute', 'Attribute')], 'Inherit Position', default='after',
+                                             required=True)
+    inherit_view_attribute = fields.Char('Change Attribute')
+    inherit_view_attribute_value = fields.Char('Change Attribute Value')
+    inherit_view_field = fields.Char('Field')
 
 
 class AbstractViewField(models.AbstractModel):
@@ -240,40 +239,6 @@ class AbstractViewField(models.AbstractModel):
     string = fields.Char('String')
 
     @api.one
-    @api.depends('field_id.ttype', 'view_id')
     def _compute_field_type(self):
         if self.field_id:
             self.field_ttype = self.field_id.ttype
-
-
-class CustomViewAbstract(models.AbstractModel):
-    _name = 'builder.views.abstract'
-
-    @api.multi
-    def action_save(self):
-        return {'type': 'ir.actions.act_window_close'}
-
-    @api.multi
-    def write(self, vals):
-        ret = super(CustomViewAbstract, self).write(vals)
-        super(CustomViewAbstract, self).write({
-            'arch': self._get_view_arch()
-        })
-        return ret
-
-
-    @api.model
-    @api.returns('self', lambda value: value.id)
-    def create(self, vals):
-        ret = super(CustomViewAbstract, self).create(vals)
-        ret.write({
-            'arch': self._get_view_arch()
-        })
-        return ret
-
-    @api.multi
-    def _get_view_arch(self):
-        if self.custom_arch:
-            return self.arch
-        else:
-            return False

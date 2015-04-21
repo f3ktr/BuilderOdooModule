@@ -1,5 +1,5 @@
 from openerp.addons.builder.models.fields import snake_case
-from openerp import models, fields, api, _
+from openerp import models, fields, api
 from .base import FIELD_WIDGETS_ALL
 
 __author__ = 'one'
@@ -8,7 +8,7 @@ __author__ = 'one'
 class TreeView(models.Model):
     _name = 'builder.views.tree'
 
-    _inherit = ['ir.mixin.polymorphism.subclass', 'builder.views.abstract']
+    _inherit = ['ir.mixin.polymorphism.subclass']
 
     _inherits = {
         'builder.ir.ui.view': 'view_id'
@@ -22,52 +22,42 @@ class TreeView(models.Model):
     field_ids = fields.One2many('builder.views.tree.field', 'view_id', 'Fields')
     attr_toolbar = fields.Boolean('Show Toolbar', default=False)
     attr_fonts = fields.Char('Fonts', help='Font definition. Ex: bold:message_unread==True')
-    attr_colors = fields.Char('Colors', help='Color definition. Ex: "gray:probability == 100;red:date_deadline and (date_deadline &lt; current_date)"')
+    attr_colors = fields.Char('Colors',
+                              help='Color definition. Ex: "gray:probability == 100;'
+                                   'red:date_deadline and (date_deadline &lt; current_date)"')
 
     _defaults = {
         'type': 'tree',
-        'custom_arch': False,
         'subclass_model': lambda s, c, u, cxt=None: s._name,
         'inherit_view_xpath': '//tree'
     }
 
+    @api.model
+    def create_instance(self, id):
+        self.create({
+            'view_id': id,
+        })
+
+    @api.multi
+    def action_save(self):
+        return {'type': 'ir.actions.act_window_close'}
+
     @api.onchange('model_id')
     def _onchange_model_id(self):
-        self.name = self.model_id.name
-        self.xml_id = "view_{snake}_tree".format(snake = snake_case(self.model_id.model))
-        self.model_inherit_type = self.model_id.inherit_type #shouldn`t be doing that
-        self.model_name = self.model_id.model #shouldn`t be doing that
+        model_id = self.model_id
+        self.name = model_id.name
+        self.xml_id = "view_{snake}_tree".format(snake=snake_case(model_id.model))
+        self.model_inherit_type = model_id.inherit_type  # shouldn`t be doing that
+        self.model_name = model_id.model  # shouldn`t be doing that
 
         if not len(self.field_ids):
             field_list = []
-            for field in self.model_id.field_ids:
+            for field in model_id.field_ids:
                 if field.ttype not in ['binary', 'one2many', 'many2many']:
-                    field_list.append({'field_id': field.id, 'field_ttype': field.ttype, 'model_id': self.model_id.id, 'special_states_field_id': self.model_id.special_states_field_id.id})
+                    field_list.append({'field_id': field.id, 'field_ttype': field.ttype, 'model_id': model_id.id,
+                                       'special_states_field_id': model_id.special_states_field_id.id})
 
             self.field_ids = field_list
-
-    @api.onchange('custom_arch', 'field_ids', 'name', 'attr_create', 'attr_edit', 'attr_delete', 'attr_fonts', 'attr_colors', 'attr_toolbar')
-    def _onchange_generate_arch(self):
-        if not self.custom_arch:
-            self.arch = self._get_view_arch()
-
-    @api.multi
-    def _get_view_arch(self):
-        if self.custom_arch:
-            return self.arch
-        else:
-            template_obj = self.env['document.template']
-            return template_obj.render_template('builder.view_arch_tree.xml.jinja2', {
-                'this': self,
-                'string': self.name,
-                'create': self.attr_create,
-                'fields': self.field_ids,
-                'edit': self.attr_edit,
-                'delete': self.attr_delete,
-                'toolbar': self.attr_toolbar,
-                'fonts': self.attr_fonts,
-                'colors': self.attr_colors,
-            })
 
 
 class TreeField(models.Model):

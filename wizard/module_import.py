@@ -1,12 +1,10 @@
-import StringIO
-from base64 import decodestring
-import json
-from openerp.addons.builder.tools.formats.json import JsonImport
-from openerp.addons.builder.models.module import get_module_importers
+import base64
+import io
 
 __author__ = 'one'
 
-from openerp import models, api, fields, _
+import zipfile
+from openerp import models, api, fields
 
 
 class ModuleImport(models.TransientModel):
@@ -16,17 +14,20 @@ class ModuleImport(models.TransientModel):
     def _get_import_types(self):
         return self.env['builder.exchanger.base'].get_exchangers()
 
-    import_type = fields.Selection(_get_import_types, 'Format', required=True)
     file = fields.Binary('File', required=True)
+    file_version = fields.Char('Version', compute='_compute_version')
+    version = fields.Char('Version', compute='_compute_version')
+    import_type = fields.Selection(_get_import_types, 'Format', required=True)
+    ignore_version = fields.Boolean('Ignore Version')
 
-    @api.one
+    @api.multi
     def action_import(self):
         """
         :type self: ModuleImport
         """
-        obj = self.env['builder.ir.module.module']
-
-        getattr(obj, '_import_{type}'.format(type=self.import_type))(self)
+        file_like_object = io.BytesIO(base64.decodestring(self.file))
+        zf = zipfile.ZipFile(file_like_object)
+        self.env[self.import_type].import_modules(zf)
 
         return {'type': 'ir.actions.act_window_close'}
 

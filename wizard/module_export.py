@@ -12,10 +12,9 @@ class ModelImport(models.TransientModel):
 
     @api.multi
     def action_export(self):
-        module = self.env[self.env.context.get('active_model')].search([('id', '=', self.env.context.get('active_id'))])
-
+        ids = self.env.context.get('active_ids') or [self.env.context.get('active_ids')]
         return {
             'type': 'ir.actions.act_url',
-            'url': '/builder/export/{format}/{id}'.format(id=module.id, format=self.export_type),
+            'url': '/builder/export/{format}/{ids}'.format(ids=','.join([str(i) for i in ids if i]), format=self.export_type),
             'target': 'self'
         }

@@ -1,4 +1,5 @@
 from openerp import models, fields, api, pooler
+from openerp.api import Environment
 
 __author__ = 'deimos'
 
@@ -39,13 +40,36 @@ class Superclass(models.AbstractModel):
         """
         @return <ir.actions.act_window>
         """
-        record = self.browse(cr, uid, id, context=context)
+
+        record = self.browse(cr, uid, id, context=context)[0]
+        if not record.subclass_model:
+            return super(Superclass, self).get_formview_action(cr, uid, id, context=context)
+
+        create_instance = False
+        # try:
+        if not record.subclass_id:
+            create_instance = True
+        # except:
+        #     create_instance = True
+
+        if create_instance:
+            env = Environment(cr, uid, context)
+            env[record.subclass_model].create_instance(id[0] if isinstance(id, list) else id)
+
         if self._name == record.subclass_model:
             view = super(Superclass, self).get_formview_action(cr, uid, id, context=context)
         else:
             view = self.pool.get(record.subclass_model).get_formview_action(cr, uid, record.subclass_id,
                                                                             context=context)
         return view
+
+    @api.one
+    def get_instance(self):
+        return self.env[self.subclass_model].browse(self.subclass_id)
+
+    @api.model
+    def create_instance(self, id):
+        raise NotImplementedError
 
     @api.multi
     def action_edit(self):

@@ -12,10 +12,10 @@ class ModuleGenerate(models.TransientModel):
 
     @api.multi
     def action_generate(self):
-        module = self.env[self.env.context.get('active_model')].search([('id', '=', self.env.context.get('active_id'))])
+        ids = self.env.context.get('active_ids') or ([self.env.context.get('active_id')] if self.env.context.get('active_id') else [])
 
         return {
             'type': 'ir.actions.act_url',
-            'url': '/builder/generate/{id}/{generator}'.format(id=module.id, generator=self.generator),
+            'url': '/builder/generate/{generator}/{ids}'.format(ids=','.join([str(i) for i in ids]), generator=self.generator),
             'target': 'self'
         }

@@ -33,11 +33,12 @@ This module aims to help in the development of new modules
     'author': 'Soluciones Moebius',
     #"license": "AGPL-3",
     'website': 'http://www.solucionesmoebius.com/',
-    'depends': ['web', 'web_diagram', 'web_ace_editor', 'website'],
+    'depends': ['web', 'web_diagram', 'website'],
     'data': [
         # 'security/base_security.xml',
         # 'security/ir.model.access.csv',
         # 'data/templates.xml',
+
         'data/oe.css.classes.yml',
         'wizard/module_generate_view.xml',
         'wizard/model_lookup_wizard_view.xml',
@@ -60,8 +61,8 @@ This module aims to help in the development of new modules
 
         'wizard/module_data_import_view.xml',
         'wizard/module_import_view.xml',
+        'wizard/module_export_view.xml',
         'wizard/model_import_view.xml',
-        'wizard/model_export_view.xml',
 
         'views/menu_view.xml',
         'views/module_view.xml',

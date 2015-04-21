@@ -14,9 +14,9 @@ _logger = logging.getLogger(__name__)
 
 # class EnvSelection(Selection):
 # def get_values(self, env):
-#         """ return a list of the possible values """
-#         selection = self.selection
-#         if isinstance(selection, basestring):
+# """ return a list of the possible values """
+# selection = self.selection
+# if isinstance(selection, basestring):
 #             selection = getattr(env[self.model_name], selection)(context=env.context)
 #         elif callable(selection):
 #             selection = selection(env[self.model_name], context=env.context)
@@ -46,21 +46,22 @@ class IrFields(models.Model):
         context = {}
         # Avoid too many nested `if`s below, as RedHat's Python 2.6
         # break on it. See bug 939653.
-        return sorted([(k, k) for k, v in fields_old.__dict__.iteritems()
-                       if type(v) == types.TypeType and \
-                       issubclass(v, fields_old._column) and \
-                       v != fields_old._column and \
-                       not v._deprecated and \
-                       # not issubclass(v, fields_old.function)])
-                       not issubclass(v, fields_old.function) and \
-                       (not context.get('from_diagram', False) or (
-                       context.get('from_diagram', False) and (k in ['one2many', 'many2one', 'many2many'])))
+        return sorted([
+            (k, k) for k, v in fields_old.__dict__.iteritems()
+            if type(v) == types.TypeType and \
+            issubclass(v, fields_old._column) and \
+            v != fields_old._column and \
+            not v._deprecated and \
+            # not issubclass(v, fields_old.function)])
+            not issubclass(v, fields_old.function) and \
+            (not context.get('from_diagram', False) or (
+                context.get('from_diagram', False) and (k in ['one2many', 'many2one', 'many2many'])))
 
-        ]
-        )
+        ])
 
     model_id = fields.Many2one('builder.ir.model', 'Model', select=1, ondelete='cascade')
-    special_states_field_id = fields.Many2one('builder.ir.model.fields', related='model_id.special_states_field_id', string='States Field')
+    special_states_field_id = fields.Many2one('builder.ir.model.fields', related='model_id.special_states_field_id',
+                                              string='States Field')
 
     name = fields.Char('Name', required=True, select=1)
 
@@ -86,8 +87,11 @@ class IrFields(models.Model):
                                  help="For one2many fields, the field on the target model that implement the opposite many2one relationship")
 
     field_description = fields.Char('Field Label')
+    related = fields.Char('Related')
     ttype = fields.Selection(_get_fields_type_selection, 'Field Type', required=True)
-    relation_ttype = fields.Selection([('many2one', 'many2one'), ('one2many', 'one2many'), ('many2many', 'many2many')], 'Field Type', compute='_compute_relation_ttype', fnct_inv='_relation_type_set_inverse', store=False, search=True)
+    relation_ttype = fields.Selection([('many2one', 'many2one'), ('one2many', 'one2many'), ('many2many', 'many2many')],
+                                      'Field Type', compute='_compute_relation_ttype',
+                                      fnct_inv='_relation_type_set_inverse', store=False, search=True)
     selection = fields.Char('Selection Options', help="List of options for a selection field, "
                                                       "specified as a Python expression defining a list of (key, label) pairs. "
                                                       "For example: [('blue','Blue'),('yellow','Yellow')]")
@@ -101,16 +105,17 @@ class IrFields(models.Model):
     size = fields.Char('Size')
     index = fields.Boolean('Index')
     copy = fields.Boolean('Copy', default=True, help='whether the field value should be copied when the record '
-            'is duplicated (default: ``True`` for normal fields, ``False`` for '
-            '``one2many`` and computed fields, including property fields and '
-            'related fields)')
-    default = fields.Char('Default')
+                                                     'is duplicated (default: ``True`` for normal fields, ``False`` for '
+                                                     '``one2many`` and computed fields, including property fields and '
+                                                     'related fields)')
+
     help = fields.Text('Help')
     delegate = fields.Boolean('Delegate', default=True, help=''' set it to ``True`` to make fields of the target model
         accessible from the current model (corresponds to ``_inherits``)''')
-    auto_join = fields.Boolean('Auto Join', help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
-    groups = fields.Char('Groups', help='''comma-separated list of group xml ids (string); this
-                                         restricts the field access to the users of the given groups only''')
+    auto_join = fields.Boolean('Auto Join',
+                               help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
+    # groups = fields.Char('Groups', help='''comma-separated list of group xml ids (string); this
+    #                                      restricts the field access to the users of the given groups only''')
 
     decimal_digits = fields.Char('Decimal Digits', )
     decimal_precision = fields.Char('Decimal Precision')
@@ -122,26 +127,52 @@ class IrFields(models.Model):
                               "specified as a Python expression defining a list of triplets. "
                               "For example: [('color','=','red')]")
     selectable = fields.Boolean('Selectable', default=1)
-    group_ids = fields.Many2many('builder.res.groups', 'builder_ir_model_fields_group_rel', 'field_id', 'group_id', string='Groups')
+    group_ids = fields.Many2many('builder.res.groups', 'builder_ir_model_fields_group_rel', 'field_id', 'group_id',
+                                 string='Groups')
     option_ids = fields.One2many('builder.ir.model.fields.option', 'field_id', 'Options')
     states_ids = fields.One2many('builder.ir.model.fields.state', 'field_id', 'States')
 
-    compute = fields.Boolean('Compute')
-    compute_method_name = fields.Char('Compute Method Name', related='model_compute_method_id.name')
-    compute_method = fields.Text('Compute Method', related='model_compute_method_id.code')
-    model_compute_method_id = fields.Many2one('builder.ir.model.method', 'Compute Model Method', ondelete='restrict')
+    allow_compute = fields.Boolean('Compute')
+    compute_method_name = fields.Char('Compute Method Name')
 
-    inverse = fields.Boolean('Inverse')
-    inverse_method_name = fields.Char('Inverse Method Name', related='model_inverse_method_id.name')
-    inverse_method = fields.Text('Inverse Method', related='model_inverse_method_id.code')
-    model_inverse_method_id = fields.Many2one('builder.ir.model.method', 'Inverse Model Method', ondelete='restrict')
+    allow_inverse = fields.Boolean('Inverse')
+    inverse_method_name = fields.Char('Inverse Method Name')
+
+    allow_search = fields.Boolean('Search')
+    search_method_name = fields.Char('Search Method Name')
+
+    allow_default = fields.Boolean('Default')
+    default_type = fields.Selection(
+        selection=[
+            ('value', 'Value'),
+            ('method', 'Method'),
+        ],
+        string='Default Type'
+    )
+    default_value = fields.Char('Default Value')
+    default_method_name = fields.Char('Default Method Name')
 
     is_inherited = fields.Boolean('Inherited')
 
-    diagram_arc_name = fields.Char(compute='_compute_arc_name', store=False, search=True)
+    diagram_arc_name = fields.Char(compute='_compute_arc_name')
+
+    use_to_order = fields.Boolean('Use to Order')
+    order = fields.Selection(
+        selection=[
+            ('asc', 'Ascendant'),
+            ('desc', 'Descendant'),
+        ],
+        default='asc',
+        string='Order'
+    )
+    order_priority = fields.Integer('Order Priority')
+    is_rec_name = fields.Boolean('Use as Name')
+
+    @api.onchange('name')
+    def onchange_name(self):
+        self.is_rec_name = self.name == 'name'
 
     @api.one
-    @api.depends()
     def _compute_arc_name(self):
         if self.ttype in relational_field_types:
             small_map = {'many2one': 'm2o', 'one2many': 'o2m', 'many2many': 'm2m'}
@@ -149,11 +180,12 @@ class IrFields(models.Model):
         else:
             self.diagram_arc_name = self.name
 
-    @api.onchange('compute', 'inverse')
+    @api.onchange('allow_compute', 'allow_inverse', 'allow_search', 'allow_default')
     def _compute_method_names(self):
         self.compute_method_name = "_compute_{field}".format(field=self.name)
         self.inverse_method_name = "_inverse_{field}".format(field=self.name)
-
+        self.search_method_name = "_search_{field}".format(field=self.name)
+        self.default_method_name = "_default_{field}".format(field=self.name)
 
     @api.onchange('relation_ttype')
     def _onchange_relation_ttype(self):
@@ -171,7 +203,6 @@ class IrFields(models.Model):
     def constraint_ttype_relational(self):
         if self.env.context.get('from_diagram') and self.ttype not in relational_field_types:
             self.ttype = 'many2one'
-
 
     @api.onchange('relation_model_id')
     def onchange_relation_model_id(self):
@@ -299,18 +330,23 @@ class IrFields(models.Model):
         ('size_gt_zero', 'CHECK (size>=0)', _size_gt_zero_msg ),
     ]
 
-    @api.onchange('inverse', 'compute')
-    def _onchange_inverse(self):
-        if self.inverse:
-            self.inverse_method = self.inverse_method if self.inverse_method else 'self.{field} = False'.format(field=self.name)
-
-        if self.compute:
-            self.compute_method = self.compute_method if self.compute_method else 'self.{field} = False'.format(field=self.name)
+    @api.one
+    def ensure_one_rec_name(self):
+        # set previous field with is_rec_name to False
+        # this way write is not triggered
+        [setattr(rec, 'is_rec_name', False) for rec in self.search([
+            ('id', '!=', self.id),
+            ('model_id.id', '=', self.model_id.id),
+            ('is_rec_name', '=', True)
+        ])]
 
     @api.model
     @api.returns('self', lambda value: value.id)
     def create(self, vals):
         model = super(IrFields, self).create(vals)
+        if vals.get('is_rec_name'):
+            model.ensure_one_rec_name()
+
         field_obj = self.env['builder.ir.model.fields']
 
         if model.ttype in relational_field_types and model.relation_create_inverse_relation:
@@ -331,12 +367,15 @@ class IrFields(models.Model):
                     attrs['relation_field'] = model.name
                 reverse_field = field_obj.create(attrs)
 
-        model.create_update_methods()
         return model
 
     @api.multi
     def write(self, vals):
         saved = super(IrFields, self).write(vals)
+
+        if vals.get('is_rec_name'):
+            [rec.ensure_one_rec_name() for rec in self]
+
         field_obj = self.env['builder.ir.model.fields']
 
         model = field_obj.search([('id', '=', self.id)])
@@ -359,64 +398,7 @@ class IrFields(models.Model):
                     attrs['relation_field'] = model.name
                 reverse_field = field_obj.create(attrs)
 
-        self.create_update_methods()
-
         return saved
-
-    @api.one
-    def create_update_methods(self):
-        model_inverse_method_id = self.model_inverse_method_id
-        inverse_method_name = self.inverse_method_name
-        inverse_method = self.inverse_method
-        inverse = self.inverse
-
-        if self.compute:
-            if not self.model_compute_method_id.id:
-                self.model_compute_method_id = self.env['builder.ir.model.method'].create({
-                    'model_id': self.model_id.id,
-                    'module_id': self.model_id.module_id.id,
-                    'name': self.compute_method_name,
-                    'sugar_is_depends': True,
-                    'sugar_depends_triggers': [(6, 0, [(self.id,)])],
-                    'sugar_api_type': 'one',
-                    'arguments': '',
-                    'code': self.compute_method if self.compute_method else 'self.{field} = False'.format(field=self.name),
-                    'reference': "{model},{id}".format(model=self._name, id=self.id)
-                })
-            else:
-                self.model_compute_method_id.write({
-                    'name': self.compute_method_name,
-                    'code': self.compute_method
-                })
-        else:
-            if self.model_compute_method_id.id:
-                method_id = self.model_compute_method_id.id
-                self.write({'model_compute_method_id': False})
-                self.pool['builder.ir.model.method'].unlink(self.env.cr, self.env.uid, [method_id])
-
-        if inverse:
-            if not model_inverse_method_id.id:
-                self.model_inverse_method_id = self.env['builder.ir.model.method'].create({
-                    'model_id': self.model_id.id,
-                    'module_id': self.model_id.module_id.id,
-                    'name': inverse_method_name,
-                    'sugar_is_depends': True,
-                    'sugar_depends_triggers': [(6, 0, [(self.id,)])],
-                    'sugar_api_type': 'one',
-                    'arguments': '',
-                    'code': inverse_method if inverse_method else 'self.{field} = False'.format(field=self.name),
-                    'reference': "{model},{id}".format(model=self._name, id=self.id)
-                })
-            else:
-                self.model_inverse_method_id.write({
-                    'name': inverse_method_name,
-                    'code': inverse_method
-                })
-        else:
-            if self.model_inverse_method_id.id:
-                method_id = self.model_inverse_method_id.id
-                self.write({'model_inverse_method_id': False})
-                self.pool['builder.ir.model.method'].unlink(self.env.cr, self.env.uid, [method_id])
 
 
 class ModelFieldOption(models.Model):

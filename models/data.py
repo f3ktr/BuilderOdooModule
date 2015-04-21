@@ -92,11 +92,6 @@ class ModelDataAttribute(models.Model):
     def onchange_name(self):
         self.model_attr = self.name
 
-    @api.constrains('result_name')
-    def _check_result_name(self):
-        if not ATTRIBUTE_PATTERN.match(self.result_name):
-            raise ValueError('Result Attribute must be a valid name.')
-
     def compute_value(self, row):
         value = row[self.name]
         for f in self.change_ids:

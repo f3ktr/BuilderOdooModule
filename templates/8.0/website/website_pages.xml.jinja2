@@ -1,27 +1,13 @@
 {%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
 
 {% block content %}
     {% for page in pages %}
-        <template id="website.{{page.attr_id}}" name="{{page.attr_name}}" page="True" {% if page.priority %}priority="{{page.priority}}" {% endif %}>
-            <t t-call="{{page.wrap_layout}}">
-                <div id="wrap" class="oe_structure oe_empty">
-                    {{page.content}}
-                </div>
-            </t>
-        </template>
+        {{ macros.builder_website_page(page) }}
 
     {% endfor %}
 
     {% for menu in menus %}
-        <record id="website_menu_{{menu.page_id.attr_id}}" model="website.menu">
-            <field name="name">{{menu.name}}</field>
-            <field name="url">{{menu.url}}</field>
-            {% if menu.parent_id %}
-                <field name="parent_id" ref="{{module.name}}.website_menu_{{menu.parent_id.page_id.attr_id}}"/>
-            {% else %}
-                <field name="parent_id" ref="website.main_menu"/>
-            {% endif %}
-            <field name="sequence" type="int">{{menu.sequence}}</field>
-        </record>
+        {{ macros.builder_website_menu(menu) }}
     {% endfor %}
 {% endblock %}

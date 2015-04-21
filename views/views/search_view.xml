@@ -16,10 +16,11 @@
                             <field name="xml_id"  />
                         </group>
                         <group>
+                            <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', '=', False)]}"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Items">
+                        <page string="Items" attrs="{'invisible': [('inherit_view', '=', True)]}">
                             <field name="field_ids" nolabel="1" domain="[('model_id', '=', model_id)]" context="{'default_wizard_id': id}">
                                 <tree string="Items" >
                                     <field name="sequence" widget="handle" />
@@ -34,31 +35,50 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Inherit" attrs="{'invisible': [('model_inherit_type', 'in', [False])]}">
+                        <page string="Inherit" attrs="{'invisible': [('inherit_view', '=', False)]}">
                             <group>
                                 <group>
-                                    <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', 'in', [False])]}"/>
-                                    <field name="inherit_view_id" options="{'no_create': True, 'no_open': True}" attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', 'in', [False])], 'readonly': ['|', ('inherit_view', '=', False), ('model_inherit_type', 'in', [False])]}" domain="[('model', '=', model_name), ('type', '=', type)]"/>
-                                    <field name="inherit_view_ref" attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', 'in', [False])], 'required': [('inherit_view', '=', True), ('model_inherit_type', 'not in', [False])]}"/>
+                                    <field name="inherit_view_id" options="{'no_create': True, 'no_open': True}"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'readonly': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)]}"
+                                           domain="[('model', '=', model_name), ('type', '=', type)]"/>
+                                    <field name="inherit_view_ref"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'required': [('inherit_view', '=', True), ('model_inherit_type', 'not in', [False])]}"/>
                                 </group>
                                 <group>
-                                    <field name="inherit_view_type" attrs="{'invisible': [('inherit_view', '=', False)], 'required': [('inherit_view', '=', True)]}"/>
-                                    <field name="inherit_view_field_id" domain="[('model_id', '=', model_id), ('is_inherited', '=', True)]" attrs="{'invisible': ['|', ('inherit_view', '=', False), ('inherit_view_type', 'not in', ['field'])], 'required': [('inherit_view', '=', True), ('inherit_view_type', 'in', ['field'])]}"/>
-                                    <field name="inherit_view_xpath" attrs="{'invisible': ['|', ('inherit_view', '=', False), ('inherit_view_type', 'not in', ['xpath'])], 'required': [('inherit_view', '=', True), ('inherit_view_type', 'in', ['xpath'])]}"/>
-                                    <field name="inherit_view_position" attrs="{'invisible': [('inherit_view', '=', False)], 'required': [('inherit_view', '=', True)]}"/>
+
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="inherit_change_ids">
+                                        <tree string="Changes">
+                                            <field name="inherit_view_type"/>
+                                            <field name="inherit_view_target"/>
+                                            <field name="inherit_view_position"/>
+                                        </tree>
+                                        <form string="Changes">
+                                            <group>
+                                                <group>
+                                                    <field name="inherit_view_type"/>
+                                                    <field name="inherit_view_target"/>
+                                                    <field name="inherit_view_position"/>
+                                                </group>
+                                                <group>
+                                                    <field name="inherit_view_attribute"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_attribute_value"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_field"
+                                                           domain="[['model_id', '=', parent.model_id]]"
+                                                           attrs="{'invisible': [['inherit_view_position', '=', 'attribute']]}"/>
+                                                </group>
+                                            </group>
+                                        </form>
+                                    </field>
                                 </group>
                             </group>
                         </page>
 
-                        <page string="Arch">
-                            <group>
-                                <group></group>
-                                <group>
-                                    <field name="custom_arch" />
-                                </group>
-                            </group>
-                            <field name="arch" nolabel="1" widget="ace" theme="tomorrow" mode="xml" style="min-height:200px" attrs="{'readonly': [('custom_arch', '=', False)]}"/>
-                        </page>
                     </notebook>
                     <footer>
                         <button name="action_save" string="Save" type="object" class="oe_highlight"/>

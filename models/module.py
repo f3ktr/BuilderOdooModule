@@ -1,25 +1,18 @@
 from base64 import decodestring
-from collections import defaultdict
-from jinja2 import FileSystemLoader
-from jinja2 import Environment
 import re
 from string import Template
 from types import MethodType
 import os
 import mimetypes
-from StringIO import StringIO
-import zipfile
-import base64
-import posixpath
-from openerp import models, fields, api
-from openerp import _
-from openerp.addons.builder.tools import simple_selection
-from openerp.addons.builder.tools.formats import json
 
+from openerp import models, fields, api, _
+from .utils import simple_selection
+from .utils.formats import json
 
-__author__ = 'one'
 
 MODULE_EXPORTER_RE = re.compile('_export_\w[\w_]+')
+
+
 def get_module_exporters(model):
     return [
         (attr.replace('_export_', ''), attr.replace('_export_', '').capitalize()) for attr in dir(model)
@@ -27,6 +20,8 @@ def get_module_exporters(model):
     ]
 
 MODULE_IMPORTER_RE = re.compile('_import_\w[\w_]+')
+
+
 def get_module_importers(model):
     return [
         (attr.replace('_import_', ''), attr.replace('_import_', '').capitalize()) for attr in dir(model)

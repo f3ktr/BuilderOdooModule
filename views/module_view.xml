@@ -302,7 +302,7 @@
                                             <field name="name" groups="base.group_no_one"/>
                                         </i>
                                     </p>
-                                    <button type="object" name="button_download">Download</button>
+                                    <button type="action" name="%(builder.act_builder_ir_module_module_generate_wizard)s">Download</button>
                                 </div>
                             </div>
                         </t>
