@@ -1,19 +1,19 @@
 {%- extends 'builder.base.xml.jinja2' %}
 {% block content %}
-    {% for view in models %}
-        <record model="ir.ui.view" id="{{ view.xml_id }}">
-            <field name="name">{{ view.name }}</field>
-            <field name="model">{{ view.model_id.model }}</field>
-            {% if view.type == 'tree' and view.field_parent_id %}
-                <field name="field_parent">{{ view.field_parent_id.name }}</field>
-            {% endif -%}
-            {% if view.inherit_view %}
+{% for view in models %}
+            <record model="ir.ui.view" id="{{view.xml_id}}">
+                <field name="name">{{view.name}}</field>
+                <field name="model">{{view.model_id.model}}</field>
+                {% if view.type == 'tree' and view.field_parent_id %}
+                <field name="field_parent">{{view.field_parent_id.name}}</field>
+                {% endif -%}
+                {% if view.inherit_view %}
                 <field name="inherit_id" ref="{{ view.inherit_view_ref }}"/>
-            {% endif %}
-            <field name="priority" eval="16"/>
-            <field name="arch" type="xml">
-                {{ view.arch|indent }}
-            </field>
-        </record>
-    {% endfor %}
+                {% endif %}
+                <field name="priority" eval="16" />
+                <field name="arch" type="xml">
+                    {{view.arch|indent}}
+                </field>
+            </record>
+{% endfor %}
 {% endblock %}
