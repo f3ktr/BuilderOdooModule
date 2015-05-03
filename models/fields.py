@@ -14,9 +14,9 @@ _logger = logging.getLogger(__name__)
 
 # class EnvSelection(Selection):
 # def get_values(self, env):
-# """ return a list of the possible values """
-# selection = self.selection
-# if isinstance(selection, basestring):
+#         """ return a list of the possible values """
+#         selection = self.selection
+#         if isinstance(selection, basestring):
 #             selection = getattr(env[self.model_name], selection)(context=env.context)
 #         elif callable(selection):
 #             selection = selection(env[self.model_name], context=env.context)
@@ -112,10 +112,9 @@ class IrFields(models.Model):
     help = fields.Text('Help')
     delegate = fields.Boolean('Delegate', default=True, help=''' set it to ``True`` to make fields of the target model
         accessible from the current model (corresponds to ``_inherits``)''')
-    auto_join = fields.Boolean('Auto Join',
-                               help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
-    # groups = fields.Char('Groups', help='''comma-separated list of group xml ids (string); this
-    #                                      restricts the field access to the users of the given groups only''')
+    auto_join = fields.Boolean('Auto Join', help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
+    groups = fields.Char('Groups', help='''comma-separated list of group xml ids (string); this
+                                         restricts the field access to the users of the given groups only''')
 
     decimal_digits = fields.Char('Decimal Digits', )
     decimal_precision = fields.Char('Decimal Precision')
@@ -127,8 +126,7 @@ class IrFields(models.Model):
                               "specified as a Python expression defining a list of triplets. "
                               "For example: [('color','=','red')]")
     selectable = fields.Boolean('Selectable', default=1)
-    group_ids = fields.Many2many('builder.res.groups', 'builder_ir_model_fields_group_rel', 'field_id', 'group_id',
-                                 string='Groups')
+    group_ids = fields.Many2many('builder.res.groups', 'builder_ir_model_fields_group_rel', 'field_id', 'group_id', string='Groups')
     option_ids = fields.One2many('builder.ir.model.fields.option', 'field_id', 'Options')
     states_ids = fields.One2many('builder.ir.model.fields.state', 'field_id', 'States')
 
@@ -154,7 +152,7 @@ class IrFields(models.Model):
 
     is_inherited = fields.Boolean('Inherited')
 
-    diagram_arc_name = fields.Char(compute='_compute_arc_name')
+    diagram_arc_name = fields.Char(compute='_compute_arc_name', store=False, search=True)
 
     use_to_order = fields.Boolean('Use to Order')
     order = fields.Selection(
@@ -186,6 +184,7 @@ class IrFields(models.Model):
         self.inverse_method_name = "_inverse_{field}".format(field=self.name)
         self.search_method_name = "_search_{field}".format(field=self.name)
         self.default_method_name = "_default_{field}".format(field=self.name)
+
 
     @api.onchange('relation_ttype')
     def _onchange_relation_ttype(self):
@@ -323,12 +322,6 @@ class IrFields(models.Model):
                              _("The Selection Options expression is must be in the [('key','Label'), ...] format!"))
         return True
 
-    def _size_gt_zero_msg(self, cr, user, ids, context=None):
-        return _('Size of the field can never be less than 0 !')
-
-    _sql_constraints = [
-        ('size_gt_zero', 'CHECK (size>=0)', _size_gt_zero_msg ),
-    ]
 
     @api.one
     def ensure_one_rec_name(self):

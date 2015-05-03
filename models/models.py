@@ -138,6 +138,9 @@ class IrModel(models.Model):
     rewrite_write_method = fields.Boolean('Rewrite Write Method')
     rewrite_unlink_method = fields.Boolean('Rewrite Unlink Method')
 
+    diagram_position_x = fields.Integer('X')
+    diagram_position_y = fields.Integer('Y')
+
     # @api.constrains('model')
     # def check_model_name(self):
     # if not check_object_name(self.name):
