@@ -122,13 +122,11 @@ def process(self, starting_node):
                 self.rank()   # First step:Netwoek simplex algorithm
                 self.order_in_rank()    #Second step: ordering nodes within ranks
 
-
 def init_order(self, node, level):
         """Initialize orders the nodes in each rank with depth-first search
         """
 
         self._init_order(node, level, self.transitions)
-
 
 def _init_order(self, node, level, transitions):
         if not self.result[node]['y']:
@@ -242,7 +240,10 @@ class view(osv.osv):
             else:
                 if not a[_Source_Field]:
                     no_ancester.append(a['id'])
-            for t in _Arrow_Obj.read(cr,uid, a[_Destination_Field],[]):
+            for t in _Arrow_Obj.read(cr, uid, a[_Destination_Field], []):
+                if des_node not in t or not t[des_node] or len(t[des_node]) == 0:
+                    continue
+
                 transitions.append((a['id'], t[des_node][0]))
                 tres[str(t['id'])] = (a['id'],t[des_node][0])
                 label_string = ""
