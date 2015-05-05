@@ -1,6 +1,0 @@
-* try to generate more pretty files
-* builder.ir.model.fields order field is missing in model views
-* improve views inheritance model and views
-* add xml ID checks
-* check unique values of different methods
-* add code debugging capability in the views
