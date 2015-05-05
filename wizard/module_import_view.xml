@@ -12,10 +12,11 @@
                             <field name="file" />
                         </group>
                         <group>
+                            <field name="ignore_version"/>
                         </group>
                     </group>
                     <footer>
-                        <button name="action_import" string="Import Module" type="object" class="oe_highlight"/>
+                        <button name="action_import" string="Import Module" type="object" class="oe_highlight" />
                         or
                         <button string="Cancel" class="oe_link" special="cancel"/>
                     </footer>
