@@ -87,6 +87,15 @@ class GeneratorV8(models.TransientModel):
                     'cron_jobs': module.cron_job_ids,
                 })
 
+        if len(module.workflow_ids):
+            module_data.append('data/workflow.xml')
+            zip_file.write_template(
+                'data/workflow.xml',
+                'data/workflow.xml.jinja2', {
+                    'module': module,
+                    'workflows': module.workflow_ids,
+                })
+
         if module.icon_image:
             zip_file.write(
                 'static/description/icon.png',
