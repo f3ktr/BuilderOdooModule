@@ -56,3 +56,14 @@ class ExchangerBase(models.TransientModel):
         zip_file.write('metadata', self.get_metadata())
         [zip_file.write(self.get_export_module_filename(module), self.export_module(module)) for module in modules]
         return zip_file.get_zip()
+
+    @api.model
+    def import_modules(self, zip_file):
+        [
+            self.load_module(zip_file.read(module)) for module in zip_file.namelist()
+            if module != 'metadata'
+        ]
+
+    @api.model
+    def load_module(self, module):
+        raise NotImplementedError

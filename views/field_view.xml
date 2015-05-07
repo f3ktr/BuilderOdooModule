@@ -7,20 +7,22 @@
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
                 <form string="Field">
-                    <group col="4">
-                        <field name="name"/>
-                        <field name="field_description"/>
-                        <field name="model_id" invisible="1"/>
-                        <field name="relation_model_id" invisible="1"/>
-                        <field name="special_states_field_id" invisible="1"/>
-                    </group>
                     <group>
                         <group>
+                            <field name="name"/>
+                            <field name="field_description"/>
+                            <field name="model_id" invisible="1"/>
+                            <field name="relation_model_id" invisible="1"/>
+                            <field name="special_states_field_id" invisible="1"/>
+                        </group>
+                        <group>
                             <field name="is_rec_name"/>
+                            <field name="use_to_order"/>
+                            <field name="order"
+                                   attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
                             <field name="ttype" invisible="1"/>
                             <field name="relation_ttype" required="1" readonly="0"/>
                         </group>
-                        <group></group>
                     </group>
                     <notebook>
                         <page string="General">
@@ -183,7 +185,8 @@
                             <group>
                                 <field name="is_rec_name"/>
                                 <field name="use_to_order"/>
-                                <field name="order" attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
+                                <field name="order"
+                                       attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
                             </group>
                         </group>
                         <group>

@@ -2,92 +2,79 @@
 
 {# generate builder.ir.model #}
 {% macro builder_ir_model(model) %}
-{% set class_name = model.model | replace(".", " ") | replace("_", " ") | title | replace(" ","") %}
+{%- set class_name = model.model | replace(".", " ") | replace("_", " ") | title | replace(" ","") -%}
 class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}models.Model{% endif %}):
     _name = '{{ model.model }}'
-    {%- if model.rec_name_field_id %}
+    {% if model.rec_name_field_id -%}
     _rec_name='{{ model.rec_name_field_id.name }}'
-    {% endif %}
-    {% if model.order_string %}
+    {% endif -%}
+    {% if model.order_string -%}
     _order = '{{ model.order_string }}'
-    {% endif %}
+    {% endif -%}
     {% if model.inherit_model_ids -%}
     _inherit = [{% for inherit in model.inherit_model_ids -%}
-        {%- if inherit.system_model_id.model -%}
+        {% if inherit.system_model_id.model -%}
         '{{ inherit.system_model_id.model }}',
-        {%- endif -%}
-        {%- if inherit.module_model_id.model -%}
+        {% endif -%}
+        {% if inherit.module_model_id.model -%}
         '{{ inherit.module_model_id.model }}',
-        {%- endif -%}
-        {%- endfor %}
+        {% endif -%}
+        {% endfor -%}
     ]
     {% endif -%}
-    {%- if model.inherits_model_ids -%}
-    _inherits = {{'{'}} {%- for inherits in model.inherits_model_ids -%}
-        {%- if inherits.system_model_id.model -%}
-            '{{ inherits.system_model_id.model }}' : '{{ inherits.field_name }}',
-        {%- endif -%}
-        {%- if inherits.module_model_id.model -%}
+    {% if model.inherits_model_ids -%}
+    _inherits = {{'{'}} {% for inherits in model.inherits_model_ids -%}
+        {% if inherits.system_model_id.model -%}
+        '{{ inherits.system_model_id.model }}' : '{{ inherits.field_name }}',
+        {% endif -%}
+        {% if inherits.module_model_id.model -%}
         '{{ inherits.module_model_id.model }}' : '{{ inherits.field_id }}',
-        {%- endif -%}
-        {%- endfor %}
+        {% endif -%}
+        {% endfor -%}
     {{'}'}}
     {% endif -%}
-    {%- if model.name -%}
+    {% if model.name -%}
     _description = '{{ model.name }}'{% else %}_description = _(_doc_)
     {% endif %}
-
     {% for field in model.field_ids %}
     {{ builder_ir_model_field(field) }}
-    {% endfor %}
-
-    {% for method_name, fields in model.compute_field_methods.items() %}
+    {% endfor -%}
+    {% for method_name, fields in model.compute_field_methods.items() -%}
     {{ builder_ir_model_field_compute(method_name, fields) }}
-    {% endfor %}
-
-    {% for method_name, fields in model.inverse_field_methods.items() %}
+    {% endfor -%}
+    {% for method_name, fields in model.inverse_field_methods.items() -%}
     {{ builder_ir_model_field_inverse(method_name, fields) }}
-    {% endfor %}
-
-    {% for method_name, fields in model.search_field_methods.items() %}
+    {% endfor -%}
+    {% for method_name, fields in model.search_field_methods.items() -%}
     {{ builder_ir_model_field_search(method_name, fields) }}
-    {% endfor %}
-
-    {% for method_name, fields in model.default_field_methods.items() %}
+    {% endfor -%}
+    {% for method_name, fields in model.default_field_methods.items() -%}
     {{ builder_ir_model_field_default(method_name, fields) }}
-    {% endfor %}
-
-    {% for method in model.method_ids %}
+    {% endfor -%}
+    {% for method in model.method_ids -%}
     {{ builder_ir_model_method(method) }}
-    {% endfor %}
-
-    {% if model.rewrite_create_method %}
+    {% endfor -%}
+    {% if model.rewrite_create_method -%}
     @api.model
     @api.returns('self', lambda value: value.id)
     def create(self, vals):
         return super({{ class_name }}, self).create(vals)
-    {% endif %}
-
-    {% if model.rewrite_write_method %}
+    {% endif -%}
+    {% if model.rewrite_write_method -%}
     @api.multi
     def write(self, vals):
         return super({{ class_name }}, self).write(vals)
-    {% endif %}
-
-    {% if model.rewrite_unlink_method %}
+    {% endif -%}
+    {% if model.rewrite_unlink_method -%}
     def unlink(self, cr, uid, ids, context=None):
         return super({{ class_name }}, self).unlink(self, cr, uid, ids, context=None):
-    {% endif %}
-
-    {% for button in model.status_bar_button_ids %}
+    {% endif -%}
+    {% for button in model.status_bar_button_ids -%}
     {{ builder_ir_model_status_bar_button(button) }}
-    {% endfor %}
-
-    {% for button in model.button_ids %}
+    {% endfor -%}
+    {% for button in model.button_ids -%}
     {{ builder_ir_model_button(button) }}
-    {% endfor %}
-
-
+    {% endfor -%}
 {% endmacro %}
 
 {# generate builder.ir.model.method #}
@@ -109,18 +96,18 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 {% macro builder_ir_model_field_compute(method_name, fields) %}
     @api.one
     def {{ method_name }}(self):
-        {% for field in fields %}
+        {% for field in fields -%}
         self.{{ field }} = False
-        {% endfor %}
+        {% endfor -%}
 {% endmacro %}
 
 {# generate builder.ir.model.method #}
 {% macro builder_ir_model_field_inverse(method_name, fields) %}
     @api.one
     def {{ method_name }}(self):
-        {% for field in fields %}
+        {% for field in fields -%}
         # self. = self.{{ field }}
-        {% endfor %}
+        {% endfor -%}
         pass
 {% endmacro %}
 
@@ -128,9 +115,9 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 {% macro builder_ir_model_field_search(method_name, fields) %}
     def {{ method_name }}(self, operator, value):
         return [
-        {% for field in fields %}
+        {% for field in fields -%}
             ('{{ field }}', operator, value)
-        {% endfor %}
+        {% endfor -%}
         ]
 {% endmacro %}
 
@@ -194,21 +181,21 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 
 {# generate builder.ir.cron #}
 {% macro builder_ir_cron(cron) %}
-    <record id="{{ cron.module_id.name }}_ir_cron_{{ cron.index }}_action" model="ir.cron">
-        <field name="name">{{ cron.name }}</field>
-        <field name="interval_number">{{ cron.interval_number }}</field>
-        <field name="interval_type">{{ cron.interval_type }}</field>
-        {% if cron.numbercall -%}
-        <field name="numbercall">{{ cron.numbercall }}</field>
-        {%- else -%}
-        <field name="numbercall">-1</field>
-        {%- endif %}
-        <field name="doall" eval="{{ cron.doall }}"/>
-        <field name="model">{{ cron.model_id.model }}</field>
-        <field name="function">{{ cron.model_method_id.name }}</field>
-        <field name="args">{{ cron.arguments if cron.arguments else '()' }}</field>
-        <field name="active" eval="{{ cron.active }}"/>
-    </record>
+        <record id="{{ cron.module_id.name }}_ir_cron_{{ cron.id }}_action" model="ir.cron">
+            <field name="name">{{ cron.name }}</field>
+            <field name="interval_number">{{ cron.interval_number }}</field>
+            <field name="interval_type">{{ cron.interval_type }}</field>
+            {%- if cron.numbercall -%}
+            <field name="numbercall">{{ cron.numbercall }}</field>
+            {%- else -%}
+            <field name="numbercall">-1</field>
+            {%- endif -%}
+            <field name="doall" eval="{{ cron.doall }}"/>
+            <field name="model">{{ cron.model_id.model }}</field>
+            <field name="function">{{ cron.model_method_id.name }}</field>
+            <field name="args">{{ cron.arguments if cron.arguments else '()' }}</field>
+            <field name="active" eval="{{ cron.active }}"/>
+        </record>
 {% endmacro %}
 
 {# generate builder.ir.ui.menu #}
@@ -630,9 +617,9 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 {% endmacro %}
 
 {# generate builder.ir.model.access #}
-{% macro builder_ir_model_access(access) %}
+{% macro builder_ir_model_access(access) -%}
 access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed }}_{{ access.group_id.xml_id|dot2dashed }},{{ access.name }},{{ access.model_id.module_id.name }}.{{ access.model_id.model|dot2dashed }},{{ access.group_id.module_id.name }}.{{ access.group_id.xml_id }},{{ access.perm_read|int }},{{ access.perm_write|int }},{{ access.perm_create|int }},{{ access.perm_unlink|int }}
-{% endmacro %}
+{% endmacro -%}
 
 
 

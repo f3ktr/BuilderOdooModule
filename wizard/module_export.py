@@ -1,8 +1,8 @@
 from openerp import models, api, fields, _
 
 
-class ModelImport(models.TransientModel):
-    _name = 'builder.ir.model.export.wizard'
+class ModuleImport(models.TransientModel):
+    _name = 'builder.ir.module.export.wizard'
 
     @api.model
     def _get_export_types(self):

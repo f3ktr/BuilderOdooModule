@@ -3,7 +3,7 @@
 from openerp import models, fields, api, tools, _
 # from openerp.osv import fields as fields_old
 # import openerp.addons.decimal_precision as dp
-
 {% for model in models %}
+
 {{ macros.builder_ir_model(model) }}
-{% endfor %}
+{%- endfor -%}
