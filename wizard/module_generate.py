@@ -10,6 +10,16 @@ class ModuleGenerate(models.TransientModel):
 
     generator = fields.Selection(_get_generators, 'Version', required=True)
 
+    @api.one
+    def _get_default_exporter(self):
+        generators = self.env['builder.generator.base'].get_generators()
+        if generators:
+            return generators[0][0]
+
+    _defaults = {
+        'generator': _get_default_exporter
+    }
+
     @api.multi
     def action_generate(self):
         ids = self.env.context.get('active_ids') or ([self.env.context.get('active_id')] if self.env.context.get('active_id') else [])

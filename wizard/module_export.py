@@ -10,6 +10,16 @@ class ModuleImport(models.TransientModel):
 
     export_type = fields.Selection(_get_export_types, 'Format', required=True)
 
+    @api.one
+    def _get_default_exporter(self):
+        exporters = self.env['builder.exchanger.base'].get_exchangers()
+        if exporters:
+            return exporters[0][0]
+
+    _defaults = {
+        'export_type': _get_default_exporter
+    }
+
     @api.multi
     def action_export(self):
         ids = self.env.context.get('active_ids') or [self.env.context.get('active_ids')]
