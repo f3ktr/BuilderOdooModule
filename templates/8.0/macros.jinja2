@@ -663,6 +663,17 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
 {% endmacro %}
 
 
+{# generate builder.web.asset #}
+{% macro builder_web_asset(asset) %}
+    <template id="{{ asset.module_id.name }}.{{ asset.attr_id|default('assets_backend%s'%asset.id, true) }}" name="{{ asset.attr_name|default('backend asset', true) }}" inherit_id="web.assets_backend" {% if asset.type == 'website.theme' %} {% if not asset.attr_active %}active="False"{% endif %} customize_show="{{ asset.attr_customize_show }}" {% endif %}>
+        <xpath expr="." position="inside">
+            {% for item in asset.item_ids -%}
+                {{ builder_website_asset_item(item, asset.module_id) }}
+            {% endfor -%}
+        </xpath>
+    </template>
+{% endmacro %}
+
 {# generate builder.website.asset #}
 {% macro builder_website_asset(asset) %}
     <template id="{{ asset.module_id.name }}.{{ asset.attr_id }}" name="{{ asset.attr_name }}" inherit_id="{{ asset.type }}" {% if asset.type == 'website.theme' %} {% if not asset.attr_active %}active="False"{% endif %} customize_show="{{ asset.attr_customize_show }}" {% endif %}>
@@ -680,7 +691,7 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
 
 
 {# generate builder.website.asset.item #}
-{% macro builder_website_asset_item(item) %}
+{% macro builder_website_asset_item(item, module) %}
     {% if item.file_id.extension == '.css' -%}
         <link rel="stylesheet" href="/{{module.name}}{{item.file_id.path}}" t-ignore="true"/>
     {% elif  item.file_id.extension == '.less' -%}
@@ -693,6 +704,16 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
 {% endmacro %}
 
 
+{# generate builder.website.media.item #}
+{% macro builder_website_media_item(item) %}
+    <record id="{{ item.attr_id|default('attachment_%s' % item.id, true) }}" model="ir.attachment">
+      <field name="name">{{ item.attr_name }}</field>
+      <field name="datas_fname">{{ item.attr_name }}</field>
+      <field name="res_model">ir.ui.view</field>
+      <field name="type">url</field>
+      <field name="url">/{{ item.module_id.name }}{{ item.file_id.path }}</field>
+  </record>
+{% endmacro %}
 
 {# generate builder.website.page #}
 {% macro builder_website_page(page) %}

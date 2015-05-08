@@ -68,7 +68,6 @@
                     <field name="attr_name"/>
                     <field name="attr_inherit_id"/>
                     <field name="attr_page"/>
-                    <field name="wrap_layout"/>
                 </tree>
             </field>
         </record>
@@ -87,7 +86,6 @@
                             <group>
                                 <field name="attr_page"/>
                                 <field name="attr_inherit_id"/>
-                                <field name="wrap_layout"/>
                                 <button string="Edit in Website" name="action_edit_html" type="object" class="oe_link"/>
                             </group>
                         </group>
@@ -100,6 +98,53 @@
         <!-- Page -->
 
         <!-- Asset -->
+        <record model="ir.ui.view" id="builder_web_asset_tree_view">
+            <field name="name">builder.web.asset.tree</field>
+            <field name="model">builder.web.asset</field>
+            <field name="arch" type="xml">
+                <tree string="Asset">
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                    <field name="attr_priority"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_web_asset_form_view">
+            <field name="name">builder.web.asset.form</field>
+            <field name="model">builder.web.asset</field>
+            <field name="arch" type="xml">
+                <form string="Asset" version="7.0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="module_id" invisible="1"/>
+                                <field name="attr_id"/>
+                                <field name="attr_name"/>
+                            </group>
+                            <group>
+                                <field name="attr_priority"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Files">
+                                <button string="Bulk Import" name="%(act_builder_website_asset_data_wizard)d" type="action" class="oe_link" context="{'default_module_id': module_id, 'default_asset_id': context.get('active_id'), 'asset_model': 'builder.web.asset.item'}"/>
+                                <field name="item_ids" nolabel="1" mode="tree">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="file_id" domain="[('extension', 'in', ['.js', '.css', '.less', '.sass'])]"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Web Asset -->
+
+        <!-- Asset -->
         <record model="ir.ui.view" id="builder_website_asset_tree_view">
             <field name="name">builder.website.asset.tree</field>
             <field name="model">builder.website.asset</field>
@@ -110,7 +155,6 @@
                     <field name="attr_active"/>
                     <field name="attr_customize_show"/>
                     <field name="attr_priority"/>
-                    <field name="type"/>
                 </tree>
             </field>
         </record>
@@ -131,7 +175,6 @@
                             </group>
                             <group>
                                 <field name="attr_priority"/>
-                                <field name="type"/>
                             </group>
                         </group>
                         <notebook>
@@ -152,6 +195,69 @@
         </record>
 
         <!-- Asset -->
+
+        <!-- Media Item -->
+        <record model="ir.ui.view" id="builder_website_media_item_tree">
+            <field name="name">builder.website.media.item.tree</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <tree string="Media Item" editable="bottom">
+                    <field name="module_id" invisible="1"/>
+                    <field name="file_id" domain="[('module_id', '=', module_id), ('extension', 'in', ['.png', '.jpg', '.jpeg', '.gif'])]" />
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_media_item_form">
+            <field name="name">builder.website.media.item.form</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <form string="Media Item" editable="bottom">
+                    <sheet>
+                        <group>
+                            <field name="module_id" invisible="1"/>
+                            <field name="file_id" domain="[('module_id', '=', module_id), ('extension', 'in', ['.png', '.jpg', '.jpeg', '.gif'])]" />
+                        </group>
+                        <group>
+                            <group>
+                                <field name="attr_id"/>
+                                <field name="attr_name"/>
+                            </group>
+                            <group>
+                                <div style="width:150px;height:150px">
+                                    <field name="image" widget="image" readonly="1" />
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_media_item_kanban">
+            <field name="name">builder.website.media.item.kanban</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="image"/>
+                    <field name="attr_name"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                           <a type="open">
+                                <img t-att-src="kanban_image('builder.website.media.item', 'image', record.id.value, {'preview_image': 'image'})" class="oe_image"/>
+                            </a>
+                            <a type="open">
+                                <field name="attr_name"/>
+                            </a>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <!-- Media Item -->
 
         <!-- Theme -->
         <record model="ir.ui.view" id="builder_website_theme_tree_view">

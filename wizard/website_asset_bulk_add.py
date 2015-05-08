@@ -11,11 +11,12 @@ class ModelImport(models.TransientModel):
 
     @api.one
     def action_import(self):
+        asset_model_name = self.env.context.get('asset_model', 'builder.website.asset.item')
         asset = self.env[self.env.context.get('active_model')].search([('id', '=', self.env.context.get('active_id'))])
-        asset_item_model = self.env['builder.website.asset.item']
+        asset_item_model = self.env[asset_model_name]
 
         for data_file in self.data_ids:
-            current_file = self.env['builder.website.asset.item'].search([('asset_id', '=', asset.id), ('file_id', '=', data_file.id)])
+            current_file = self.env[asset_model_name].search([('asset_id', '=', asset.id), ('file_id', '=', data_file.id)])
 
             if not current_file.id:
                 new_item = asset_item_model.create({

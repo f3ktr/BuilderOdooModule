@@ -96,6 +96,15 @@ class GeneratorV8(models.TransientModel):
                     'workflows': module.workflow_ids,
                 })
 
+        if len(module.backend_asset_ids):
+            module_data.append('views/assets.xml')
+            zip_file.write_template(
+                'views/assets.xml',
+                'views/web_assets.xml.jinja2', {
+                    'module': module,
+                    'assets': module.backend_asset_ids,
+                })
+
         if module.icon_image:
             zip_file.write(
                 'static/description/icon.png',
@@ -142,6 +151,13 @@ class GeneratorV8(models.TransientModel):
                 'views/website_themes.xml',
                 'views/website_themes.xml.jinja2',
                 {'module': module, 'themes': module.website_theme_ids},
+            )
+        if module.website_media_item_ids:
+            module_data.append('views/website_images.xml')
+            zip_file.write_template(
+                'views/website_images.xml',
+                'views/website_images.xml.jinja2',
+                {'module': module, 'images': module.website_media_item_ids},
             )
 
         if module.website_snippet_ids:

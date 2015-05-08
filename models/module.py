@@ -103,6 +103,7 @@ class Module(models.Model):
     action_window_ids = fields.One2many('builder.ir.actions.act_window', 'module_id', 'Window Actions')
     action_url_ids = fields.One2many('builder.ir.actions.act_url', 'module_id', 'URL Actions')
     workflow_ids = fields.One2many('builder.workflow', 'module_id', 'Workflows')
+    backend_asset_ids = fields.One2many('builder.web.asset', 'module_id', 'Assets')
 
     data_file_ids = fields.One2many('builder.data.file', 'module_id', 'Data Files')
     snippet_bookmarklet_url = fields.Char('Link', compute='_compute_snippet_bookmarklet_url')
@@ -313,6 +314,23 @@ javascript:(function(){
         }
 
     @api.multi
+    def action_backend_assets(self):
+
+        return {
+            'name': _('Backend Assets'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'builder.web.asset',
+            'views': [(False, 'tree'), (False, 'form')],
+            'domain': [('module_id', '=', self.id)],
+            # 'target': 'current',
+            'context': {
+                'default_module_id': self.id
+            },
+        }
+
+    @api.multi
     def action_website_pages(self):
 
         return {
@@ -356,6 +374,23 @@ javascript:(function(){
             'view_mode': 'tree,form',
             'res_model': 'builder.website.theme',
             'views': [(False, 'tree'), (False, 'form')],
+            'domain': [('module_id', '=', self.id)],
+            # 'target': 'current',
+            'context': {
+                'default_module_id': self.id
+            },
+        }
+
+    @api.multi
+    def action_website_media_item(self):
+
+        return {
+            'name': _('Media Manager'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'builder.website.media.item',
+            'views': [(False, 'kanban'), (False, 'tree')],
             'domain': [('module_id', '=', self.id)],
             # 'target': 'current',
             'context': {
@@ -454,22 +489,22 @@ class DataFile(models.Model):
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
     path = fields.Char(string='Path', required=True)
-    filename = fields.Char('Filename')
+    filename = fields.Char('Filename', compute='_compute_stats', store=True)
     content_type = fields.Char('Content Type', compute='_compute_stats', store=True)
     extension = fields.Char('Extension', compute='_compute_stats', store=True)
     size = fields.Integer('Size', compute='_compute_stats', store=True)
     content = fields.Binary('Content')
 
     @api.one
-    @api.depends('content', 'filename')
+    @api.depends('content', 'path')
     def _compute_stats(self):
-        self.size = False
-        self.filename = False
-        self.extension = False
-        self.content_type = False
         if self.content:
             self.size = len(decodestring(self.content))
-
-        self.filename = os.path.basename(self.path)
-        self.extension = os.path.splitext(self.path)[1]
-        self.content_type = mimetypes.guess_type(self.filename)[0] if mimetypes.guess_type(self.filename) else False
+            self.filename = os.path.basename(self.path)
+            self.extension = os.path.splitext(self.path)[1]
+            self.content_type = mimetypes.guess_type(self.filename)[0] if mimetypes.guess_type(self.filename) else False
+        else:
+            self.size = False
+            self.filename = False
+            self.extension = False
+            self.content_type = False

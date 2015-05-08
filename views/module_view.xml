@@ -44,9 +44,12 @@
                                         <li>
                                             <button class="oe_inline oe_stat_button" string="Cron Jobs" name="action_backend_cron_jobs" type="object"  icon="fa-bell-slash" context="{'default_module_id': id}"/>
                                         </li>
+                                        <li>
+                                            <button class="oe_inline oe_stat_button" string="Assets" name="action_backend_assets" type="object"  icon="fa-archive" context="{'default_module_id': id}"/>
+                                        </li>
                                     </ul>
                                 </li>
-                                <li class="dropdown" invisible="1">
+                                <li class="dropdown">
                                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                         <span class="oe_topbar_name">Website</span>
                                         <b class="caret"></b>
@@ -57,6 +60,9 @@
                                         </li>
                                         <li>
                                             <button class="oe_inline oe_stat_button" string="Themes" name="action_website_themes" type="object"  icon="fa-html5" context="{'default_module_id': id}"/>
+                                        </li>
+                                        <li>
+                                            <button class="oe_inline oe_stat_button" string="Media Manager" name="action_website_media_item" type="object"  icon="fa-image" context="{'default_module_id': id}"/>
                                         </li>
                                         <li>
                                             <button class="oe_inline oe_stat_button" string="Snippets" name="action_website_snippets" type="object"  icon="fa-puzzle-piece" context="{'default_module_id': id}"/>
@@ -234,7 +240,7 @@
                                 </notebook>
                             </page>
 
-                            <page string="Website" invisible="1">
+                            <page string="Website">
                                 <notebook class="ui-tabs-vertical">
                                     <page string="Pages">
                                         <button string="Import Page" name="%(act_builder_website_page_import_wizard)d" type="action" class="oe_link" context="{'default_module_id': id}"/>
@@ -242,6 +248,19 @@
                                     </page>
                                     <page string="Themes">
                                         <field nolabel="1" name="website_theme_ids"  context="{'default_module_id': active_id}"/>
+                                    </page>
+                                    <page string="Media Items">
+                                        <field nolabel="1" name="website_media_item_ids"  context="{'default_module_id': active_id}" mode="kanban">
+                                            <kanban>
+                                                <field name="image"/>
+                                                <field name="attr_name"/>
+                                                <templates>
+                                                    <t t-name="kanban-box">
+                                                        <img t-att-src="kanban_image('builder.website.media.item', 'image', record.id.value, {'preview_image': 'image'})" class="oe_module_icon"/>
+                                                    </t>
+                                                </templates>
+                                            </kanban>
+                                        </field>
                                     </page>
                                     <page string="Snippets">
                                         <field name="snippet_bookmarklet_url" widget="url" readonly="1" text="Create Snippet"/>
@@ -375,7 +394,6 @@
                 <tree string="Data File">
                     <field name="path"/>
                     <field name="content_type"/>
-                    <field name="extension"/>
                     <field name="size"/>
                 </tree>
             </field>
