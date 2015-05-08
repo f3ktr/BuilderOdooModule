@@ -1,3 +1,5 @@
+from lxml import html
+
 __author__ = 'one'
 
 from openerp import models, api, fields, _
@@ -20,12 +22,17 @@ class PageImport(models.TransientModel):
             data = self.env['ir.model.data'].search([('model', '=', 'ir.ui.view'), ('res_id', '=', page.id)])
             current_page = page_item_model.search([('module_id', '=', self.module_id.id), ('attr_id', '=', data.name)])
 
+            page_source = html.fromstring(page.arch)
+
+            while page_source.xpath('//t'):
+                page_source = html.fromstring(page_source.xpath('//t')[0].text_content())
+
             if not current_page.id:
                 new_item = page_item_model.create({
                     'module_id': self.module_id.id,
                     'attr_id': data.name,
                     'attr_name': page.name,
-                    'content': page.arch,
+                    'content': page_source.text_content(),
                     'attr_page': True,
                     'wrap_layout': 'website.layout',
                     'attr_priority': page.priority,
