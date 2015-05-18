@@ -15,7 +15,7 @@ class GeneratorV8(models.TransientModel):
     @api.model
     def generate_module(self, zip_file, module):
 
-        has_models = len(module.model_ids)
+        has_models = any(model.define for model in module.model_ids)
         module_data = []
 
         if has_models:
@@ -56,7 +56,7 @@ class GeneratorV8(models.TransientModel):
             zip_file.write_template(
                 'models/models.py',
                 'models/models.py.jinja2',
-                {'models': module.model_ids}
+                {'models': [model for model in module.model_ids if model.define]}
             )
 
         if len(module.rule_ids) or len(module.group_ids):

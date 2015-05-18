@@ -42,6 +42,7 @@ class IrFields(models.Model):
     _description = 'Fields'
     _rec_name = 'name'
 
+    @api.model
     def _get_fields_type_selection(self):
         context = {}
         # Avoid too many nested `if`s below, as RedHat's Python 2.6
@@ -151,6 +152,7 @@ class IrFields(models.Model):
     default_method_name = fields.Char('Default Method Name')
 
     is_inherited = fields.Boolean('Inherited')
+    redefine = fields.Boolean('Redefine')
 
     diagram_arc_name = fields.Char(compute='_compute_arc_name', store=False, search=True)
 
@@ -165,6 +167,10 @@ class IrFields(models.Model):
     )
     order_priority = fields.Integer('Order Priority')
     is_rec_name = fields.Boolean('Use as Name')
+
+    @property
+    def define(self):
+        return not self.is_inherited or self.redefine
 
     @api.onchange('name')
     def onchange_name(self):
@@ -184,7 +190,6 @@ class IrFields(models.Model):
         self.inverse_method_name = "_inverse_{field}".format(field=self.name)
         self.search_method_name = "_search_{field}".format(field=self.name)
         self.default_method_name = "_default_{field}".format(field=self.name)
-
 
     @api.onchange('relation_ttype')
     def _onchange_relation_ttype(self):

@@ -37,7 +37,6 @@ This module aims to help in the development of new modules
     'data': [
         # 'security/base_security.xml',
         # 'security/ir.model.access.csv',
-        # 'data/templates.xml',
 
         'data/oe.css.classes.yml',
         'wizard/module_generate_view.xml',
@@ -47,6 +46,7 @@ This module aims to help in the development of new modules
         'wizard/website_asset_bulk_add_view.xml',
         'wizard/website_page_import_view.xml',
         'wizard/model_access_generate_wizard_view.xml',
+        'wizard/demo_creator_wizard_view.xml',
 
         'views/views/base_view.xml',
         'views/views/calendar_view.xml',
@@ -58,6 +58,8 @@ This module aims to help in the development of new modules
         'views/views/tree_view.xml',
         'views/views/selector_view.xml',
         'views/website_view.xml',
+
+        'views/demo/char_views.xml',
 
         'wizard/module_data_import_view.xml',
         'wizard/module_import_view.xml',

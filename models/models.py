@@ -1,9 +1,6 @@
 from collections import defaultdict
-from openerp import models, fields, api
-from openerp.models import check_object_name
-from openerp.osv import fields as fields_old
-from openerp import tools
-from openerp import _
+
+from openerp import models, fields, api, _
 
 
 class IrModel(models.Model):
@@ -14,7 +11,6 @@ class IrModel(models.Model):
     _rec_name = 'model'
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', required=True, select=1, ondelete='cascade')
-
     name = fields.Char('Description', required=True)
     model = fields.Char('Model', required=True, select=1)
     info = fields.Text('Information')
@@ -141,10 +137,9 @@ class IrModel(models.Model):
     diagram_position_x = fields.Integer('X')
     diagram_position_y = fields.Integer('Y')
 
-    # @api.constrains('model')
-    # def check_model_name(self):
-    # if not check_object_name(self.name):
-    # raise Warning(_('The model name is not valid.'))
+    @property
+    def define(self):
+        return len(self.method_ids) or len(self.status_bar_button_ids) or len(self.button_ids) or any(not field.is_inherited or field.redefine for field in self.field_ids)
 
     @api.one
     def _compute_rec_name_field_id(self):
@@ -181,11 +176,6 @@ class IrModel(models.Model):
     def on_model_change(self):
         if not self.name:
             self.name = self.model
-
-    # @api.one
-    # @api.depends('inherit_model_ids')
-    # def _compute_inherit_model(self):
-    # self.inherit_model = ','.join([m.model for m in self.inherit_model_ids])
 
     @api.multi
     def find_field_by_name(self, name):
@@ -254,9 +244,6 @@ class IrModel(models.Model):
             },
         }
 
-    @api.model
-    def _default_sdf(self):
-        return self.env.context.get('sdf')
 
 class ModelMethod(models.Model):
     _name = 'builder.ir.model.method'

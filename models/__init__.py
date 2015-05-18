@@ -1,17 +1,20 @@
 __author__ = 'one'
 
-from . import mixins
-from . import base
-from . import module
-from . import models
-from . import fields
-from . import views
-from . import menus
-from . import actions
-from . import website
-from . import security
-from . import data
-from . import cron
-from . import workflow
-from . import generators
-from . import exchangers
+from . import (
+    mixins,
+    base,
+    module,
+    models,
+    fields,
+    views,
+    menus,
+    actions,
+    website,
+    security,
+    data,
+    cron,
+    workflow,
+    generators,
+    exchangers,
+    demo
+)
