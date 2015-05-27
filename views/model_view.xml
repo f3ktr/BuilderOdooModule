@@ -285,9 +285,16 @@
                                 </field>
                             </page>
                             <page string="Demo Data">
-                                <div class="oe_right oe_button_box" name="demo-buttons">
-                                    <button class="oe_inline oe_stat_button" string="Generator" name="%(act_builder_ir_model_demo_creator_wizard)d" type="action" icon="fa-plus" context="{'default_model_id': id}"/>
-                                </div>
+                                <group>
+                                    <group>
+                                        <field name="demo_records"/>
+                                    </group>
+                                    <group>
+                                        <div class="oe_right oe_button_box" name="demo-buttons">
+                                            <button class="oe_inline oe_stat_button" string="Generator" name="%(act_builder_ir_model_demo_creator_wizard)d" type="action" icon="fa-plus" context="{'default_model_id': id}"/>
+                                        </div>
+                                    </group>
+                                </group>
                                 <field name="demo_data_ids" nolabel="1" mode="tree">
                                     <tree create="0" edit="0" delete="1">
                                         <field name="type" />

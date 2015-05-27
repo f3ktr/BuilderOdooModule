@@ -42,7 +42,7 @@ class RandomStringGenerator(models.Model):
         'subclass_model': lambda s, c, u, cxt=None: s._name
     }
 
-    @api.one
+    @api.multi
     def get_generator(self):
         while True:
             words = []
@@ -51,4 +51,5 @@ class RandomStringGenerator(models.Model):
                 for l in range(randint(self.min_word_length, self.max_word_length)):
                     word += self.allowed_chars[randint(0, len(self.allowed_chars)-1)]
                 words.append(word)
-            yield ' '.join(words)
+            s = ' '.join(words)
+            yield s

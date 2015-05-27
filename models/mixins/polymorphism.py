@@ -67,6 +67,10 @@ class Superclass(models.AbstractModel):
     def get_instance(self):
         return self.env[self.subclass_model].browse(self.subclass_id)
 
+    @property
+    def instance(self):
+        return self.env[self.subclass_model].browse(self.subclass_id)
+
     @api.model
     def create_instance(self, id):
         raise NotImplementedError

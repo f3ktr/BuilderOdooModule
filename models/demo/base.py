@@ -1,3 +1,5 @@
+import pickle
+
 from openerp import models, api, fields, _
 
 
@@ -5,7 +7,7 @@ class GeneratorInterface(models.AbstractModel):
     _name = 'builder.ir.model.demo.generator.base'
     _description = 'Generator Interface'
 
-    @api.one
+    @api.multi
     def get_generator(self):
         raise NotImplementedError
 
@@ -69,7 +71,7 @@ class Generator(models.Model):
 
     @api.one
     def get_generator(self):
-        return self.get_instance().generate()
+        return self.get_instance().get_generator()
 
     @api.multi
     def action_open_view(self):
@@ -83,11 +85,35 @@ class IrModel(models.Model):
     _name = 'builder.ir.model'
     _inherit = ['builder.ir.model']
 
+    demo_records = fields.Integer('Demo Records')
     demo_data_ids = fields.One2many(
         comodel_name='builder.ir.model.demo.generator',
         inverse_name='model_id',
         string='Demo Data',
     )
+    demo_xml_id_sample = fields.Text(compute='_compute_demo_xml_id_sample', store=True)
+
+    @api.one
+    @api.depends('demo_records')
+    def _compute_demo_xml_id_sample(self):
+        tmpl = '{model}_'.format(model=self.model.lower().replace('.', '_')) + '{id}'
+        self.demo_xml_id_sample = pickle.dumps([tmpl.format(id=i) for i in xrange(self.demo_records)])
+
+    @api.multi
+    def demo_xml_id(self, index):
+        return pickle.loads(self.demo_xml_id_sample)[index]
+
+    @property
+    def field_generators(self):
+        result = {}
+
+        for generator in self.demo_data_ids:
+            gen = generator.instance.get_generator()
+            for field in generator.field_ids:
+                if field.name not in result:
+                    result[field.name] = gen
+
+        return result
 
 
 class IrModule(models.Model):
