@@ -34,6 +34,7 @@
                             <group>
                                 <field name="id" invisible="1"/>
                                 <field name="module_id" invisible="1"/>
+                                <field name="special_states_field_id" invisible="1"/>
                                 <field name="model"/>
                                 <field name="name"/>
                                 <field name="osv_memory"/>
@@ -61,9 +62,12 @@
                                             <group>
                                                 <field name="name"/>
                                                 <field name="field_description"/>
+                                                <field name="is_inherited" invisible="1"/>
+                                                <field name="redefine" attrs="{'invisible': [['is_inherited', '=', False]], }"/>
                                             </group>
                                             <group>
                                                 <field name="is_rec_name"/>
+                                                <field name="special_states_field_id" invisible="1"/>
                                                 <field name="use_to_order"/>
                                                 <field name="order" attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
                                             </group>
@@ -277,6 +281,25 @@
                                     <tree string="Methods" create="1" edit="1" delete="1">
                                         <field name="name"/>
                                         <field name="type"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Demo Data">
+                                <group>
+                                    <group>
+                                        <field name="demo_records"/>
+                                    </group>
+                                    <group>
+                                        <div class="oe_right oe_button_box" name="demo-buttons">
+                                            <button class="oe_inline oe_stat_button" string="Generator" name="%(act_builder_ir_model_demo_creator_wizard)d" type="action" icon="fa-plus" context="{'default_model_id': id}"/>
+                                        </div>
+                                    </group>
+                                </group>
+                                <field name="demo_data_ids" nolabel="1" mode="tree">
+                                    <tree create="0" edit="0" delete="1">
+                                        <field name="type" />
+                                        <field name="field_names" />
+                                        <button name="action_open_view" type="object" string="Configure" class="oe_button oe_form_button oe_link"/>
                                     </tree>
                                 </field>
                             </page>

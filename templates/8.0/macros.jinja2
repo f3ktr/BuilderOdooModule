@@ -1,7 +1,18 @@
-
+{# generate demo data #}
+{% macro builder_ir_model_demo_data(model, index) %}
+    {% set field_generators = model.field_generators %}
+    <record id="{{ model.demo_xml_id(index) }}" model="{{ model.model }}">
+        {% for field in model.field_ids -%}
+        {% if field.name in field_generators -%}
+        <field name="{{ field.name }}">{{ field_generators[field.name].next() }}</field>
+        {% endif -%}
+        {% endfor -%}
+    </record>
+{% endmacro %}
 
 {# generate builder.ir.model #}
 {% macro builder_ir_model(model) %}
+{%- if model.define %}
 {%- set class_name = model.model | replace(".", " ") | replace("_", " ") | title | replace(" ","") -%}
 class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}models.Model{% endif %}):
     _name = '{{ model.model }}'
@@ -75,6 +86,7 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
     {% for button in model.button_ids -%}
     {{ builder_ir_model_button(button) }}
     {% endfor -%}
+{% endif -%}
 {% endmacro %}
 
 {# generate builder.ir.model.method #}
@@ -153,7 +165,7 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 
 {# generate builder.ir.model.field #}
 {% macro builder_ir_model_field(field) %}
-    {%- if not field.is_inherited -%}
+    {%- if field.define -%}
     {{ field.name }} = fields.{{ field.ttype.capitalize() }}(
         {%- if field.ttype == 'many2many' %} '{{ field.relation_model_id.model }}', {%- endif %}
         {%- if field.ttype == 'many2one' %} '{{ field.relation_model_id.model }}', {% if field.on_delete %}ondelete='{{field.on_delete}}',{% endif %}{% if field.auto_join %}auto_join=True,{% endif %}{% if field.delegate -%}delegate=True,{% endif %}{%- endif -%}

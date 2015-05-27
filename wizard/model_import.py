@@ -49,11 +49,12 @@ class ModelImport(models.TransientModel):
                         'on_delete': field.on_delete,
                         'domain': field.domain,
                         'selectable': field.selectable,
-                        'is_inherited': self.set_inherited
+                        'is_inherited': self.set_inherited,
+                        'redefine': not self.set_inherited
                     }
 
                     if field.ttype in ['one2many', 'many2many', 'many2one']:
-                        if  field.relation in model_map:
+                        if field.relation in model_map:
                             values.update({
                                 'relation': field.relation,
                                 'relation_model_id': model_map[field.relation].id,
@@ -69,7 +70,6 @@ class ModelImport(models.TransientModel):
 
         if len(_review_models):
             self._create_model_fields(module, _review_models, model_map, relations_only)
-
 
     @api.one
     def action_import(self):

@@ -15,9 +15,10 @@ class GeneratorV8(models.TransientModel):
     @api.model
     def generate_module(self, zip_file, module):
 
-        has_models = len(module.model_ids)
+        has_models = any(model.define for model in module.model_ids)
         module_data = []
         py_packages = []
+        demo_data = []
 
         if has_models:
             py_packages.append('models')
@@ -53,7 +54,22 @@ class GeneratorV8(models.TransientModel):
             zip_file.write_template(
                 'models/models.py',
                 'models/models.py.jinja2',
-                {'models': module.model_ids}
+                {'models': [model for model in module.model_ids if model.define]}
+            )
+
+        for model in module.model_ids:
+            if not model.demo_records:
+                continue
+
+            filename = 'demo/{model}_demo.xml'.format(model=model.model.lower().replace('.', '_'))
+            demo_data.append(filename)
+            zip_file.write_template(
+                filename,
+                'demo/model_demo.xml.jinja2',
+                {
+                    'model': model,
+                    'records': model.demo_records
+                }
             )
 
         if len(module.rule_ids) or len(module.group_ids):
@@ -201,6 +217,10 @@ class GeneratorV8(models.TransientModel):
         zip_file.write_template(
             '__openerp__.py',
             '__openerp__.py.jinja2',
-            {'module': module, 'data': module_data}
+            {
+                'module': module,
+                'data': module_data,
+                'demo': demo_data
+            }
         )
 
