@@ -4,6 +4,7 @@ from string import Template
 from types import MethodType
 import os
 import mimetypes
+import string
 
 from openerp import models, fields, api, _
 from .utils import simple_selection
@@ -47,9 +48,7 @@ class Module(models.Model):
     contributors = fields.Text('Contributors')
     website = fields.Char("Website")
 
-    installed_version = fields.Char('Installed Version', default='0.1')
-    latest_version = fields.Char('Latest Version')
-    published_version = fields.Char('Published Version')
+    version = fields.Char('Version', default='0.1')
     mirror = fields.Text('CodeMirror')
 
     url = fields.Char('URL')
@@ -108,6 +107,20 @@ class Module(models.Model):
     data_file_ids = fields.One2many('builder.data.file', 'module_id', 'Data Files')
     snippet_bookmarklet_url = fields.Char('Link', compute='_compute_snippet_bookmarklet_url')
 
+
+    @api.model
+    def _get_default_author(self):
+        return self.env.user.name if self.env.user else None
+
+    _defaults = {
+        'author': _get_default_author
+    }
+
+    @api.onchange('shortdesc')
+    def _compute_name(self):
+        if not self.name and self.shortdesc:
+            self.name = self.shortdesc.lower().replace(' ', '_').replace('.', '_')
+
     @api.one
     @api.depends('name')
     def _compute_snippet_bookmarklet_url(self):
@@ -153,6 +166,24 @@ javascript:(function(){
     @api.depends('model_ids')
     def _compute_models_count(self):
         self.models_count = len(self.model_ids)
+
+    @api.multi
+    def action_base_files(self):
+
+        return {
+            'name': _('Files'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'builder.data.file',
+            'views': [(False, 'tree'), (False, 'form')],
+            'domain': [('module_id', '=', self.id)],
+            # 'target': 'current',
+            'context': {
+                'default_module_id': self.id
+            },
+        }
+
 
     @api.multi
     def action_backend_models(self):

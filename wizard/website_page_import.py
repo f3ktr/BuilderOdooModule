@@ -1,5 +1,5 @@
 from lxml import html
-
+import lxml.etree as etree
 __author__ = 'one'
 
 from openerp import models, api, fields, _
@@ -25,14 +25,15 @@ class PageImport(models.TransientModel):
             page_source = html.fromstring(page.arch)
 
             while page_source.xpath('//t'):
-                page_source = html.fromstring(page_source.xpath('//t')[0].text_content())
+                for t in page_source.xpath('//t'):
+                    t. getparent().remove(t)
 
             if not current_page.id:
                 new_item = page_item_model.create({
                     'module_id': self.module_id.id,
                     'attr_id': data.name,
                     'attr_name': page.name,
-                    'content': page_source.text_content(),
+                    'content': etree.tostring(page_source, pretty_print=True, xml_declaration=True),
                     'attr_page': True,
                     'wrap_layout': 'website.layout',
                     'attr_priority': page.priority,

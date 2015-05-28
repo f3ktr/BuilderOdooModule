@@ -71,6 +71,8 @@ class Pages(models.Model):
     attr_inherit_id = fields.Char('Inherit Asset')
     attr_priority = fields.Integer('Priority', default=10)
     attr_page = fields.Boolean('Page', default=True)
+    gen_controller = fields.Boolean('Generate Controller', default=False)
+    controller_route = fields.Char('Route')
     content = fields.Html('Body', sanitize=False)
 
     def action_edit_html(self, cr, uid, ids, context=None):
@@ -84,6 +86,10 @@ class Pages(models.Model):
             'target': 'self',
         }
 
+    @api.onchange('attr_page')
+    def _onchange_page(self):
+        self.gen_controller = not self.attr_page
+
 
 class Theme(models.Model):
     _name = 'builder.website.theme'
@@ -91,10 +97,23 @@ class Theme(models.Model):
     _rec_name = 'attr_name'
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
+    attr_id = fields.Char(string='ID', required=True)
     attr_name = fields.Char(string='Name', required=True)
     attr_description = fields.Html('Description')
-    asset_id = fields.Many2one('builder.website.asset', 'Asset', required=True, ondelete='cascade')
     image = fields.Binary(string='Image')
+    color = fields.Char(string='Color')
+    font_name = fields.Char("Font Name")
+    font_attr = fields.Char("Font", help="ex: Times New Roman")
+    type = fields.Selection([('layout', 'Layout'),('color', 'Color'), ('font', 'Font'), ('other', 'Other')], string='Type', required=True, default='layout')
+    item_ids = fields.One2many('builder.website.theme.item', 'theme_id', 'Items')
+
+
+class ThemeAssetItem(models.Model):
+    _name = 'builder.website.theme.item'
+
+    sequence = fields.Integer('Sequence', default=10)
+    file_id = fields.Many2one('builder.data.file', 'File', ondelete='CASCADE')
+    theme_id = fields.Many2one('builder.website.theme', 'Theme', ondelete='CASCADE')
 
 
 class Menu(models.Model):
@@ -111,9 +130,12 @@ class Menu(models.Model):
 
     @api.onchange('page_id')
     def onchange_page_id(self):
-        if not self.name and self.page_id:
+        if self.page_id:
             self.name = self.page_id.attr_name
-            self.url = '/page/website.' + self.page_id.attr_id
+            if self.page_id.attr_page:
+                self.url = '/page/website.' + self.page_id.attr_id
+            else:
+                self.url = self.page_id.controller_route
 
 SNIPPET_TEMPLATE = Template("""
     <xpath expr="//div[@id='snippet_{{ category }}']" position="inside">

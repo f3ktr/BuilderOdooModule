@@ -12,16 +12,15 @@ class ModelImport(models.TransientModel):
     @api.one
     def action_import(self):
         asset_model_name = self.env.context.get('asset_model', 'builder.website.asset.item')
-        asset = self.env[self.env.context.get('active_model')].search([('id', '=', self.env.context.get('active_id'))])
+        model = self.env[self.env.context.get('active_model')].search([('id', '=', self.env.context.get('active_id'))])
         asset_item_model = self.env[asset_model_name]
+        model_field = self.env.context.get('model_link_field', 'asset_id')
+        asset_field = self.env.context.get('asset_field', 'file_id')
 
         for data_file in self.data_ids:
-            current_file = self.env[asset_model_name].search([('asset_id', '=', asset.id), ('file_id', '=', data_file.id)])
+            current_file = self.env[asset_model_name].search([(model_field, '=', model.id), (asset_field, '=', data_file.id)])
 
             if not current_file.id:
-                new_item = asset_item_model.create({
-                    'asset_id': asset.id,
-                    'file_id': data_file.id,
-                })
+                new_item = asset_item_model.create(dict(((model_field, model.id), (asset_field, data_file.id))))
 
         return {'type': 'ir.actions.act_window_close'}

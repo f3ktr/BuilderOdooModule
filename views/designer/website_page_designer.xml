@@ -8,7 +8,7 @@
                     <div id="page_designer" class="mb32">
                         <a class="mt16 btn btn-primary pull-right css_editable_mode_hidden"
                            t-attf-href="#{returnUrl}">
-                            Back to module
+                            Go Back
                         </a>
                         <t t-call="#{field_template}" >
                             <t t-set="record" t-value="record"/>

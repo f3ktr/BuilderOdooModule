@@ -85,10 +85,11 @@
                             </group>
                             <group>
                                 <field name="attr_page"/>
-                                <field name="attr_inherit_id"/>
-                                <button string="Edit in Website" name="action_edit_html" type="object" class="oe_link"/>
+                                <field name="gen_controller" attrs="{'invisible': [('attr_page', '=', True)]}"/>
+                                <field name="controller_route" placeholder="/myroute/mypage" attrs="{'invisible': [('gen_controller', '=', False)], 'required': [('gen_controller', '=', True)]}"/>
                             </group>
                         </group>
+                        <button string="Edit in Website" name="action_edit_html" type="object" class="oe_link"/>
                         <field name="content" nolabel="1" widget="ace" theme="tomorrow" mode="html"
                                style="min-height:200px;width:90%"/>
                     </sheet>
@@ -265,8 +266,9 @@
             <field name="model">builder.website.theme</field>
             <field name="arch" type="xml">
                 <tree string="Theme">
+                    <field name="attr_id"/>
                     <field name="attr_name"/>
-                    <field name="asset_id"/>
+                    <field name="type"/>
                 </tree>
             </field>
         </record>
@@ -288,13 +290,30 @@
                         </div>
                         <group>
                             <group>
+                                <field name="attr_id"/>
                                 <field name="module_id" invisible="1"/>
-                                <field name="asset_id" domain="[('module_id', '=', module_id)]"/>
                             </group>
                             <group>
+                                <field name="type"/>
+                                <field name="color" attrs="{'invisible': [('type', 'not in', ['color'])]}"/>
+                                <field name="font_name" attrs="{'invisible': [('type', 'not in', ['font'])]}"/>
+                                <field name="font_attr" attrs="{'invisible': [('type', 'not in', ['font'])]}"/>
                             </group>
                         </group>
-                        <field name="attr_description" nolabel="1"/>
+                        <notebook>
+                            <page string="Description">
+                                <field name="attr_description" nolabel="1"/>
+                            </page>
+                            <page string="Files">
+                                <button string="Bulk Import" name="%(act_builder_website_asset_data_wizard)d" type="action" class="oe_link" context="{'default_module_id': module_id, 'default_theme_id': context.get('active_id'), 'asset_model': 'builder.website.theme.item', 'model_link_field': 'theme_id'}"/>
+                                <field name="item_ids" nolabel="1" mode="tree">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="file_id" domain="[('extension', 'in', ['.js', '.css', '.less', '.sass'])]"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

@@ -25,11 +25,13 @@ class WebsiteDesigner(http.Controller):
         # try to find fields to display / edit -> as t-field is static, we have to limit
         cr, uid, context = request.cr, request.uid, request.context
         record = request.registry[model].browse(cr, uid, res_id, context=context)
+        model_name = request.registry[model]._description
 
         values = {
             'record': record,
             'templates': None,
             'model': model,
+            'model_name': model_name,
             'res_id': res_id,
             'field': field,
             'return_url': return_url,
@@ -51,15 +53,13 @@ class WebsiteDesigner(http.Controller):
         cr, uid, context = request.cr, request.uid, request.context
         record = request.registry[model].browse(cr, uid, res_id, context=context)
 
+        return_url = '/web#return_label=Website&model={model}&id={id}&view_type=form'.format(model=model, id=record.id)
         if model == 'builder.ir.module.module':
             field_template = 'builder.page_designer_builder_ir_module_module_description_html'
-            return_url = '/web#return_label=Website&model={model}&id={id}&view_type=form&action=builder.open_module_tree'.format(model=model, id=record.id)
         elif model == 'builder.website.page':
             field_template = 'builder.page_designer_builder_website_page_content'
-            return_url = '/web#return_label=Website&model={model}&id={id}&view_type=form&action=builder.open_module_tree'.format(model=model, id=record.module_id.id)
         elif model == 'builder.website.snippet':
             field_template = 'builder.page_designer_builder_website_snippet_content'
-            return_url = '/web#return_label=Website&model={model}&id={id}&view_type=form&action=builder.open_module_tree'.format(model=model, id=record.module_id.id)
         else:
             return request.redirect('/')
 

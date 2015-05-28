@@ -17,17 +17,14 @@ class GeneratorV8(models.TransientModel):
 
         has_models = len(module.model_ids)
         module_data = []
+        py_packages = []
 
         if has_models:
+            py_packages.append('models')
+
             module_data.append('views/views.xml')
             module_data.append('views/actions.xml')
             module_data.append('views/menu.xml')
-
-            zip_file.write_template(
-                '__init__.py',
-                '__init__.py.jinja2',
-                {'packages': ['models']}
-            )
 
             zip_file.write_template(
                 'models/__init__.py',
@@ -138,6 +135,7 @@ class GeneratorV8(models.TransientModel):
                 'views/website_assets.xml.jinja2',
                 {'module': module, 'assets': module.website_asset_ids},
             )
+
         if module.website_page_ids:
             module_data.append('views/website_pages.xml')
             zip_file.write_template(
@@ -145,6 +143,25 @@ class GeneratorV8(models.TransientModel):
                 'views/website_pages.xml.jinja2',
                 {'module': module, 'pages': module.website_page_ids, 'menus': module.website_menu_ids},
             )
+
+            controller_pages = [p for p in module.website_page_ids if not p.attr_page and p.gen_controller]
+
+            if controller_pages:
+                py_packages.append('controllers')
+
+                zip_file.write_template(
+                    'controllers/__init__.py',
+                    '__init__.py.jinja2',
+                    {'packages': ['main']}
+                )
+
+                zip_file.write_template(
+                    'controllers/main.py',
+                    'controllers/main.py.jinja2',
+                    {'module': module, 'pages': controller_pages},
+                )
+
+
         if module.website_theme_ids:
             module_data.append('views/website_themes.xml')
             zip_file.write_template(
@@ -171,6 +188,12 @@ class GeneratorV8(models.TransientModel):
                 'views/website_snippets.xml.jinja2',
                 {'module': module, 'snippet_type': snippet_type},
             )
+
+        zip_file.write_template(
+            '__init__.py',
+            '__init__.py.jinja2',
+            {'packages': py_packages}
+        )
 
         # end website stuff
 

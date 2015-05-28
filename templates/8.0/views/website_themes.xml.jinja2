@@ -1,0 +1,22 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+
+    <template id="themes" inherit_id="website.themes" name="Themes">
+        <xpath expr="//div[@id='themes-list']" position="inside">
+            {% for theme in themes %}
+                {{ macros.builder_website_theme(theme)|indent(8) }}
+            {% endfor %}
+        </xpath>
+    </template>
+
+    <!--
+         Theme assets
+    -->
+
+    {% for theme in themes %}
+        {{ macros.builder_website_theme_asset(theme)|indent(8) }}
+    {% endfor %}
+
+{% endblock %}

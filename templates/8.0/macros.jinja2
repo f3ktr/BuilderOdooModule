@@ -676,14 +676,10 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
 
 {# generate builder.website.asset #}
 {% macro builder_website_asset(asset) %}
-    <template id="{{ asset.module_id.name }}.{{ asset.attr_id }}" name="{{ asset.attr_name }}" inherit_id="{{ asset.type }}" {% if asset.type == 'website.theme' %} {% if not asset.attr_active %}active="False"{% endif %} customize_show="{{ asset.attr_customize_show }}" {% endif %}>
-        {% if asset.type == 'website.theme' -%}
-        <xpath expr="//link[@id='bootstrap_css']" position="after">
-        {% else -%}
+    <template id="{{ asset.module_id.name }}.{{ asset.attr_id }}" name="{{ asset.attr_name }}" inherit_id="website.assets_frontend" {% if not asset.attr_active %}active="False"{% endif %} customize_show="{{ asset.attr_customize_show }}">
         <xpath expr="." position="inside">
-        {% endif -%}
             {% for item in asset.item_ids -%}
-                {{ builder_website_asset_item(item) }}
+                {{ builder_website_asset_item(item, asset.module_id)|indent(8) }}
             {% endfor -%}
         </xpath>
     </template>
@@ -717,8 +713,8 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
 
 {# generate builder.website.page #}
 {% macro builder_website_page(page) %}
-    <template id="website.{{ page.attr_id }}" name="{{ page.attr_name }}" page="True" {% if page.priority %}priority="{{ page.priority }}" {% endif %}>
-        <t t-call="{{ page.wrap_layout }}">
+    <template {% if page.attr_page %}id="website.{{ page.attr_id }}" {% else %}id="{{ page.attr_id }}" {% endif %} name="{{ page.attr_name }}"{% if page.attr_page %} page="{{page.attr_page }}"{% endif %} {% if page.priority %}priority="{{ page.priority }}" {% endif %}>
+        <t t-call="website.layout">
             <div id="wrap" class="oe_structure oe_empty">
                 {{ page.content }}
             </div>
@@ -739,11 +735,22 @@ access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed 
             {% endif %}
             <div class="options">
                 <h3>{{ theme.attr_name }}</h3>
-                <p>{{ theme.attr_description }}</p>
-                <a class="btn btn-info" href="/website/theme_change?theme_id={{ theme.module_id.name }}.{{ theme.asset_id.attr_id }}">Apply</a>
+                <p>{{ theme.attr_description|default(theme.attr_name) }}</p>
+                <a class="btn btn-info" href="/website/theme_change?theme_id={{ theme.module_id.name }}.{{ theme.attr_id }}">Apply</a>
             </div>
         </div>
     </div>
+{% endmacro %}
+
+{# generate builder.website.theme #}
+{% macro builder_website_theme_asset(theme) %}
+    <template id="{{ theme.module_id.name }}.{{ theme.attr_id }}" name="{{ theme.attr_name }}" inherit_id="website.theme" active="False" customize_show="True">
+        <xpath expr="//link[@id='bootstrap_css']" position="after">
+            {% for item in theme.item_ids -%}
+                {{ builder_website_asset_item(item, theme.module_id)|indent(8) }}
+            {%- endfor %}
+        </xpath>
+    </template>
 {% endmacro %}
 
 
