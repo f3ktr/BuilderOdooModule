@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, sample
 import openerp
 
 __author__ = 'deimos'
@@ -22,10 +22,10 @@ class RandomStringGenerator(models.Model):
         required=True
     )
 
-    min_word_length = fields.Integer('Minimum Word Length', required=True)
-    max_word_length = fields.Integer('Maximum Word Length', required=True)
-    min_word_count = fields.Integer('Minimum Word Count', required=True)
-    max_word_count = fields.Integer('Maximum Word Count', required=True)
+    min_word_length = fields.Integer('Minimum Word Length', required=True, default=3)
+    max_word_length = fields.Integer('Maximum Word Length', required=True, default=10)
+    min_word_count = fields.Integer('Minimum Word Count', required=True, default=1)
+    max_word_count = fields.Integer('Maximum Word Count', required=True, default=3)
     allowed_chars = fields.Char('Allowed Chars', required=True, default='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
 
     @api.constrains('max_word_length')
@@ -43,13 +43,11 @@ class RandomStringGenerator(models.Model):
     }
 
     @api.multi
-    def get_generator(self):
+    def get_generator(self, field):
         while True:
             words = []
             for i in range(randint(self.min_word_count, self.max_word_count)):
-                word = ''
-                for l in range(randint(self.min_word_length, self.max_word_length)):
-                    word += self.allowed_chars[randint(0, len(self.allowed_chars)-1)]
+                word = ''.join(sample(self.allowed_chars, randint(self.min_word_length, self.max_word_length)))
                 words.append(word)
             s = ' '.join(words)
             yield s

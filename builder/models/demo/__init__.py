@@ -2,5 +2,8 @@ __author__ = 'deimos'
 
 from . import (
     base,
-    char
+    char,
+    name,
+    email,
+    autoincrement,
 )

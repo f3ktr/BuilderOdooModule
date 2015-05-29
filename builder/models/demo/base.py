@@ -8,7 +8,7 @@ class GeneratorInterface(models.AbstractModel):
     _description = 'Generator Interface'
 
     @api.multi
-    def get_generator(self):
+    def get_generator(self, field):
         raise NotImplementedError
 
     @api.multi
@@ -70,8 +70,8 @@ class Generator(models.Model):
         ]
 
     @api.one
-    def get_generator(self):
-        return self.get_instance().get_generator()
+    def get_generator(self, field):
+        return self.get_instance().get_generator(field)
 
     @api.multi
     def action_open_view(self):
@@ -103,17 +103,19 @@ class IrModel(models.Model):
     def demo_xml_id(self, index):
         return pickle.loads(self.demo_xml_id_sample)[index]
 
+    _field_generators = None
     @property
-    def field_generators(self):
-        result = {}
+    def field_generators(self, reload=False):
+        if not self._field_generators or reload:
+            result = {}
 
-        for generator in self.demo_data_ids:
-            gen = generator.instance.get_generator()
-            for field in generator.field_ids:
-                if field.name not in result:
-                    result[field.name] = gen
+            for generator in self.demo_data_ids:
+                for field in generator.field_ids:
+                    if field.name not in result:
+                        result[field.name] = generator.instance.get_generator(field)
 
-        return result
+            self._field_generators = result
+        return self._field_generators
 
 
 class IrModule(models.Model):
