@@ -1,11 +1,11 @@
 import random
-import openerp
 import string
 
 __author__ = 'one'
 
 from openerp import models, api, fields, _
 import re
+
 
 class NameGenerator(models.Model):
     _name = 'builder.ir.model.demo.generator.name'
@@ -29,12 +29,12 @@ class NameGenerator(models.Model):
                                      ('FemaleName', 'Jane (female name)'),
                                      ('MaleName Surname', 'John Smith'),
                                      ('FemaleName Surname', 'Jane Smith'),
-                                     ('Name Surname', 'Alex Smith'),
+                                     ('Title Name Surname', 'Mr. Alex Smith'),
                                      ('Name Initial. Surname', 'Alex J. Smith'),
                                      ('Surname', 'Smith (surname)'),
                                  ], required=True)
 
-    name_type_schema = fields.Char(required=True, help=_("Valid placeholders are : Name, MaleName, FemaleName, Surname, Initial"))
+    name_type_schema = fields.Char(required=True, help=_("Valid placeholders are : Title, Name, MaleName, FemaleName, Surname, Initial"))
 
     _defaults = {
         'subclass_model': lambda s, c, u, cxt=None: s._name
@@ -54,16 +54,10 @@ class NameGenerator(models.Model):
             placeholder = re.sub('FemaleName', self.get_random_name_part, placeholder)
             placeholder = re.sub('Surname', self.get_random_name_part, placeholder)
             placeholder = re.sub('Initial', self.get_random_name_part, placeholder)
+            placeholder = re.sub('Title', self.get_random_name_part, placeholder)
 
             yield placeholder
 
-    @staticmethod
-    def get_random_name_part(m):
-        parts = {
-            'MaleName': ['Yusnel', 'Yunier', 'Yunior'],
-            'FemaleName': ['Maira', 'Maria', 'Alina'],
-            'Surname': ['Rojas', 'Garcia', 'Suarez'],
-            'Initial': string.uppercase,
-        }
-        name_part = m.group(0)
-        return random.choice(parts.get(name_part, []))
+    def get_random_name_part(self, m):
+        parts = self.get_demo_data()
+        return random.choice(parts.get(m.group(0), []))

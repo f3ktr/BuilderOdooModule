@@ -1,7 +1,9 @@
+import json
 import pickle
+import os
+import random
 
 from openerp import models, api, fields, _
-
 
 class GeneratorInterface(models.AbstractModel):
     _name = 'builder.ir.model.demo.generator.base'
@@ -14,6 +16,23 @@ class GeneratorInterface(models.AbstractModel):
     @api.multi
     def action_save(self):
         return {'type': 'ir.actions.act_window_close'}
+
+    _demo_data = {}
+    @api.model
+    def get_demo_data(self, filename=None, dataFormat='json'):
+        if filename is None:
+            filename = "{name}.json".format(name=self.subclass_model)
+        if filename not in self._demo_data:
+            fullname = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', filename))
+            if os.path.exists(fullname):
+                try:
+                    if dataFormat == 'json':
+                        self._demo_data[filename] = json.loads(open(fullname).read())
+                    else:
+                        self._demo_data[filename] = open(fullname).read()
+                except Exception, e:
+                    return {}
+        return self._demo_data.get(filename, {})
 
 
 class Generator(models.Model):
@@ -36,10 +55,17 @@ class Generator(models.Model):
         string='Fields',
     )
     field_names = fields.Char('Field Names', compute='_compute_field_names', store=True)
+    allow_nulls = fields.Boolean('Allow Null Values', help='If the field is not required allow to generate null values for them.')
 
     _defaults = {
         'subclass_model': lambda s, c, u, cxt=None: s._name
     }
+
+    @api.multi
+    def generate_null_values(self, field):
+        if self.allow_nulls and not field.required:
+            return random.random() <= (1.0 / (self.model_id.demo_records + 1))
+        return False
 
     @api.one
     @api.depends('subclass_model')
@@ -56,6 +82,8 @@ class Generator(models.Model):
     @api.depends('subclass_model')
     def _compute_target_fields_type(self):
         self.target_fields_type = self.env[self.subclass_model]._model._target_type
+
+
 
     @api.model
     def get_generators(self):

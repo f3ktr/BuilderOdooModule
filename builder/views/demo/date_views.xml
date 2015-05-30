@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Date Generator -->
+
+        <record model="ir.ui.view" id="builder_ir_model_demo_generator_date_form_view">
+            <field name="name">builder.ir.model.demo.generator.date.form</field>
+            <field name="model">builder.ir.model.demo.generator.date</field>
+            <field name="arch" type="xml">
+                <form string="Date Generator" version="7.0">
+                    <group>
+                        <group>
+                            <field name="field_ids" widget="many2many_tags" domain="[['ttype', 'in', ['date', 'datetime']], ['model_id', '=', model_id]]"/>
+                            <field name="allow_nulls" />
+                        </group>
+                        <group>
+                            <field name="model_id" invisible="1"/>
+                            <field name="module_id" invisible="1"/>
+                            <field name="subclass_model" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="dynamic_datetime" />
+                        </group>
+                        <group>
+                            <field name="min_days_diff"  attrs="{'invisible': [('dynamic_datetime', '=', False)], 'required': [('dynamic_datetime', '=', True)] , 'readonly': [('dynamic_datetime', '=', False)]}"/>
+                            <field name="max_days_diff" attrs="{'invisible': [('dynamic_datetime', '=', False)], 'required': [('dynamic_datetime', '=', True)] , 'readonly': [('dynamic_datetime', '=', False)]}"/>
+                            <field name="date_from" attrs="{'invisible': [('dynamic_datetime', '=', True)], 'required': [('dynamic_datetime', '=', False)] , 'readonly': [('dynamic_datetime', '=', True)]}"/>
+                            <field name="date_to" attrs="{'invisible': [('dynamic_datetime', '=', True)], 'required': [('dynamic_datetime', '=', False)] , 'readonly': [('dynamic_datetime', '=', True)]}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_save" string="Save" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_model_demo_generator_date">
+            <field name="name">Date Generator</field>
+            <field name="res_model">builder.ir.model.demo.generator.date</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Date Generator -->
+    </data>
+</openerp>

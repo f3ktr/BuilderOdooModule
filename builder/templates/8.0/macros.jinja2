@@ -2,13 +2,38 @@
 {% macro builder_ir_model_demo_data(model, index) %}
     {% set field_generators = model.field_generators %}
     <record id="{{ model.demo_xml_id(index) }}" model="{{ model.model }}">
-        {% for field in model.field_ids -%}
-        {% if field.name in field_generators -%}
-        <field name="{{ field.name }}">{{ field_generators[field.name].next() }}</field>
-        {% endif -%}
-        {% endfor -%}
+        {%- for field in model.field_ids -%}
+        {%- if field.name in field_generators %}
+        {%- set value = field_generators[field.name].next() %}
+        {%- if value == False %}
+        <field name="{{ field.name }}" eval="False"></field>
+        {%- elif field.ttype in ['integer', 'float', 'boolean'] %}
+        <field name="{{ field.name }}" eval="{{ value }}"></field>
+        {%- elif field.ttype in ['binary'] %}
+        <field name="{{ field.name }}" type="base64" file="{{ model.module_id.name }}{{ value }}"/>
+        {%- elif field.ttype in ['many2one'] %}
+        <field name="{{ field.name }}" ref="{{ value }}"/>
+        {%- elif field.ttype in ['many2many'] %}
+        <field name="{{ field.name }}" eval="{{ value }}" />
+        {%- else %}
+        <field name="{{ field.name }}">{{ value }}</field>
+        {%- endif %}
+        {%- endif -%}
+        {%- endfor %}
     </record>
 {% endmacro %}
+
+{% macro builder_ir_model_demo_data_yml(model, index) %}
+    {% set field_generators = model.field_generators %}
+-
+    !record {model: {{ model.model }}, id: {{ model.demo_xml_id(index) }}}:
+        {%- for field in model.field_ids -%}
+        {%- if field.name in field_generators %}
+        {{ field.name }}: {{ field_generators[field.name].next() }}
+        {%- endif -%}
+        {%- endfor %}
+{% endmacro %}
+
 
 {# generate builder.ir.model #}
 {% macro builder_ir_model(model) %}
