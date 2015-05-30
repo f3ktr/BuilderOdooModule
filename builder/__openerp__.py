@@ -63,6 +63,10 @@ This module aims to help in the development of new modules
         'views/demo/name_views.xml',
         'views/demo/email_views.xml',
         'views/demo/autoincrement_views.xml',
+        'views/demo/selection_views.xml',
+        'views/demo/normal_views.xml',
+        'views/demo/custom_list_views.xml',
+        'views/demo/m2o_views.xml',
 
         'wizard/module_data_import_view.xml',
         'wizard/module_import_view.xml',

@@ -2,11 +2,11 @@
 {% macro builder_ir_model_demo_data(model, index) %}
     {% set field_generators = model.field_generators %}
     <record id="{{ model.demo_xml_id(index) }}" model="{{ model.model }}">
-        {% for field in model.field_ids -%}
-        {% if field.name in field_generators -%}
+        {%- for field in model.field_ids -%}
+        {%- if field.name in field_generators %}
         <field name="{{ field.name }}">{{ field_generators[field.name].next() }}</field>
-        {% endif -%}
-        {% endfor -%}
+        {%- endif -%}
+        {%- endfor %}
     </record>
 {% endmacro %}
 

@@ -6,4 +6,8 @@ from . import (
     name,
     email,
     autoincrement,
+    selection,
+    normal_distribution,
+    custom_list,
+    m2o,
 )
