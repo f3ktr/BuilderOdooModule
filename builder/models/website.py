@@ -1,6 +1,6 @@
 import random
 from jinja2 import Template
-
+import re
 __author__ = 'one'
 
 from openerp import models, fields, api, _
@@ -54,10 +54,21 @@ class MediaItem(models.Model):
     _rec_name = 'attr_name'
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
-    attr_id = fields.Char('XML ID')
+    attr_id = fields.Char('XML ID', compute='_compute_attr_id', readonly=False, store=True)
     file_id = fields.Many2one('builder.data.file', 'Image', required=True, ondelete='cascade')
     attr_name = fields.Char(string='Name', related='file_id.filename', store=False, search=True)
     image = fields.Binary('Image', related='file_id.content', store=False, search=True)
+
+    @api.one
+    @api.depends('attr_name')
+    def _compute_attr_id(self):
+        if not self.attr_id and self.attr_name:
+            self.attr_id = re.sub('[^a-zA-Z_]', '_', self.attr_name) + str(1 + len(self.search([])))
+
+    @api.onchange('attr_name')
+    def _onchange_attr_id(self):
+        if not self.attr_id and self.attr_name:
+            self.attr_id = re.sub('[^a-zA-Z_]', '_', self.attr_name) + str(1 + len(self.search([])))
 
 
 class Pages(models.Model):

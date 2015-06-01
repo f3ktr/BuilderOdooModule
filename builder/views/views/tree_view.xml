@@ -14,9 +14,6 @@
                             <field name="model_inherit_type" invisible="1"/>
                             <field name="name"/>
                             <field name="xml_id"/>
-                            <field name="attr_create"/>
-                            <field name="attr_edit"/>
-                            <field name="attr_delete"/>
                         </group>
                         <group>
                             <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', '=', False)]}"/>

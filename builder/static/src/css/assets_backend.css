@@ -5,3 +5,7 @@
     padding-top: 0px;
     padding-bottom: 0px;
 }
+
+#image_preview img.oe_form_field_image{
+      max-width: 100px !important;
+}

@@ -12,4 +12,5 @@ from . import website_asset_bulk_add
 from . import website_page_import
 from . import model_access_generate_wizard
 from . import demo_creator_wizard
+from . import website_media_item_bulk_add
 # from . import model_view_wizard

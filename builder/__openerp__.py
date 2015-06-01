@@ -44,6 +44,7 @@ This module aims to help in the development of new modules
         'wizard/menu_lookup_wizard_view.xml',
         'wizard/action_lookup_wizard_view.xml',
         'wizard/website_asset_bulk_add_view.xml',
+        'wizard/website_media_item_bulk_add_view.xml',
         'wizard/website_page_import_view.xml',
         'wizard/model_access_generate_wizard_view.xml',
         'wizard/demo_creator_wizard_view.xml',

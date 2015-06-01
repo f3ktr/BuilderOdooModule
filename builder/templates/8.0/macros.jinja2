@@ -192,7 +192,7 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 {% macro builder_ir_model_field(field) %}
     {%- if field.define -%}
     {{ field.name }} = fields.{{ field.ttype.capitalize() }}(
-        {%- if field.ttype == 'many2many' %} '{{ field.relation_model_id.model }}', {%- endif %}
+        {%- if field.ttype == 'many2many' %} '{{ field.relation_model_id.model }}', '{{ field.relation_many2many_relation }}', {% if field.relation_many2many_column1 and field.relation_many2many_column2 %}'{{ field.relation_many2many_column1 }}', '{{ field.relation_many2many_column2 }}', {%- endif %}{%- endif %}
         {%- if field.ttype == 'many2one' %} '{{ field.relation_model_id.model }}', {% if field.on_delete %}ondelete='{{field.on_delete}}',{% endif %}{% if field.auto_join %}auto_join=True,{% endif %}{% if field.delegate -%}delegate=True,{% endif %}{%- endif -%}
         {%- if field.ttype == 'one2many' %} '{{ field.relation_model_id.model }}', '{{field.relation_field}}', {%- endif -%}
         {%- if field.ttype == 'char' %} {%- if field.size %} size={{ field.size }}, {%- endif -%}{% if field.translate %}translate=True,{% endif %}{%- endif -%}
@@ -262,34 +262,33 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
         {% if view.type == 'tree' and view.field_parent_id %}
         <field name="field_parent">{{ view.field_parent_id.name }}</field>
         {% endif -%}
-        <field name="priority" eval="{{ view.priority }}" />
+        {% if view.priority %}<field name="priority" eval="{{ view.priority }}" />{% endif %}
         {% if view.inherit_view %}
         <field name="inherit_id" ref="{{ view.inherit_view_ref }}" />
         {% endif %}
         <field name="arch" type="xml">
-            {% if view.inherit_view %}
+            {%- if view.inherit_view -%}
                 {% for change in view.inherit_change_ids %}
                 {{ builder_ir_ui_view_inherit_change(change) }}
                 {% endfor %}
-            {% else %}
+            {%- else -%}
                 {% set view_gen = view.subclass_model|dot2dashed %}
                 {% set instance = view.get_instance().0 %}
-{#                {{ (view_gen | get_macro)(view.get_instance()) }}#}
-                {% if view.type == 'form' %}
-                {{ builder_views_form(instance) }}
-                {% elif view.type == 'calendar' %}
-                {{ builder_views_calendar(instance) }}
-                {% elif view.type == 'gantt' %}
-                {{ builder_views_gantt(instance) }}
-                {% elif view.type == 'graph' %}
-                {{ builder_views_graph(instance) }}
-                {% elif view.type == 'kanban' %}
-                {{ builder_views_kanban(instance) }}
-                {% elif view.type == 'search' %}
-                {{ builder_views_search(instance) }}
-                {% elif view.type == 'tree' %}
-                {{ builder_views_tree(instance) }}
-                {% endif %}
+                {%- if view.type == 'form' -%}
+                {{ builder_views_form(instance)|indent(8) }}
+                {%- elif view.type == 'calendar' -%}
+                {{ builder_views_calendar(instance)|indent(8) }}
+                {%- elif view.type == 'gantt' -%}
+                {{ builder_views_gantt(instance)|indent(8) }}
+                {%- elif view.type == 'graph' -%}
+                {{ builder_views_graph(instance)|indent(8) }}
+                {%- elif view.type == 'kanban' -%}
+                {{ builder_views_kanban(instance)|indent(8) }}
+                {%- elif view.type == 'search' -%}
+                {{ builder_views_search(instance)|indent(8) }}
+                {%- elif view.type == 'tree' -%}
+                {{ builder_views_tree(instance)|indent(8) }}
+                {% endif -%}
             {% endif %}
         </field>
     </record>
@@ -311,8 +310,8 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 
 {# generate builder.views.tree #}
 {% macro builder_views_tree(instance) %}
-    <tree string="{{ instance.string }}"{% if not instance.create %} create="false" {% endif %}{% if not instance.edit %} edit="false" {% endif %}{% if not instance.delete %} delete="false" {% endif %}{% if instance.toolbar %} toolbar="True" {% endif %}{% if instance.fonts %} fonts="{{ instance.fonts }}" {% endif %}{% if instance.colors %} colors="{{ instance.colors }}" {% endif %}>
-    {% for field in instance.fields %}
+    <tree string="{{ instance.name }}"{% if not instance.attr_create %} create="false" {% endif %}{% if not instance.attr_edit %} edit="false" {% endif %}{% if not instance.attr_delete %} delete="false" {% endif %}{% if instance.toolbar %} toolbar="True" {% endif %}{% if instance.fonts %} fonts="{{ instance.fonts }}" {% endif %}{% if instance.colors %} colors="{{ instance.colors }}" {% endif %}>
+    {%- for field in instance.field_ids %}
         <field name="{{ field.field_id.name }}"{% if field.string %} string="{{ field.string }}" {% endif %}{% if field.invisible %} invisible="True" {% endif %}{% if field.widget %} widget="{{ field.widget }}" {% endif %}{% if field.widget_options %} widget_options="{{ field.widget_options }}" {% endif %}{% if field.readonly %} readonly="{{ field.readonly }}" {% endif %}{% if field.domain %} domain="{{ field.domain }}" {% endif %} />
     {%- endfor %}
     </tree>
@@ -325,7 +324,7 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 
 {# generate builder.views.search #}
 {% macro builder_views_search(instance) %}
-    <search string="{{ instance.string}}">
+    <search string="{{ instance.name}}">
     {% for field in instance.ungrouped_fields %}
         {% if field.type == 'filter' -%}
             <filter {% if field.attr_name %}name="{{ field.attr_name }}" {% endif %}{% if field.attr_string %} string="{{field.attr_string}}" {% endif %}{% if field.attr_domain %} domain="{{field.attr_domain}}" {% endif %}{% if field.attr_filter_domain %} filter_domain="{{field.attr_filter_domain}}" {% endif %}{% if field.attr_operator %} operator="{{field.attr_operator}}" {% endif %}{% if field.attr_help %} help="{{field.attr_help}}" {% endif %}{% if field.group_field_id %} context="{'group_by':'{{field.group_field_id.name}}'}" {% endif %} />
@@ -421,7 +420,7 @@ class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}mo
 
 {# generate builder.views.form #}
 {% macro builder_views_form(instance) %}
-    <form string="{{ instance.string }}" {% if not instance.create %} create="false" {% endif %}{% if not instance.edit %} edit="false" {% endif %}{% if not instance.delete %} delete="false" {% endif %}>
+    <form string="{{ instance.name }}" {% if not instance.attr_create %} create="false" {% endif %}{% if not instance.attr_edit %} edit="false" {% endif %}{% if not instance.attr_delete %} delete="false" {% endif %}>
     {% if instance.show_status_bar %}
         <header>
         {% for button in instance.statusbar_button_ids %}

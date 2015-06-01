@@ -261,6 +261,7 @@
                                         <field nolabel="1" name="website_theme_ids"  context="{'default_module_id': active_id}"/>
                                     </page>
                                     <page string="Media Items">
+                                        <button string="Import Items" name="%(act_builder_website_media_item_bulk_add_wizard)d" type="action" class="oe_link" context="{'default_module_id': id}"/>
                                         <field nolabel="1" name="website_media_item_ids"  context="{'default_module_id': active_id}" mode="kanban">
                                             <kanban>
                                                 <field name="image"/>

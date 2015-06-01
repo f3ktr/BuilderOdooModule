@@ -227,7 +227,7 @@
                                 <field name="attr_name"/>
                             </group>
                             <group>
-                                <div style="width:150px;height:150px">
+                                <div style="width:150px;height:150px" id="image_preview">
                                     <field name="image" widget="image" readonly="1" />
                                 </div>
                             </group>

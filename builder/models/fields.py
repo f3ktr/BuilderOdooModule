@@ -363,6 +363,15 @@ class IrFields(models.Model):
                 }
                 if ttype == 'one2many':
                     attrs['relation_field'] = model.name
+
+                if ttype == 'many2many':
+                    attrs['relation_many2many_relation'] = model.relation_many2many_relation
+                    attrs['relation_many2many_column1'] = model.relation_many2many_column2
+                    attrs['relation_many2many_column2'] = model.relation_many2many_column1
+                    attrs['reverse_relation_name'] = model.name
+                    attrs['reverse_field_description'] = model.model_id.name
+                    attrs['relation_create_inverse_relation'] = True
+
                 reverse_field = field_obj.create(attrs)
 
         return model
@@ -394,6 +403,14 @@ class IrFields(models.Model):
                 }
                 if ttype == 'one2many':
                     attrs['relation_field'] = model.name
+                if ttype == 'many2many':
+                    attrs['relation_many2many_relation'] = model.relation_many2many_relation
+                    attrs['relation_many2many_column1'] = model.relation_many2many_column2
+                    attrs['relation_many2many_column2'] = model.relation_many2many_column1
+                    attrs['reverse_relation_name'] = model.name
+                    attrs['reverse_field_description'] = model.model_id.name
+                    attrs['relation_create_inverse_relation'] = True
+
                 reverse_field = field_obj.create(attrs)
 
         return saved
