@@ -136,7 +136,7 @@ class StatusBarActionButton(models.Model):
 
     @api.onchange('type', 'name')
     def _onchange_type(self):
-        if self.type == 'object' and self.name:
+        if (self.type == 'object') and self.name:
             self.method_name = "action_{name}".format(name=snake_case(self.name.replace(' ', '.')).lower())
 
 
@@ -226,7 +226,8 @@ class FormButton(models.Model):
 
     @api.onchange('name', 'type')
     def onchange_name(self):
-        self.method_name = 'do_{name}'.format(name=self.name.lower().replace(' ', '_'))
+        if self.name:
+            self.method_name = 'do_{name}'.format(name=self.name.lower().replace(' ', '_'))
 
 
 

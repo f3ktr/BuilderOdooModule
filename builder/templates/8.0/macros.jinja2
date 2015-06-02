@@ -39,7 +39,7 @@
 {% macro builder_ir_model(model) %}
 {%- if model.define %}
 {%- set class_name = model.model | replace(".", " ") | replace("_", " ") | title | replace(" ","") -%}
-class {{ class_name }}({% if model.osv_memory %}models.AbstractModel{% else %}models.Model{% endif %}):
+class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}models.Model{% endif %}):
     _name = '{{ model.model }}'
     {% if model.rec_name_field_id -%}
     _rec_name='{{ model.rec_name_field_id.name }}'
