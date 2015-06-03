@@ -81,6 +81,7 @@ This module aims to help in the development of new modules
         'views/module_view.xml',
         'views/field_view.xml',
         'views/model_view.xml',
+        'views/res_config_model_view.xml',
         'views/action_view.xml',
         'views/data_view.xml',
         'views/security_view.xml',

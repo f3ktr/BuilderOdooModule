@@ -328,6 +328,23 @@ javascript:(function(){
         }
 
     @api.multi
+    def action_backend_config_models(self):
+
+        return {
+            'name': _('Configuration Models'),
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'builder.res.config.settings',
+            'views': [(False, 'tree'), (False, 'form')],
+            'domain': [('module_id', '=', self.id)],
+            # 'target': 'current',
+            'context': {
+                'default_module_id': self.id
+            },
+        }
+
+    @api.multi
     def action_backend_cron_jobs(self):
 
         return {

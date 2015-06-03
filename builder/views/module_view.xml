@@ -53,6 +53,9 @@
                                             <button class="oe_inline oe_stat_button" string="Workflows" name="action_backend_workflows" type="object"  icon="fa-random" context="{'default_module_id': id}"/>
                                         </li>
                                         <li>
+                                            <button class="oe_inline oe_stat_button" string="Setting Models" name="action_backend_config_models" type="object"  icon="fa-cog" context="{'default_module_id': id}"/>
+                                        </li>
+                                        <li>
                                             <button class="oe_inline oe_stat_button" string="Cron Jobs" name="action_backend_cron_jobs" type="object"  icon="fa-bell-slash" context="{'default_module_id': id}"/>
                                         </li>
                                         <li>

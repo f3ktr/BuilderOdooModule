@@ -14,6 +14,7 @@ from . import (
     data,
     cron,
     workflow,
+    res_config_model,
     generators,
     exchangers,
     demo
