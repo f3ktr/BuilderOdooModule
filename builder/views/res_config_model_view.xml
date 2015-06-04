@@ -49,11 +49,11 @@
                                             <group>
                                                 <field name="setting_field_type"/>
                                                 <field name="ttype"
-                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'readonly': [('setting_field_type', 'not in', ['other'])]}"/>
+                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])]}"/>
                                             </group>
                                             <group>
                                                 <field name="name"
-                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'readonly': [('setting_field_type', 'not in', ['other'])], }"/>
+                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])], }"/>
                                                 <field name="field_description"/>
                                             </group>
                                         </group>

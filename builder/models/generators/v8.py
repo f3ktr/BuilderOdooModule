@@ -19,19 +19,15 @@ class GeneratorV8(models.TransientModel):
         module_data = []
         py_packages = []
         demo_data = []
+        model_packages = []
 
         if has_models:
             py_packages.append('models')
+            model_packages.append('models')
 
             module_data.append('views/views.xml')
             module_data.append('views/actions.xml')
             module_data.append('views/menu.xml')
-
-            zip_file.write_template(
-                'models/__init__.py',
-                '__init__.py.jinja2',
-                {'packages': ['models']}
-            )
 
             zip_file.write_template(
                 'views/menu.xml',
@@ -118,6 +114,23 @@ class GeneratorV8(models.TransientModel):
                     'assets': module.backend_asset_ids,
                 })
 
+        if len(module.setting_ids):
+            module_data.append('views/settings.xml')
+            zip_file.write_template(
+                'views/settings.xml',
+                'views/settings.xml.jinja2', {
+                    'module': module,
+                    'settings': module.setting_ids,
+                })
+
+            model_packages.append('settings')
+            zip_file.write_template(
+                'models/settings.py',
+                'models/settings.py.jinja2', {
+                    'module': module,
+                    'settings': module.setting_ids,
+                })
+
         if module.icon_image:
             zip_file.write(
                 'static/description/icon.png',
@@ -177,7 +190,6 @@ class GeneratorV8(models.TransientModel):
                     {'module': module, 'pages': controller_pages},
                 )
 
-
         if module.website_theme_ids:
             module_data.append('views/website_themes.xml')
             zip_file.write_template(
@@ -205,6 +217,13 @@ class GeneratorV8(models.TransientModel):
                 {'module': module, 'snippet_type': snippet_type},
             )
 
+        if model_packages:
+            zip_file.write_template(
+                'models/__init__.py',
+                '__init__.py.jinja2',
+                {'packages': model_packages}
+            )
+
         zip_file.write_template(
             '__init__.py',
             '__init__.py.jinja2',
@@ -213,7 +232,7 @@ class GeneratorV8(models.TransientModel):
 
         # end website stuff
 
-        #this must be last to include all resources
+        # this must be last to include all resources
         zip_file.write_template(
             '__openerp__.py',
             '__openerp__.py.jinja2',
@@ -223,4 +242,3 @@ class GeneratorV8(models.TransientModel):
                 'demo': demo_data
             }
         )
-

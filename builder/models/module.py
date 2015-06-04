@@ -107,7 +107,6 @@ class Module(models.Model):
     data_file_ids = fields.One2many('builder.data.file', 'module_id', 'Data Files')
     snippet_bookmarklet_url = fields.Char('Link', compute='_compute_snippet_bookmarklet_url')
 
-
     @api.model
     def _get_default_author(self):
         return self.env.user.name if self.env.user else None
@@ -183,7 +182,6 @@ javascript:(function(){
                 'default_module_id': self.id
             },
         }
-
 
     @api.multi
     def action_backend_models(self):

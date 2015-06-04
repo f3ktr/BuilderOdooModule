@@ -42,6 +42,7 @@ class SettingModelField(models.Model):
     model_id = fields.Many2one('builder.res.config.settings', 'Model', ondelete='cascade')
     special_states_field_id = fields.Many2one('builder.ir.model.fields', related=False,
                                               string='States Field')
+    ttype = fields.Selection(required=False)
 
     setting_field_type = fields.Selection(
         [
@@ -126,3 +127,14 @@ class SettingModelField(models.Model):
                 [('model', '=', 'res.groups'), ('res_id', '=', self.group_system_group_id.id)])
             if data:
                 self.group_name = "{module}.{id}".format(module=data.module, id=data.name)
+
+
+class Module(models.Model):
+    _name = 'builder.ir.module.module'
+    _inherit = ['builder.ir.module.module']
+
+    setting_ids = fields.One2many(
+        comodel_name='builder.res.config.settings',
+        inverse_name='module_id',
+        string='Settings',
+    )
