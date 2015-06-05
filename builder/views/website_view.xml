@@ -198,6 +198,54 @@
         <!-- Asset -->
 
         <!-- Media Item -->
+        <record model="ir.ui.view" id="builder_website_media_item_kanban_view">
+            <field name="name">builder.website.media.item.kanban</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <kanban quick_create="false" create="true" delete="true">
+                    <field name="attr_name"/>
+                    <field name="is_image"/>
+                    <field name="size"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette">
+                                <div class="oe_attachment extended">
+                                    <div class="buttons">
+                                        <span  class="options">
+                                            <a t-att-href="'/web/binary/saveas?model=builder.website.media.item&amp;field=image&amp;filename_field=attr_name&amp;id=' + record.id.value" title="Download">
+                                                <span class='oe_e' style="line-height: 19%;">w</span>
+                                            </a>
+                                            <div t-if="record.is_image.value" class="oe_clear"></div>
+                                            <a t-if="record.is_image.value" target="_blank" t-att-href="'/web/binary/image?model=builder.website.media.item&amp;field=image&amp;filename_field=attr_name&amp;id=' + record.id.value" title="View Full Image">
+                                                <span class='oe_e' style="line-height: 19%;">D</span>
+                                            </a>
+
+                                        </span>
+                                        <span  class="visibility">
+                                            <a t-if="widget.view.is_action_enabled('delete')" type="delete" title="Delete">
+                                                <span class='oe_e' style="line-height: 19%;">[</span>
+                                            </a>
+                                        </span>
+
+                                    </div>
+                                    <div>
+                                        <a type="open">
+                                            <img t-if="record.is_image.value" t-att-src="kanban_image('builder.website.media.item', 'image_small', record.id.value)" class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                            <img t-if="!record.is_image.value" src="/builder/static/src/img/file.svg"/>
+                                        </a>
+                                    </div>
+                                    <div class="oe_name">
+                                        <field name="attr_name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
         <record model="ir.ui.view" id="builder_website_media_item_tree">
             <field name="name">builder.website.media.item.tree</field>
             <field name="model">builder.website.media.item</field>
@@ -238,26 +286,6 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="builder_website_media_item_kanban">
-            <field name="name">builder.website.media.item.kanban</field>
-            <field name="model">builder.website.media.item</field>
-            <field name="arch" type="xml">
-                <kanban>
-                    <field name="image"/>
-                    <field name="attr_name"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                           <a type="open">
-                                <img t-att-src="kanban_image('builder.website.media.item', 'image', record.id.value, {'preview_image': 'image'})" class="oe_image"/>
-                            </a>
-                            <a type="open">
-                                <field name="attr_name"/>
-                            </a>
-                        </t>
-                    </templates>
-                </kanban>
-            </field>
-        </record>
         <!-- Media Item -->
 
         <!-- Theme -->

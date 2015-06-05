@@ -6,7 +6,7 @@ import os
 import mimetypes
 import string
 
-from openerp import models, fields, api, _
+from openerp import models, fields, api, _, tools
 from .utils import simple_selection
 from .utils.formats import json
 
@@ -168,15 +168,16 @@ javascript:(function(){
 
     @api.multi
     def action_base_files(self):
-
+        search = self.env.ref('builder.view_builder_data_file_filter', False)
         return {
             'name': _('Files'),
             'type': 'ir.actions.act_window',
             'view_type': 'form',
-            'view_mode': 'tree,form',
+            'view_mode': 'kanban,tree,form',
             'res_model': 'builder.data.file',
-            'views': [(False, 'tree'), (False, 'form')],
+            'views': [(False, 'kanban'),(False, 'tree'), (False, 'form')],
             'domain': [('module_id', '=', self.id)],
+            'search_view_id': search.id if search else False,
             # 'target': 'current',
             'context': {
                 'default_module_id': self.id
@@ -536,10 +537,27 @@ class DataFile(models.Model):
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
     path = fields.Char(string='Path', required=True)
     filename = fields.Char('Filename', compute='_compute_stats', store=True)
+    file_type_icon = fields.Char('Icon File', store=True)
     content_type = fields.Char('Content Type', compute='_compute_stats', store=True)
+    is_image = fields.Boolean('Is Image', compute='_compute_stats', store=True)
+    image_small = fields.Binary('Image Thumb', compute='_compute_stats', store=True)
+    in_media = fields.Boolean('In Media', compute='_compute_is_in_media', store=False, search=True)
     extension = fields.Char('Extension', compute='_compute_stats', store=True)
     size = fields.Integer('Size', compute='_compute_stats', store=True)
     content = fields.Binary('Content')
+    media_item_ids = fields.One2many('builder.website.media.item', 'file_id', 'Media Files')
+
+    @api.one
+    @api.depends('media_item_ids.file_id')
+    def _compute_is_in_media(self):
+        self.in_media = len(self.media_item_ids) > 0
+
+    @api.multi
+    def action_add_as_media_item(self):
+        self.env['builder.website.media.item'].create({
+            'module_id': self.module_id.id,
+            'file_id': self.id,
+        })
 
     @api.one
     @api.depends('content', 'path')
@@ -549,8 +567,13 @@ class DataFile(models.Model):
             self.filename = os.path.basename(self.path)
             self.extension = os.path.splitext(self.path)[1]
             self.content_type = mimetypes.guess_type(self.filename)[0] if mimetypes.guess_type(self.filename) else False
+            self.is_image = self.content_type in ['image/png', 'image/jpeg', 'image/gif', 'image/bmp']
+
+            self.image_small = tools.image_resize_image_small(self.content, size=(100, 100)) if self.is_image else False
         else:
             self.size = False
             self.filename = False
             self.extension = False
             self.content_type = False
+            self.image_small = False
+            self.is_image = False

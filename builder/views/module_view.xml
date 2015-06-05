@@ -161,7 +161,7 @@
                                 <div class="oe_right oe_button_box" name="buttons">
                                     <button class="oe_inline oe_stat_button" string="Import Zip" name="%(act_builder_data_import_wizard)d" type="action" icon="fa-reply" context="{}"/>
                                 </div>
-                                <field name="data_file_ids" nolabel="1"/>
+                                <field name="data_file_ids" nolabel="1" mode="kanban"/>
                             </page>
                             <page string="Data" invisible="1">
                                 <field name="data_ids" nolabel="1" context="{'default_module_id': active_id}" />
@@ -266,15 +266,6 @@
                                     <page string="Media Items">
                                         <button string="Import Items" name="%(act_builder_website_media_item_bulk_add_wizard)d" type="action" class="oe_link" context="{'default_module_id': id}"/>
                                         <field nolabel="1" name="website_media_item_ids"  context="{'default_module_id': active_id}" mode="kanban">
-                                            <kanban>
-                                                <field name="image"/>
-                                                <field name="attr_name"/>
-                                                <templates>
-                                                    <t t-name="kanban-box">
-                                                        <img t-att-src="kanban_image('builder.website.media.item', 'image', record.id.value, {'preview_image': 'image'})" class="oe_module_icon"/>
-                                                    </t>
-                                                </templates>
-                                            </kanban>
                                         </field>
                                     </page>
                                     <page string="Snippets">
@@ -402,6 +393,26 @@
 
 
         <!-- Data File -->
+
+        <record id="view_builder_data_file_filter" model="ir.ui.view">
+            <field name="name">builder.data.file.select</field>
+            <field name="model">builder.data.file</field>
+            <field name="arch" type="xml">
+                <search string="Search files">
+                    <field name="filename" filter_domain="['|', '|', ('filename', 'ilike', self), ('path', 'ilike', self)]" string="Name"/>
+                    <field name="extension" filter_domain="[('extension', '=', '.' + self)]" string="Ext"/>
+                    <field name="path" filter_domain="[('path', 'ilike', self)]" string="Path"/>
+                    <separator/>
+                    <filter string="Image" domain="[('is_image', '=', True)]"/>
+                    <filter string="Not Image" domain="[('is_image', '=', False)]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Content Type" domain="[]" context="{'group_by':'content_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="builder_data_file_tree_view">
             <field name="name">builder.data.file.tree</field>
             <field name="model">builder.data.file</field>
@@ -411,6 +422,64 @@
                     <field name="content_type"/>
                     <field name="size"/>
                 </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_data_file_kanban_view">
+            <field name="name">builder.data.file.kanban</field>
+            <field name="model">builder.data.file</field>
+            <field name="arch" type="xml">
+                <kanban quick_create="false" create="true" delete="true">
+                    <field name="file_type_icon"/>
+                    <field name="is_image"/>
+                    <field name="in_media"/>
+                    <field name="filename"/>
+                    <field name="content_type"/>
+                    <field name="extension"/>
+                    <field name="size"/>
+                    <field name="path"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette">
+                                <div class="oe_attachment extended">
+                                    <div class="buttons">
+                                        <span  class="options">
+                                            <a t-att-href="'/web/binary/saveas?model=builder.data.file&amp;field=content&amp;filename_field=filename&amp;id=' + record.id.value" title="Download">
+                                                <span class='oe_e' style="line-height: 19%;">w</span>
+                                            </a>
+                                            <div t-if="record.is_image.value" class="oe_clear"></div>
+                                            <a t-if="record.is_image.value" target="_blank" t-att-href="'/web/binary/image?model=builder.data.file&amp;field=content&amp;filename_field=filename&amp;id=' + record.id.value" title="View Full Image">
+                                                <span class='oe_e' style="line-height: 19%;">D</span>
+                                            </a>
+                                            <div t-if="record.is_image.value and !record.in_media.value" class="oe_clear"></div>
+                                            <a t-if="record.is_image.value and !record.in_media.value"  title="Add as Media Item" name="action_add_as_media_item" type="object">
+                                                <span class='oe_e' style="line-height: 19%;">Z</span>
+                                            </a>
+
+                                        </span>
+                                        <span  class="visibility">
+                                            <a t-if="!read_only_mode and widget.view.is_action_enabled('delete')" type="delete" title="Delete">
+                                                <span class='oe_e' style="line-height: 19%;">[</span>
+                                            </a>
+                                        </span>
+
+                                    </div>
+                                    <div>
+                                        <a type="open">
+                                            <img t-if="record.is_image.value" t-att-src="kanban_image('builder.data.file', 'image_small', record.id.value)" class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                            <img t-if="!record.is_image.value" src="/builder/static/src/img/file.svg"/>
+                                        </a>
+                                    </div>
+                                    <div class="oe_name" t-att-title="record.path.value">
+                                        <a type="open" class="oe_small_name"><field name="filename"/></a>
+                                        <a type="open" class="oe_fullname"><field name="filename"/></a>
+                                        <!--<a type="open" class="oe_fullname"><field name="path"/></a>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
             </field>
         </record>
 

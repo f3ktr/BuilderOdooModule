@@ -57,7 +57,18 @@ class MediaItem(models.Model):
     attr_id = fields.Char('XML ID', compute='_compute_attr_id', readonly=False, store=True)
     file_id = fields.Many2one('builder.data.file', 'Image', required=True, ondelete='cascade')
     attr_name = fields.Char(string='Name', related='file_id.filename', store=False, search=True)
+    is_image = fields.Boolean('Image', related='file_id.is_image', store=False, search=True)
     image = fields.Binary('Image', related='file_id.content', store=False, search=True)
+    image_small = fields.Binary('Image Small', related='file_id.image_small', store=False, search=True)
+    size = fields.Integer('Size', related='file_id.size', store=False, search=True)
+
+    @api.constrains('file_id')
+    def constraint_file_id_image(self):
+        if self.file_id and not self.file_id.is_image:
+            raise ValueError(
+                _("You must select only images files."))
+
+        return True
 
     @api.one
     @api.depends('attr_name')
@@ -245,6 +256,7 @@ class Module(models.Model):
     _inherit = 'builder.ir.module.module'
 
     website_media_item_ids = fields.One2many('builder.website.media.item', 'module_id', 'Media Items')
+    # website_media_item_ids = fields.Many2many('builder.data.file', 'website_media_item_file_rel', 'module_id', 'file_id', 'Media Items', domain=[('is_image', '=', True)])
     website_menu_ids = fields.One2many('builder.website.menu', 'module_id', 'Menu')
     website_asset_ids = fields.One2many('builder.website.asset', 'module_id', 'Assets')
     website_theme_ids = fields.One2many('builder.website.theme', 'module_id', 'Themes')
