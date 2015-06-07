@@ -1,3 +1,4 @@
+from collections import defaultdict
 from openerp.addons.builder.models.fields import snake_case
 from openerp import models, fields, api
 
@@ -44,6 +45,22 @@ class SearchView(models.Model):
     def find_field_by_name(self, name):
         field_obj = self.env['builder.ir.model.fields']
         return field_obj.search([('model_id', '=', self.id), ('name', '=', name)])
+
+    @property
+    def ungrouped_fields(self):
+        flat = []
+        for field in self.field_ids:
+            if not field.group:
+                flat.append(field)
+        return flat
+
+    @property
+    def groups(self):
+        groups = defaultdict(list)
+        for field in self.field_ids:
+            if field.group:
+                groups[field.group].append(field)
+        return groups
 
 
 class SearchField(models.Model):

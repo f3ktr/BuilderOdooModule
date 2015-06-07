@@ -100,6 +100,7 @@ class FormView(models.Model):
         [
             pages[field.page].append(field)
             for field in self.field_ids
+            if field.page
         ]
         return pages
 

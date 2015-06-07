@@ -353,8 +353,8 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.views.calendar #}
 {% macro builder_views_calendar(instance) %}
-    <calendar string="{{ instance.string }}"{% if instance.date_start %} date_start="{{ instance.date_start }}" {% endif %}{% if instance.date_stop %} date_stop="{{ instance.date_stop }}" {% endif %}{% if instance.date_length %} date_length="{{ instance.date_length }}" {% endif %}{% if instance.date_delay %} date_delay="{{ instance.date_delay }}" {% endif %}{% if instance.day_length %} day_length="{{ instance.day_length }}" {% endif %}{% if instance.all_day %} all_day="true" {% endif %}{% if instance.use_contacts %} use_contacts="true" {% endif %}{% if instance.color %} color="{{ instance.color }}" {% endif %}{% if instance.color_is_attendee %} color_is_attendee="true" {% endif %}{% if instance.event_open_popup %} event_open_popup="{{ instance.event_open_popup }}" {% endif %}{% if instance.avatar_filter %} avatar_filter="{{ instance.avatar_filter }}" {% endif %}{% if instance.avatar_model %} avatar_model="{{ instance.avatar_model }}" {% endif %}{% if instance.avatar_title %} avatar_title="{{ instance.avatar_title }}" {% endif %}{% if not instance.quick_add %} quick_add="false" {% endif %}{% if instance.display %} display="{{ instance.display }}" {% endif %}>
-    {% for field in instance.fields %}
+    <calendar string="{{ instance.name }}"{% if instance.attr_date_start_field_id.id %} date_start="{{ instance.attr_date_start_field_id.name }}" {% endif %}{% if instance.attr_date_stop_field_id.id %} date_stop="{{ instance.attr_date_stop_field_id.name }}" {% endif %}{% if instance.attr_day_length_field_id.id %} day_length="{{ instance.attr_day_length_field_id.name }}" {% endif %}{% if instance.attr_date_delay_field_id.id %} date_delay="{{ instance.attr_date_delay_field_id.name }}" {% endif %}{% if instance.attr_all_day %} all_day="true" {% endif %}{% if instance.attr_use_contacts %} use_contacts="true" {% endif %}{% if instance.attr_color_field_id.id %} color="{{ instance.attr_color_field_id.name }}" {% endif %}{% if instance.attr_color_is_attendee %} color_is_attendee="true" {% endif %}{% if instance.attr_event_open_popup %} event_open_popup="{{ instance.attr_event_open_popup }}" {% endif %}{% if instance.attr_avatar_filter %} avatar_filter="{{ instance.attr_avatar_filter }}" {% endif %}{% if instance.attr_avatar_model %} avatar_model="{{ instance.attr_avatar_model }}" {% endif %}{% if instance.attr_avatar_title %} avatar_title="{{ instance.attr_avatar_title }}" {% endif %}{% if not instance.attr_quick_add %} quick_add="false" {% endif %}{% if instance.attr_display %} display="{{ instance.attr_display }}" {% endif %}>
+    {% for field in instance.field_ids %}
         <field name="{{ field.field_id.name }}"{% if field.invisible %} invisible="True" {% endif %} />
     {%- endfor %}
     </calendar>
@@ -391,9 +391,9 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
             <separator  />
         {%- endif %}
     {%- endfor %}
-    {% for k, item in instance.groups.items() %}
-        <group string="{{item.group.name}}">
-            {%- for field in item.fields %}
+    {% for k, fields in instance.groups.items() %}
+        <group string="{{k}}">
+            {%- for field in fields %}
                 {% if field.type == 'filter' -%}
                     <filter {% if field.attr_name %}name="{{field.attr_name}}" {% endif %}{% if field.attr_string %} string="{{field.attr_string}}" {% endif %}{% if field.attr_domain %} domain="{{field.attr_domain}}" {% endif %}{% if field.attr_filter_domain %} filter_domain="{{field.attr_filter_domain}}" {% endif %}{% if field.attr_operator %} operator="{{field.attr_operator}}" {% endif %}{% if field.attr_help %} help="{{field.attr_help}}" {% endif %}{% if field.group_field_id %} context="{'group_by':'{{field.group_field_id.name}}'}" {% endif %} />
                 {%- elif field.type == 'field' -%}
@@ -422,14 +422,14 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.views.kanban #}
 {% macro builder_views_kanban(instance) %}
-    <kanban string="{{ instance.string }}"{% if not instance.create %} create="false" {% endif %}{% if not instance.edit %} edit="false" {% endif %}{% if not instance.delete %} delete="false" {% endif %}{% if instance.default_group_by %} default_group_by="{{ instance.default_group_by }}" {% endif %}{% if not instance.quick_create%} quick_create="false" {% endif %}>
-    {% for field in instance.fields %}
-        <field name="{{ field.name }}" />
+    <kanban string="{{ instance.name }}"{% if not instance.attr_create %} create="false" {% endif %}{% if not instance.attr_edit %} edit="false" {% endif %}{% if not instance.attr_delete %} delete="false" {% endif %}{% if instance.attr_default_group_by_field_id.id %} default_group_by="{{ instance.attr_default_group_by_field_id.name }}" {% endif %}{% if not instance.attr_quick_create %} quick_create="false" {% endif %}>
+    {% for field in instance.field_ids %}
+        {{ builder_views_kanban_field(field) }}
     {%- endfor %}
-    {% if instance.template %}
+    {% if instance.attr_template %}
         <templates>
             <t t-name="kanban-box">
-                {{ instance.template }}
+                {{ instance.attr_template }}
             </t>
         </templates>
     {% endif %}
@@ -438,15 +438,15 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.views.kanban.field #}
 {% macro builder_views_kanban_field(field) %}
-    <field name="{{ field.field_id.name }}" />
+    <field name="{{ field.name }}" />
 {% endmacro %}
 
 
 {# generate builder.views.graph #}
 {% macro builder_views_graph(instance) %}
-    <graph string="{{ instance.string }}"{% if instance.type %} type="{{ instance.type }}" {% endif %}{% if instance.stacked %} stacked="true" {% endif %}{% if instance.orientation %} orientation="{{ instance.orientation }}" {% endif %}>
-    {% for field in instance.fields %}
-        <field name="{{field.field_id.name}}"{% if field.operator %} operator="{{field.operator}}" {% endif %}{% if field.type %} type="{{field.type}}" {% endif %}{% if field.interval %} interval="{{field.interval}}" {% endif %}/>
+    <graph string="{{ instance.name }}"{% if instance.attr_type %} type="{{ instance.attr_type }}" {% endif %}{% if instance.attr_stacked %} stacked="true" {% endif %}{% if instance.attr_orientation %} orientation="{{ instance.attr_orientation }}" {% endif %}>
+    {% for field in instance.field_ids %}
+        {{ builder_views_graph_field(field) }}
     {%- endfor %}
     </graph>
 {% endmacro %}
@@ -460,7 +460,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.views.gantt #}
 {% macro builder_views_gantt(instance) %}
-    <gantt string="{{ instance.string }}"{% if not instance.create %} create="false" {% endif %}{% if not instance.edit %} edit="false" {% endif %}{% if not instance.delete %} delete="false" {% endif %}{% if instance.date_start %} date_start="{{ instance.date_start }}" {% endif %}{% if instance.date_stop %} date_stop="{{ instance.date_stop }}" {% endif %}{% if instance.date_delay %} date_delay="{{ instance.date_delay }}" {% endif %}{% if instance.progress %} progress="{{ instance.progress }}" {% endif %}{% if instance.color %} color="{{ instance.color }}" {% endif %}{% if instance.mode %} mode="{{ instance.mode}}" {% endif %}{% if instance.default_group_by %} default_group_by="{{ instance.default_group_by }}" {% endif %}>
+    <gantt string="{{ instance.name }}"{% if not instance.attr_create %} create="false" {% endif %}{% if not instance.attr_edit %} edit="false" {% endif %}{% if not instance.attr_delete %} delete="false" {% endif %}{% if instance.attr_date_start_field_id.id %} date_start="{{ instance.attr_date_start_field_id.name }}" {% endif %}{% if instance.attr_date_stop_field_id.id %} date_stop="{{ instance.attr_date_stop_field_id.name }}" {% endif %}{% if instance.attr_date_delay_field_id.id %} date_delay="{{ instance.attr_date_delay_field_id.name }}" {% endif %}{% if instance.attr_progress_field_id.id %} progress="{{ instance.attr_progress_field_id.name }}" {% endif %}{% if instance.attr_color_field_id.id %} color="{{ instance.attr_color_field_id.name }}" {% endif %}{% if instance.attr_mode %} mode="{{ instance.attr_mode}}" {% endif %}{% if instance.attr_default_group_by_field_id.id %} default_group_by="{{ instance.attr_default_group_by_field_id.name }}" {% endif %}>
     {% for field in instance.field_ids %}
         {{ builder_views_gantt_field(field) }}
     {% endfor %}
