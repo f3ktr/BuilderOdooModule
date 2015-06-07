@@ -140,7 +140,7 @@
                             </group>
                         </page>
                         <page string="Groups">
-                            <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
+                            <field name="group_ids" domain="[('module_id', '=', module_id)]" context="{}"/>
                         </page>
                     </notebook>
                 </form>
