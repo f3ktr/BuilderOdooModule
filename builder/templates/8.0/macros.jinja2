@@ -115,9 +115,10 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
     {% if model.name -%}
     _description = '{{ model.name }}'{% else %}_description = _(_doc_)
     {% endif %}
-    {% for field in model.field_ids %}
+
+    {% for field in model.field_ids -%}
     {{ builder_ir_model_field(field) }}
-    {% endfor -%}
+    {%- endfor %}
     {% for method_name, fields in model.compute_field_methods.items() -%}
     {{ builder_ir_model_field_compute(method_name, fields) }}
     {% endfor -%}
@@ -232,15 +233,15 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 {% endmacro %}
 
 {# generate builder.ir.model.field #}
-{% macro builder_ir_model_field(field) %}
+{% macro builder_ir_model_field(field) -%}
     {%- if field.define -%}
     {{ field.name }} = fields.{{ field.ttype.capitalize() }}(
-        {%- if field.ttype == 'many2many' %} '{{ field.relation_model_id.model }}', '{{ field.relation_many2many_relation }}', {% if field.relation_many2many_column1 and field.relation_many2many_column2 %}'{{ field.relation_many2many_column1 }}', '{{ field.relation_many2many_column2 }}', {%- endif %}{%- endif %}
-        {%- if field.ttype == 'many2one' %} '{{ field.relation_model_id.model }}', {% if field.on_delete %}ondelete='{{field.on_delete}}',{% endif %}{% if field.auto_join %}auto_join=True,{% endif %}{% if field.delegate -%}delegate=True,{% endif %}{%- endif -%}
-        {%- if field.ttype == 'one2many' %} '{{ field.relation_model_id.model }}', '{{field.relation_field}}', {%- endif -%}
-        {%- if field.ttype == 'char' %} {%- if field.size %} size={{ field.size }}, {%- endif -%}{% if field.translate %}translate=True,{% endif %}{%- endif -%}
-        {%- if field.ttype == 'text' %} {% if field.translate %}translate=True, {% endif %}{%- endif -%}
-        {%- if field.ttype == 'float' %} {% if field.decimal_digits and field.decimal_precision %} digits=({{field.decimal_digits}}, {{field.decimal_precision}}),{% endif %}{%- endif -%}
+        {%- if field.ttype == 'many2many' -%} '{{ field.relation_model_id.model }}', '{{ field.relation_many2many_relation }}', {% if field.relation_many2many_column1 and field.relation_many2many_column2 %}'{{ field.relation_many2many_column1 }}', '{{ field.relation_many2many_column2 }}', {%- endif %}{%- endif -%}
+        {%- if field.ttype == 'many2one' -%} '{{ field.relation_model_id.model }}', {% if field.on_delete %}ondelete='{{field.on_delete}}',{% endif %}{% if field.auto_join %}auto_join=True,{% endif %}{% if field.delegate -%}delegate=True,{% endif %}{%- endif -%}
+        {%- if field.ttype == 'one2many' -%} '{{ field.relation_model_id.model }}', '{{field.relation_field}}', {%- endif -%}
+        {%- if field.ttype == 'char' -%} {%- if field.size %} size={{ field.size }}, {%- endif -%}{% if field.translate %}translate=True,{% endif %}{%- endif -%}
+        {%- if field.ttype == 'text' -%} {% if field.translate %}translate=True, {% endif %}{%- endif -%}
+        {%- if field.ttype == 'float' -%} {% if field.decimal_digits and field.decimal_precision %} digits=({{field.decimal_digits}}, {{field.decimal_precision}}),{% endif %}{%- endif -%}
         {%- if field.required %} required=True,{%- endif -%}
         {%- if field.readonly %} readonly=True,{%- endif -%}
         {%- if field.field_description %} string='{{ field.field_description }}',{% endif -%} {# This should be removed??? #}
@@ -256,7 +257,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
         {%- if field.allow_search -%} search='{{ field.search_method_name }}',{%- endif -%}
         {%- if field.allow_default -%} default='{{ field.default_method_name }}',{%- endif -%})
     {% endif -%}
-{% endmacro %}
+{%- endmacro %}
 
 
 {# generate builder.ir.cron #}
