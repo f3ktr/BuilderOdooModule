@@ -6,7 +6,19 @@ class {{ class_name }}(models.TransientModel):
     _inherit = ['res.config.settings']
 
     {% for field in model.field_ids %}
+    {% if field.setting_field_type == 'module' -%}
+    {{ field.name }} = fields.Boolean({%- if field.field_description %}string='{{ field.field_description }}', {% endif -%})
+    {% elif field.setting_field_type == 'default' -%}
+    {{ field.name }} = fields.{{ field.ttype.capitalize() }}(
+        {%- if field.field_description %}string='{{ field.field_description }}', {% endif -%}
+        default_model='{{ field.default_model }}')
+    {% elif field.setting_field_type == 'group' -%}
+    {{ field.name }} = fields.Boolean(
+        {%- if field.field_description %}string='{{ field.field_description }}', {% endif -%}
+        group='{{ field.groups }}', implied_group='{{ field.group_name }}')
+    {% else -%}
     {{ builder_ir_model_field(field) }}
+    {% endif -%}
     {% endfor %}
 {% endmacro %}
 
@@ -14,31 +26,31 @@ class {{ class_name }}(models.TransientModel):
 {% macro builder_res_config_settings_form(model) %}
     {% set xml_id = model.model | replace(".", "_") %}
     <record id="view_{{ xml_id }}" model="ir.ui.view">
-            <field name="name">{{ model.name }}</field>
-            <field name="model">{{ model.model }}</field>
-            <field name="arch" type="xml">
-                <form string="{{ model.name }}" class="oe_form_configuration">
-                    <header>
-                        <button string="Apply" type="object" name="execute" class="oe_highlight"></button>
-                        or
-                        <button string="Cancel" type="object" name="cancel" class="oe_link"></button>
-                    </header>
-                    {% for field in model.field_ids %}
-                    <field name="{{ field.name }}" ></field>
-                    {% endfor %}
-                </form>
-            </field>
-        </record>
+        <field name="name">{{ model.name }}</field>
+        <field name="model">{{ model.model }}</field>
+        <field name="arch" type="xml">
+            <form string="{{ model.name }}" class="oe_form_configuration">
+                <header>
+                    <button string="Apply" type="object" name="execute" class="oe_highlight"></button>
+                    or
+                    <button string="Cancel" type="object" name="cancel" class="oe_link"></button>
+                </header>
+                {% for field in model.field_ids %}
+                <field name="{{ field.name }}" ></field>
+                {% endfor %}
+            </form>
+        </field>
+    </record>
 
-        <record id="action_{{ xml_id }}" model="ir.actions.act_window">
-            <field name="name">{{ model.name }}</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">{{ model.model }}</field>
-            <field name="view_mode">form</field>
-            <field name="target">inline</field>
-        </record>
+    <record id="action_{{ xml_id }}" model="ir.actions.act_window">
+        <field name="name">{{ model.name }}</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">{{ model.model }}</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
 
-        <menuitem id="menu_{{ xml_id }}" name="{{ model.name }}" parent="base.menu_config" action="action_{{ xml_id }}"/>
+    <menuitem id="menu_{{ xml_id }}" name="{{ model.name }}" parent="base.menu_config" action="action_{{ xml_id }}"/>
 {% endmacro %}
 
 {# generate demo data #}
@@ -249,6 +261,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
         {%- if field.index %} index=True,{%- endif -%}
         {%- if not field.copy %} copy=False,{%- endif -%}
         {%- if field.related %} related='{{ field.related }}',{%- endif -%}
+        {%- if field.groups %} groups='{{ field.groups }}',{%- endif -%}
         {%- if field.selection %} selection={{ field.selection }},{%- endif -%}
         {%- if field.option_ids %} selection={{ field.option_ids|field_options }},{%- endif -%}
         {%- if field.allow_compute -%} compute='{{ field.compute_method_name }}',{%- endif -%}

@@ -114,9 +114,6 @@ class IrFields(models.Model):
     delegate = fields.Boolean('Delegate', default=True, help=''' set it to ``True`` to make fields of the target model
         accessible from the current model (corresponds to ``_inherits``)''')
     auto_join = fields.Boolean('Auto Join', help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
-    groups = fields.Char('Groups', help='''comma-separated list of group xml ids (string); this
-                                         restricts the field access to the users of the given groups only''')
-
     decimal_digits = fields.Char('Decimal Digits', )
     decimal_precision = fields.Char('Decimal Precision')
 
@@ -167,6 +164,10 @@ class IrFields(models.Model):
     )
     order_priority = fields.Integer('Order Priority')
     is_rec_name = fields.Boolean('Use as Name')
+
+    @property
+    def groups(self):
+        return ','.join([group.xml_id for group in self.group_ids])
 
     @property
     def define(self):
