@@ -1,0 +1,446 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Model View -->
+        <record model="ir.ui.view" id="builder_ir_model_tree_view">
+            <field name="name">builder.ir.model.tree</field>
+            <field name="model">builder.ir.model</field>
+            <field name="arch" type="xml">
+                <tree string="Model Description">
+                    <field name="model"/>
+                    <field name="name"/>
+                    <field name="osv_memory"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_ir_model_form_view">
+            <field name="name">builder.ir.model.form</field>
+            <field name="model">builder.ir.model</field>
+            <field name="arch" type="xml">
+                <form string="Model Description" version="7.0">
+                    <sheet>
+                        <div class="oe_right oe_button_box" name="buttons"
+                             invisible="not context.get('active_id', False)">
+                            <button class="oe_inline oe_stat_button" string="Fields" name="action_fields" type="object"
+                                    icon="fa-list" context="{'default_model_id': id, 'default_module_id': module_id}"/>
+                            <button class="oe_inline oe_stat_button" string="Methods" name="action_methods"
+                                    type="object" icon="fa-cog"
+                                    context="{'default_model_id': id, 'default_module_id': module_id}"/>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="id" invisible="1"/>
+                                <field name="module_id" invisible="1"/>
+                                <field name="special_states_field_id" invisible="1"/>
+                                <field name="model"/>
+                                <field name="name"/>
+                                <field name="osv_memory"/>
+                            </group>
+                            <group>
+                                <field name="rec_name_field_id"
+                                       domain="[('model_id', '=', id), ('ttype', 'in', ['char', 'text', 'date', 'datetime', 'selection'])]"/>
+
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Fields">
+                                <field name="field_ids">
+                                    <tree string="Fields Description">
+                                        <field name="position" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="field_description"/>
+                                        <field name="ttype"/>
+                                        <field name="required"/>
+                                        <field name="readonly"/>
+                                        <field name="select_level"/>
+                                    </tree>
+                                    <form string="Field">
+                                        <group>
+                                            <group>
+                                                <field name="name"/>
+                                                <field name="field_description"/>
+                                                <field name="is_inherited" invisible="1"/>
+                                                <field name="redefine" attrs="{'invisible': [['is_inherited', '=', False]], }"/>
+                                            </group>
+                                            <group>
+                                                <field name="is_rec_name"/>
+                                                <field name="special_states_field_id" invisible="1"/>
+                                                <field name="use_to_order"/>
+                                                <field name="order" attrs="{'invisible': [['use_to_order', '=', False]], 'required': [['use_to_order', '=', True]]}"/>
+                                            </group>
+                                        </group>
+                                        <group>
+                                            <group>
+                                                <field name="ttype"/>
+                                            </group>
+                                            <group></group>
+                                        </group>
+                                        <notebook>
+                                            <page string="General">
+                                                <group>
+                                                    <group>
+                                                        <field name="required"/>
+                                                        <field name="readonly"/>
+                                                        <field name="index"/>
+                                                        <field name="copy"/>
+                                                        <field name="select_level"
+                                                               attrs="{'readonly': [('ttype','in',['binary', 'serialized'])], 'invisible': [('ttype','in',['binary', 'serialized'])]}"/>
+                                                        <field name="translate"
+                                                               attrs="{'readonly': [('ttype','not in',['char','html', 'text'])], 'invisible': [('ttype','not in',['char','html', 'text'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="related"/>
+                                                        <field name="size"
+                                                               attrs="{'readonly': [('ttype','not in',['char','reference'])], 'invisible': [('ttype','not in',['char','reference'])]}"/>
+
+                                                        <label for="decimal_digits"
+                                                               attrs="{'invisible': [('ttype','not in',['float'])]}"/>
+                                                        <div attrs="{'invisible': [('ttype','not in',['float'])]}">
+                                                            <field name="decimal_digits"
+                                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                                   placeholder="Digits" class="oe_inline"
+                                                                   style="width: 20%"/>
+                                                            <field name="decimal_precision"
+                                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                                   placeholder="Precision" class="oe_inline"
+                                                                   style="width: 20%"/>
+                                                        </div>
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="Relation"
+                                                  attrs="{'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}">
+                                                <group>
+                                                    <group>
+                                                        <field name="relation_model_id"
+                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])],'readonly': [('ttype','!=','one2many'), ('ttype','!=','many2one'), ('ttype','!=','many2many')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="relation" readonly="1"
+                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="relation_field"
+                                                               attrs="{'required': [('ttype','=','one2many')], 'readonly': [('ttype','!=','one2many')], 'invisible': [('ttype', 'not in', ['one2many'])]}"/>
+
+                                                        <field name="auto_join"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                        <field name="delegate"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="relation_create_inverse_relation"/>
+                                                        <field name="reverse_relation_name"
+                                                               attrs="{'required': [('relation_create_inverse_relation', '=', True)], 'invisible': [('relation_create_inverse_relation', '=', False)]}"/>
+                                                        <field name="reverse_relation_field_description"
+                                                               attrs="{'required': [('relation_create_inverse_relation', '=', True)], 'invisible': [('relation_create_inverse_relation', '=', False)]}"/>
+                                                    </group>
+                                                </group>
+                                                <group>
+                                                    <group>
+                                                        <field name="domain"
+                                                               attrs="{'readonly': [('relation','=','')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="on_delete"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                    </group>
+                                                    <group>
+
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="States" attrs="{'invisible': [('special_states_field_id', '=', False)]}">
+                                                <field name="states_ids" mode="tree">
+                                                    <tree editable="bottom">
+                                                        <field name="state_id"
+                                                               domain="[('field_id.model_id', '=', parent.model_id)]"
+                                                               options="{'no_open': True}"/>
+                                                        <field name="required"/>
+                                                        <field name="readonly"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Options"
+                                                  attrs="{'invisible': [('ttype', 'not in', ['selection'])]}">
+                                                <field name="option_ids" nolabel="1" mode="tree"
+                                                       attrs="{'required': [('ttype', 'in', ['selection'])]}">
+                                                    <tree name="Options" editable="bottom">
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="value"/>
+                                                        <field name="name"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Methods">
+                                                <group>
+                                                    <group>
+                                                        <field name="allow_compute"/>
+                                                        <field name="compute_method_name"
+                                                               attrs="{'required': [('allow_compute', '=', True)], 'readonly': [('allow_compute','=',False)], 'invisible': [('allow_compute','=',False)]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="allow_inverse"/>
+                                                        <field name="inverse_method_name"
+                                                               attrs="{'required': [('allow_inverse', '=', True)], 'readonly': [('allow_inverse','=',False)], 'invisible': [('allow_inverse','=',False)]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="allow_search"/>
+                                                        <field name="search_method_name"
+                                                               attrs="{'required': [('allow_search', '=', True)], 'readonly': [('allow_search','=',False)], 'invisible': [('allow_search','=',False)]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="allow_default"/>
+                                                        <field name="default_method_name"
+                                                               attrs="{'required': [('allow_default', '=', True)], 'readonly': [('allow_default','=',False)], 'invisible': [('allow_default','=',False)]}"/>
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="Groups">
+                                                <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
+                                            </page>
+                                        </notebook>
+                                    </form>
+
+                                </field>
+                            </page>
+                            <page string="Order">
+                                <field name="order_field_ids">
+                                    <tree string="Order Fields" delete="0" create="0">
+                                        <field name="order_priority" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="order"/>
+                                    </tree>
+                                    <form>
+                                        <group col="4">
+                                            <field name="order"/>
+                                        </group>
+                                    </form>
+                                </field>
+                            </page>
+                            <page string="Inheritance">
+                                <group>
+                                    <group>
+                                        <field name="rewrite_create_method"/>
+                                        <field name="rewrite_write_method"/>
+                                    </group>
+                                    <group>
+                                        <field name="rewrite_unlink_method"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group string="Inherit">
+                                        <field nolabel="1" name="inherit_model_ids"
+                                               domain="[('module_id', '=', module_id)]"
+                                               context="{'default_module_id': module_id, 'default_model_id': id}">
+                                            <tree>
+                                                <!--<field name="sequence" widget="handle"/>-->
+                                                <field name="model_display"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                    <group string="Inherits">
+                                        <field nolabel="1" name="inherits_model_ids"
+                                               domain="[('module_id', '=', module_id)]"
+                                               context="{'default_module_id': module_id, 'default_model_id': id}">
+                                            <tree>
+                                                <field name="sequence" widget="handle"/>
+                                                <field name="model_display"/>
+                                                <field name="field_display"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                </group>
+
+                                <!--<group string="Inherited Fields">
+                                     <field nolabel="1" name="field_ids" domain="[('is_inherited', '=', True)]" create="false" edit="false" delete="false" >
+                                        <tree string="Fields Description">
+                                            <field name="position" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="field_description"/>
+                                            <field name="ttype"/>
+                                            <field name="required"/>
+                                            <field name="readonly"/>
+                                            <field name="select_level"/>
+                                        </tree>
+                                    </field>
+                                </group>-->
+
+                            </page>
+                            <page string="Views">
+                                <field name="view_ids" nolabel="1">
+                                    <tree string="Views" create="0" edit="0" delete="1">
+                                        <field name="type"/>
+                                        <field name="xml_id"/>
+                                        <field name="inherit_id"/>
+                                        <button name="action_open_view" type="object" string="Configure"
+                                                class="oe_button oe_form_button oe_link"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Methods">
+                                <field name="method_ids" nolabel="1"
+                                       context="{'default_module_id': module_id, 'default_model_id': id}">
+                                    <tree string="Methods" create="1" edit="1" delete="1">
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Demo Data">
+                                <group>
+                                    <group>
+                                        <field name="demo_records"/>
+                                    </group>
+                                    <group>
+                                        <div class="oe_right oe_button_box" name="demo-buttons">
+                                            <button class="oe_inline oe_stat_button" string="Generator" name="%(act_builder_ir_model_demo_creator_wizard)d" type="action" icon="fa-plus" context="{'default_model_id': id}"/>
+                                        </div>
+                                    </group>
+                                </group>
+                                <field name="demo_data_ids" nolabel="1" mode="tree">
+                                    <tree create="0" edit="0" delete="1">
+                                        <field name="type" />
+                                        <field name="field_names" />
+                                        <button name="action_open_view" type="object" string="Configure" class="oe_button oe_form_button oe_link"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Access Rights">
+                                <field name="access_ids"
+                                       context="{'default_module_id': module_id, 'default_model_id': id}">
+                                    <tree string="Access Rules" editable="bottom">
+                                        <field name="group_id" domain="[('module_id', '=', parent.module_id)]"/>
+                                        <field name="perm_read"/>
+                                        <field name="perm_write"/>
+                                        <field name="perm_create"/>
+                                        <field name="perm_unlink"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Notes">
+                                <field name="info"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_model">
+            <field name="name">Models</field>
+            <field name="res_model">builder.ir.model</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- Model View -->
+
+        <record model="ir.ui.view" id="builder_ir_model_inherit_form_view">
+            <field name="name">builder.ir.model.inherit.form</field>
+            <field name="model">builder.ir.model.inherit</field>
+            <field name="arch" type="xml">
+                <form string="Model Inherit">
+                    <group>
+                        <group>
+                            <field name="module_id" invisible="1"/>
+                            <field name="model_source"/>
+                            <field name="module_model_id" domain="[('module_id', '=', module_id)]"
+                                   attrs="{'invisible': [('model_source', 'not in', ['module'])], 'readonly': [('model_source', 'not in', ['module'])], 'required': [('model_source', 'in', ['module'])]}"/>
+                            <field name="system_model_id"
+                                   attrs="{'invisible': [('model_source', 'not in', ['system'])], 'readonly': [('model_source', 'not in', ['system'])], 'required': [('model_source', 'in', ['system'])]}"/>
+                            <field name="system_model_name"
+                                   attrs="{'invisible': [('model_source', 'not in', ['system'])], 'readonly': [('model_source', 'not in', ['system'])], 'required': [('model_source', 'in', ['system'])]}"/>
+                        </group>
+                        <group>
+
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_ir_model_inherits_form_view">
+            <field name="name">builder.ir.model.inherits.form</field>
+            <field name="model">builder.ir.model.inherits</field>
+            <field name="arch" type="xml">
+                <form string="Model Inherits">
+                    <group>
+                        <group>
+                            <field name="module_id" invisible="1"/>
+                            <field name="model_id" invisible="1"/>
+                            <field name="model_source"/>
+                            <field name="module_model_id" domain="[('module_id', '=', module_id)]"
+                                   attrs="{'invisible': [('model_source', 'not in', ['module'])], 'readonly': [('model_source', 'not in', ['module'])], 'required': [('model_source', 'in', ['module'])]}"/>
+                            <field name="system_model_id"
+                                   attrs="{'invisible': [('model_source', 'not in', ['system'])], 'readonly': [('model_source', 'not in', ['system'])], 'required': [('model_source', 'in', ['system'])]}"/>
+                            <field name="system_model_name"
+                                   attrs="{'invisible': [('model_source', 'not in', ['system'])], 'readonly': [('model_source', 'not in', ['system'])], 'required': [('model_source', 'in', ['system'])]}"/>
+                            <field name="field_id"
+                                   domain="[('model_id', '=', model_id), ('ttype', '=', 'many2one'), ('relation_model_id', '=', module_model_id)]"
+                                   context="{'default_module_id': module_id, 'default_model_id': model_id, 'default_ttype': 'many2one', 'default_relation_model_id': module_model_id, 'form_view_id': 'builder.builder_ir_model_fields_form_diagram_view'}"
+                                   attrs="{'invisible': [('model_source', 'not in', ['module'])], 'readonly': [('model_source', 'not in', ['module'])], 'required': [('model_source', 'in', ['module'])]}"/>
+                            <field name="field_name"
+                                   attrs="{'invisible': [('model_source', 'not in', ['system'])], 'readonly': [('model_source', 'not in', ['system'])], 'required': [('model_source', 'in', ['system'])]}"/>
+                        </group>
+                        <group>
+
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+        <!-- Model Method -->
+        <record model="ir.ui.view" id="builder_ir_model_method_tree_view">
+            <field name="name">builder.ir.model.method.tree</field>
+            <field name="model">builder.ir.model.method</field>
+            <field name="arch" type="xml">
+                <tree string="Model Method">
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_ir_model_method_form_view">
+            <field name="name">builder.ir.model.method.form</field>
+            <field name="model">builder.ir.model.method</field>
+            <field name="arch" type="xml">
+                <form string="Model Method">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="model_id" invisible="1"/>
+                                <field name="module_id" invisible="1"/>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="type"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="arguments" attrs="{'invisible': [['type', 'not in', ['simple_model', 'simple_instance']]], }" />
+                            </group>
+                            <group>
+                                <field name="use_cache" attrs="{'invisible': [['type', 'not in', ['simple_instance']]], }"/>
+                                <field name="field_ids" widget="many2many_tags" domain="[('model_id', '=', model_id)]" attrs="{'invisible': ['&amp;', ('type', 'not in', ['onchange', 'constraint']), ('use_cache', '=', False)],}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_model_method">
+            <field name="name">Model Method</field>
+            <field name="res_model">builder.ir.model.method</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Model Method -->
+
+    </data>
+</openerp>

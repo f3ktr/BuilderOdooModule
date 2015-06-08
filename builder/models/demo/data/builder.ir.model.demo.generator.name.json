@@ -1,0 +1,8 @@
+{
+  "Name": ["Yusnel", "Yunier", "Yunior"],
+  "MaleName": ["Yusnel", "Yunier", "Yunior"],
+  "FemaleName": ["Demo", "AAA"],
+  "Surname": ["red", "green", "yellow", "purple", "blue", "black", "white", "aqua", "azure", "violet", "cyan", "gray"],
+  "Title": ["Dr.", "Mr.", "Mrs.", "Ms."],
+  "Initial": "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+}

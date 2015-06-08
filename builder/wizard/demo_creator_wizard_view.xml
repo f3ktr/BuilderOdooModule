@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="builder_ir_model_demo_creator_wizard_form_view">
+            <field name="name">builder.ir.model.demo.creator.wizard.form</field>
+            <field name="model">builder.ir.model.demo.creator.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Demo Data">
+                    <group>
+                        <group>
+                            <field name="model_id" invisible="1" />
+                            <field name="target_fields_type" invisible="1" />
+                            <field name="type" />
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_create" string="Create" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_model_demo_creator_wizard">
+            <field name="name">Demo Data</field>
+            <field name="res_model">builder.ir.model.demo.creator.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

@@ -1,0 +1,68 @@
+#builder_button_box .oe_stat_button {
+    width: 100% !important;
+}
+
+#builder_button_box .navbar-nav > li > .dropdown-menu {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+#image_preview img.oe_form_field_image {
+    max-width: 100px !important;
+}
+
+.oe_attachment.extended .buttons {
+    position: relative;
+    display: none;
+}
+
+.oe_attachment.extended .buttons .visibility {
+    position: absolute;
+    top: -5px;
+    left: 5px;
+    z-index: 9;
+}
+
+.oe_attachment.extended .buttons .ownership {
+    position: absolute;
+    top: 15px;
+    left: 5px;
+    z-index: 9;
+}
+
+.oe_attachment.extended .buttons .options {
+    position: absolute;
+    top: -5px;
+    right: 7px;
+    z-index: 9;
+}
+
+.oe_attachment.extended .buttons .options a {
+    color: #4c4c4c;
+}
+
+.oe_attachment.extended:hover .buttons {
+    display: block;
+}
+
+.oe_attachment.extended .oe_fullname {
+    display: none;
+}
+
+.oe_attachment.extended:hover .oe_fullname {
+    display: block;
+}
+
+.oe_attachment.extended:hover .oe_name {
+    display: inline-table;
+    overflow: visible;
+    max-width: inherit;
+}
+
+.oe_attachment.extended:hover .oe_small_name {
+    display: none;
+}
+
+.oe_attachment.extended .oe_small_name {
+    display: block;
+}

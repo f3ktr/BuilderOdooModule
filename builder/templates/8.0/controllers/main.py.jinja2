@@ -1,0 +1,13 @@
+from openerp.addons.web import http
+from openerp.addons.web.controllers.main import content_disposition
+from openerp.addons.web.http import request
+
+
+class MainController(http.Controller):
+    {% for page in pages %}
+    @http.route('{{ page.controller_route }}', type='http', auth="public", website=True)
+    def page{{ loop.index }}(self, **kwargs):
+        cr, uid, context = request.cr, request.uid, request.context
+
+        return request.website.render('{{ page.module_id.name }}.{{ page.attr_id }}', {})
+    {% endfor %}

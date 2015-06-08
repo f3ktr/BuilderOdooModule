@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_builder_views_graph">
+            <field name="name">builder.views.graph</field>
+            <field name="model">builder.views.graph</field>
+            <field name="arch" type="xml">
+                <form string="View Generator">
+                    <group>
+                        <group>
+                            <field name="model_id" invisible="1"/>
+                            <field name="special_states_field_id" invisible="1"/>
+                            <field name="model_name" invisible="1"/>
+                            <field name="model_inherit_type" invisible="1"/>
+                            <field name="name"/>
+                            <field name="xml_id"/>
+                        </group>
+                        <group>
+                            <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Option" attrs="{'invisible': [('inherit_view', '=', True)]}">
+                            <group>
+                                <group>
+                                    <field name="attr_type"/>
+                                    <field name="attr_stacked"/>
+                                </group>
+                                <group>
+                                    <field name="attr_orientation"
+                                           attrs="{'readonly': [('attr_type', 'not in', ['bar', 'pivot'])], 'invisible': [('attr_type', 'not in', ['bar', 'pivot'])]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Fields" attrs="{'invisible': [('inherit_view', '=', True)]}">
+                            <field name="field_ids" nolabel="1">
+                                <tree string="Fields"
+                                      context="{'default_special_states_field_id': parent.special_states_field_id}">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="field_id"/>
+                                    <field name="operator"/>
+                                    <field name="type"/>
+                                    <field name="interval"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Inherit" attrs="{'invisible': [('inherit_view', '=', False)]}">
+                            <group>
+                                <group>
+                                    <field name="inherit_view_id" options="{'no_create': True, 'no_open': True}"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'readonly': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)]}"
+                                           domain="[('model', '=', model_name), ('type', '=', type)]"/>
+                                    <field name="inherit_view_ref"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'required': [('inherit_view', '=', True), ('model_inherit_type', 'not in', [False])]}"/>
+                                </group>
+                                <group>
+
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="inherit_change_ids">
+                                        <tree string="Changes">
+                                            <field name="inherit_view_type"/>
+                                            <field name="inherit_view_target"/>
+                                            <field name="inherit_view_position"/>
+                                        </tree>
+                                        <form string="Changes">
+                                            <group>
+                                                <group>
+                                                    <field name="inherit_view_type"/>
+                                                    <field name="inherit_view_target"/>
+                                                    <field name="inherit_view_position"/>
+                                                </group>
+                                                <group>
+                                                    <field name="inherit_view_attribute"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_attribute_value"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_field"
+                                                           domain="[['model_id', '=', parent.model_id]]"
+                                                           attrs="{'invisible': [['inherit_view_position', '=', 'attribute']]}"/>
+                                                </group>
+                                            </group>
+                                        </form>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="action_save" string="Save" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_builder_views_graph_field">
+            <field name="name">builder.views.graph.field</field>
+            <field name="model">builder.views.graph.field</field>
+            <field name="arch" type="xml">
+                <form string="Fields">
+                    <group>
+                        <group>
+                            <field name="special_states_field_id" invisible="1"/>
+                            <field name="model_id" invisible="1"/>
+                            <field name="field_id"
+                                   domain="[('model_id', '=', model_id), ('ttype', 'not in', ['one2many', 'many2many'])]"
+                                   options="{'no_create': True}"/>
+                            <field name="field_ttype" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="type"/>
+                            <field name="operator"
+                                   attrs="{'readonly': [('field_ttype', 'not in', ['integer', 'float'])], 'invisible': [('field_ttype', 'not in', ['integer', 'float'])]}"/>
+                            <field name="interval"
+                                   attrs="{'readonly': [('field_ttype', 'not in', ['date', 'datetime'])], 'invisible': [('field_ttype', 'not in', ['date', 'datetime'])]}"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_wizard_views_graph">
+            <field name="name">Graph View Wizard</field>
+            <field name="res_model">builder.views.graph</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

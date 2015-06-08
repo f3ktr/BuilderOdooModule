@@ -1,0 +1,9 @@
+{%- include 'python_file_header.py.jinja2' ignore missing %}
+{% import 'macros.jinja2' as macros %}
+from openerp import models, fields, api, tools, _
+# from openerp.osv import fields as fields_old
+# import openerp.addons.decimal_precision as dp
+{% for setting in settings %}
+
+{{ macros.builder_res_config_settings_model(setting) }}
+{%- endfor -%}

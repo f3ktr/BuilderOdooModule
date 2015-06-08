@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+    {% import 'macros.jinja2' as macros %}
+        {{ macros.builder_ir_module_category(module) }}
+
+        {% for group in groups -%}
+        {{ macros.builder_res_groups(group) }}
+        {% endfor %}
+    </data>
+
+    <data noupdate="1">
+        {% for rule  in rules -%}
+        {{ macros.builder_ir_rule(rule) }}
+        {% endfor %}
+    </data>
+</openerp>

@@ -1,0 +1,8 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+    {% for setting in settings %}
+            {{ macros.builder_res_config_settings_form(setting) }}
+    {% endfor %}
+{% endblock %}

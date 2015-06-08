@@ -1,0 +1,13 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+    {% for page in pages %}
+        {{ macros.builder_website_page(page) }}
+
+    {% endfor %}
+
+    {% for menu in menus %}
+        {{ macros.builder_website_menu(menu) }}
+    {% endfor %}
+{% endblock %}

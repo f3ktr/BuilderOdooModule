@@ -1,0 +1,390 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Website Snippet -->
+        <record model="ir.ui.view" id="builder_website_snippet_tree_view">
+            <field name="name">builder.website.snippet.tree</field>
+            <field name="model">builder.website.snippet</field>
+            <field name="arch" type="xml">
+                <tree string="Website Snippet">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="category"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_snippet_form_view">
+            <field name="name">builder.website.snippet.form</field>
+            <field name="model">builder.website.snippet</field>
+            <field name="arch" type="xml">
+                <form string="Website Snippet" version="7.0">
+                    <sheet>
+                        <div>
+                            <field name="image" widget="image"  class="oe_avatar oe_left"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" class="oe_inline"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Attributes">
+                                <field name="category"/>
+                                <field name="snippet_id"/>
+                            </group>
+                            <group string="Options">
+                                <field name="siblings"/>
+                                <field name="children"/>
+                            </group>
+                        </group>
+                        <group>
+                            <button string="Edit in Website" name="action_edit_html" type="object" class="oe_link"/>
+                        </group>
+                        <field name="content" nolabel="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_website_snippet">
+            <field name="name">Website Snippet</field>
+            <field name="res_model">builder.website.snippet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Website Snippet -->
+
+        <!-- Page -->
+        <record model="ir.ui.view" id="builder_website_page_tree_view">
+            <field name="name">builder.website.page.tree</field>
+            <field name="model">builder.website.page</field>
+            <field name="arch" type="xml">
+                <tree string="Page">
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                    <field name="attr_inherit_id"/>
+                    <field name="attr_page"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_page_form_view">
+            <field name="name">builder.website.page.form</field>
+            <field name="model">builder.website.page</field>
+            <field name="arch" type="xml">
+                <form string="Page" version="7.0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="attr_name"/>
+                                <field name="attr_id"/>
+                            </group>
+                            <group>
+                                <field name="attr_page"/>
+                                <field name="gen_controller" attrs="{'invisible': [('attr_page', '=', True)]}"/>
+                                <field name="controller_route" placeholder="/myroute/mypage" attrs="{'invisible': [('gen_controller', '=', False)], 'required': [('gen_controller', '=', True)]}"/>
+                            </group>
+                        </group>
+                        <button string="Edit in Website" name="action_edit_html" type="object" class="oe_link"/>
+                        <field name="content" nolabel="1" widget="ace" theme="tomorrow" mode="html"
+                               style="min-height:200px;width:90%"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- Page -->
+
+        <!-- Asset -->
+        <record model="ir.ui.view" id="builder_web_asset_tree_view">
+            <field name="name">builder.web.asset.tree</field>
+            <field name="model">builder.web.asset</field>
+            <field name="arch" type="xml">
+                <tree string="Asset">
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                    <field name="attr_priority"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_web_asset_form_view">
+            <field name="name">builder.web.asset.form</field>
+            <field name="model">builder.web.asset</field>
+            <field name="arch" type="xml">
+                <form string="Asset" version="7.0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="module_id" invisible="1"/>
+                                <field name="attr_id"/>
+                                <field name="attr_name"/>
+                            </group>
+                            <group>
+                                <field name="attr_priority"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Files">
+                                <button string="Bulk Import" name="%(act_builder_website_asset_data_wizard)d" type="action" class="oe_link" context="{'default_module_id': module_id, 'default_asset_id': context.get('active_id'), 'asset_model': 'builder.web.asset.item'}"/>
+                                <field name="item_ids" nolabel="1" mode="tree">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="file_id" domain="[('extension', 'in', ['.js', '.css', '.less', '.sass'])]"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Web Asset -->
+
+        <!-- Asset -->
+        <record model="ir.ui.view" id="builder_website_asset_tree_view">
+            <field name="name">builder.website.asset.tree</field>
+            <field name="model">builder.website.asset</field>
+            <field name="arch" type="xml">
+                <tree string="Asset">
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                    <field name="attr_active"/>
+                    <field name="attr_customize_show"/>
+                    <field name="attr_priority"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_asset_form_view">
+            <field name="name">builder.website.asset.form</field>
+            <field name="model">builder.website.asset</field>
+            <field name="arch" type="xml">
+                <form string="Asset" version="7.0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="module_id" invisible="1"/>
+                                <field name="attr_id"/>
+                                <field name="attr_name"/>
+                                <field name="attr_active"/>
+                                <field name="attr_customize_show"/>
+                            </group>
+                            <group>
+                                <field name="attr_priority"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Files">
+                                <button string="Bulk Import" name="%(act_builder_website_asset_data_wizard)d" type="action" class="oe_link" context="{'default_module_id': module_id, 'default_asset_id': context.get('active_id')}"/>
+                                <field name="item_ids" nolabel="1" mode="tree">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="file_id" domain="[('extension', 'in', ['.js', '.css', '.less', '.sass'])]"/>
+                                    </tree>
+                                </field>
+                                <!--<field nolabel="1" name="file_ids" domain="[('extension', 'in', ['.js', '.css'])]" />-->
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Asset -->
+
+        <!-- Media Item -->
+        <record model="ir.ui.view" id="builder_website_media_item_kanban_view">
+            <field name="name">builder.website.media.item.kanban</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <kanban quick_create="false" create="true" delete="true">
+                    <field name="attr_name"/>
+                    <field name="is_image"/>
+                    <field name="size"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_vignette">
+                                <div class="oe_attachment extended">
+                                    <div class="buttons">
+                                        <span  class="options">
+                                            <a t-att-href="'/web/binary/saveas?model=builder.website.media.item&amp;field=image&amp;filename_field=attr_name&amp;id=' + record.id.value" title="Download">
+                                                <span class='oe_e' style="line-height: 19%;">w</span>
+                                            </a>
+                                            <div t-if="record.is_image.value" class="oe_clear"></div>
+                                            <a t-if="record.is_image.value" target="_blank" t-att-href="'/web/binary/image?model=builder.website.media.item&amp;field=image&amp;filename_field=attr_name&amp;id=' + record.id.value" title="View Full Image">
+                                                <span class='oe_e' style="line-height: 19%;">D</span>
+                                            </a>
+
+                                        </span>
+                                        <span  class="visibility">
+                                            <a t-if="widget.view.is_action_enabled('delete')" type="delete" title="Delete">
+                                                <span class='oe_e' style="line-height: 19%;">[</span>
+                                            </a>
+                                        </span>
+
+                                    </div>
+                                    <div>
+                                        <a type="open">
+                                            <img t-if="record.is_image.value" t-att-src="kanban_image('builder.website.media.item', 'image_small', record.id.value)" class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                            <img t-if="!record.is_image.value" src="/builder/static/src/img/file.svg"/>
+                                        </a>
+                                    </div>
+                                    <div class="oe_name">
+                                        <field name="attr_name"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="builder_website_media_item_tree">
+            <field name="name">builder.website.media.item.tree</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <tree string="Media Item" editable="bottom">
+                    <field name="module_id" invisible="1"/>
+                    <field name="file_id" domain="[('module_id', '=', module_id), ('extension', 'in', ['.png', '.jpg', '.jpeg', '.gif'])]" />
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_media_item_form">
+            <field name="name">builder.website.media.item.form</field>
+            <field name="model">builder.website.media.item</field>
+            <field name="arch" type="xml">
+                <form string="Media Item" editable="bottom">
+                    <sheet>
+                        <group>
+                            <field name="module_id" invisible="1"/>
+                            <field name="file_id" domain="[('module_id', '=', module_id), ('extension', 'in', ['.png', '.jpg', '.jpeg', '.gif'])]" />
+                        </group>
+                        <group>
+                            <group>
+                                <field name="attr_id"/>
+                                <field name="attr_name"/>
+                            </group>
+                            <group>
+                                <div style="width:150px;height:150px" id="image_preview">
+                                    <field name="image" widget="image" readonly="1" />
+                                </div>
+                            </group>
+                        </group>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+
+        <!-- Media Item -->
+
+        <!-- Theme -->
+        <record model="ir.ui.view" id="builder_website_theme_tree_view">
+            <field name="name">builder.website.theme.tree</field>
+            <field name="model">builder.website.theme</field>
+            <field name="arch" type="xml">
+                <tree string="Theme">
+                    <field name="attr_id"/>
+                    <field name="attr_name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_theme_form_view">
+            <field name="name">builder.website.theme.form</field>
+            <field name="model">builder.website.theme</field>
+            <field name="arch" type="xml">
+                <form string="Theme" version="7.0">
+                    <sheet>
+                        <div>
+                            <field name="image" widget="image"  class="oe_avatar oe_left"/>
+                        </div>
+                        <div class="oe_title">
+                            <label for="attr_name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="attr_name" class="oe_inline"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="attr_id"/>
+                                <field name="module_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="type"/>
+                                <field name="color" attrs="{'invisible': [('type', 'not in', ['color'])]}"/>
+                                <field name="font_name" attrs="{'invisible': [('type', 'not in', ['font'])]}"/>
+                                <field name="font_attr" attrs="{'invisible': [('type', 'not in', ['font'])]}"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <field name="attr_description" nolabel="1"/>
+                            </page>
+                            <page string="Files">
+                                <button string="Bulk Import" name="%(act_builder_website_asset_data_wizard)d" type="action" class="oe_link" context="{'default_module_id': module_id, 'default_theme_id': context.get('active_id'), 'asset_model': 'builder.website.theme.item', 'model_link_field': 'theme_id'}"/>
+                                <field name="item_ids" nolabel="1" mode="tree">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="file_id" domain="[('extension', 'in', ['.js', '.css', '.less', '.sass'])]"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Theme -->
+
+        <!-- Menu -->
+        <record model="ir.ui.view" id="builder_website_menu_tree_view">
+            <field name="name">builder.website.menu.tree</field>
+            <field name="model">builder.website.menu</field>
+            <field name="arch" type="xml">
+                <tree string="Menu">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="page_id"/>
+                    <field name="url"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_website_menu_form_view">
+            <field name="name">builder.website.menu.form</field>
+            <field name="model">builder.website.menu</field>
+            <field name="arch" type="xml">
+                <form string="Menu" version="7.0">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="module_id" invisible="1"/>
+                                <field name="parent_id" domain="[('module_id', '=', module_id)]"/>
+                            </group>
+                            <group>
+                                <field name="page_id" domain="[('module_id', '=', module_id)]"/>
+                                <field name="url"/>
+                                <field name="sequence" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- Menu -->
+    </data>
+</openerp>

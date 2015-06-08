@@ -1,0 +1,382 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Config View -->
+        <record model="ir.ui.view" id="builder_res_config_settings_tree_view">
+            <field name="name">builder.res.config.settings.tree</field>
+            <field name="model">builder.res.config.settings</field>
+            <field name="arch" type="xml">
+                <tree string="Config View">
+                    <field name="sequence" widget="handle"/>
+                    <field name="model"/>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_res_config_settings_form_view">
+            <field name="name">builder.res.config.settings.form</field>
+            <field name="model">builder.res.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Config View">
+                    <sheet>
+                        <div class="oe_right oe_button_box" name="buttons"
+                             invisible="not context.get('active_id', False)">
+                            <button class="oe_inline oe_stat_button" string="Fields" name="action_fields" type="object"
+                                    icon="fa-list" context="{'default_model_id': id, 'default_module_id': module_id}"/>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="module_id" invisible="1"/>
+                                <field name="model"/>
+                            </group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Fields">
+                                <field name="field_ids">
+                                    <tree string="Fields Description">
+                                        <field name="position" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="setting_field_type"/>
+                                        <field name="ttype"/>
+                                    </tree>
+                                    <form string="Field">
+                                        <group>
+                                            <group>
+                                                <field name="setting_field_type"/>
+                                                <field name="ttype"
+                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])]}"/>
+                                            </group>
+                                            <group>
+                                                <field name="name"
+                                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])], }"/>
+                                                <field name="field_description"/>
+                                            </group>
+                                        </group>
+                                        <notebook>
+                                            <page string="Module"
+                                                  attrs="{'invisible': [('setting_field_type', 'not in', ['module'])]}">
+                                                <group>
+                                                    <group>
+                                                        <field name="toggle_module_id"/>
+                                                        <field name="toggle_module_name"
+                                                               attrs="{'required': [('setting_field_type', 'in', ['module'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="Groups" attrs="{'invisible': [('setting_field_type', 'not in', ['group'])]}">
+                                                <field name="group_ids" domain="[('module_id', '=', module_id)]" attrs="{'required': [('setting_field_type', 'in', ['group'])]}"/>
+                                            </page>
+                                            <page string="Implied Group"
+                                                  attrs="{'invisible': [('setting_field_type', 'not in', ['group'])]}" >
+                                                <group>
+                                                    <group string="Implied Group">
+                                                        <field name="group_type"/>
+                                                        <field name="group_system_group_id"
+                                                               attrs="{'invisible': [('group_type', 'not in', 'system')]}"/>
+                                                        <field name="group_group_id"
+                                                               attrs="{'invisible': [('group_type', 'not in', 'module')]}"/>
+                                                        <field name="group_name"
+                                                               attrs="{'required': [('setting_field_type', 'in', ['group'])]}"/>
+                                                    </group>
+                                                    <group></group>
+                                                </group>
+                                            </page>
+                                            <page string="Default"
+                                                  attrs="{'invisible': [('setting_field_type', 'not in', ['default'])]}">
+                                                <group>
+                                                    <group>
+                                                        <field name="default_type"/>
+                                                        <field name="default_system_model_id"
+                                                               attrs="{'invisible': [('default_type', 'not in', 'system')]}"/>
+                                                        <field name="default_model_id"
+                                                               attrs="{'invisible': [('default_type', 'not in', 'module')]}"/>
+                                                        <field name="default_model"
+                                                               attrs="{'required': [('setting_field_type', 'in', ['default'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="default_system_model_field_id"
+                                                               attrs="{'invisible': [('default_type', 'not in', 'system')]}"/>
+                                                        <field name="default_model_field_id"
+                                                               attrs="{'invisible': [('default_type', 'not in', 'module')]}"/>
+                                                        <field name="default_field_name"
+                                                               attrs="{'required': [('setting_field_type', 'in', ['default'])]}"/>
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="General"
+                                                  attrs="{'invisible': [('setting_field_type', 'not in', ['other'])]}">
+                                                <group>
+                                                    <group>
+                                                        <field name="required"/>
+                                                        <field name="readonly"/>
+                                                        <field name="index"/>
+                                                        <field name="select_level"
+                                                               attrs="{'readonly': [('ttype','in',['binary', 'serialized'])], 'invisible': [('ttype','in',['binary', 'serialized'])]}"/>
+                                                        <field name="translate"
+                                                               attrs="{'readonly': [('ttype','not in',['char','html', 'text'])], 'invisible': [('ttype','not in',['char','html', 'text'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="related"/>
+                                                        <field name="size"
+                                                               attrs="{'readonly': [('ttype','not in',['char','reference'])], 'invisible': [('ttype','not in',['char','reference'])]}"/>
+
+                                                        <label for="decimal_digits"
+                                                               attrs="{'invisible': [('ttype','not in',['float'])]}"/>
+                                                        <div attrs="{'invisible': [('ttype','not in',['float'])]}">
+                                                            <field name="decimal_digits"
+                                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                                   placeholder="Digits" class="oe_inline"
+                                                                   style="width: 20%"/>
+                                                            <field name="decimal_precision"
+                                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                                   placeholder="Precision" class="oe_inline"
+                                                                   style="width: 20%"/>
+                                                        </div>
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <page string="Relation"
+                                                  attrs="{'invisible': [('setting_field_type', 'not in', ['other']), ('ttype', 'not in', ['many2one','one2many','many2many'])]}">
+                                                <group>
+                                                    <group>
+                                                        <field name="relation_model_id"
+                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])],'readonly': [('ttype','!=','one2many'), ('ttype','!=','many2one'), ('ttype','!=','many2many')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="relation" readonly="1"
+                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="relation_field"
+                                                               attrs="{'required': [('ttype','=','one2many')], 'readonly': [('ttype','!=','one2many')], 'invisible': [('ttype', 'not in', ['one2many'])]}"/>
+
+                                                        <field name="auto_join"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                        <field name="delegate"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                    </group>
+                                                    <group>
+                                                    </group>
+                                                </group>
+                                                <group>
+                                                    <group>
+                                                        <field name="domain"
+                                                               attrs="{'readonly': [('relation','=','')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="on_delete"
+                                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                                    </group>
+                                                    <group>
+
+                                                    </group>
+                                                </group>
+                                            </page>
+                                            <!--<page string="Options"
+                                                  attrs="{'invisible': [('ttype', 'not in', ['selection'])]}">
+                                                <field name="option_ids" nolabel="1" mode="tree"
+                                                       attrs="{'required': [('ttype', 'in', ['selection'])]}">
+                                                    <tree name="Options" editable="bottom">
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="value"/>
+                                                        <field name="name"/>
+                                                    </tree>
+                                                </field>
+                                            </page>-->
+                                            <!--<page string="Groups" attrs="{'invisible': [('setting_field_type', 'not in', ['other', 'group'])]}">
+                                                <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
+                                            </page>-->
+                                        </notebook>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_res_config_settings">
+            <field name="name">Config View</field>
+            <field name="res_model">builder.res.config.settings</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!-- Config View -->
+
+        <!-- Fields -->
+        <record model="ir.ui.view" id="builder_res_config_settings_field_tree_view">
+            <field name="name">builder.res.config.settings.field.tree</field>
+            <field name="model">builder.res.config.settings.field</field>
+            <field name="arch" type="xml">
+                <tree string="Fields">
+                    <field name="position" widget="handle"/>
+                    <field name="name"/>
+                    <field name="setting_field_type"/>
+                    <field name="ttype"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_res_config_settings_field_form_view">
+            <field name="name">builder.res.config.settings.field.form</field>
+            <field name="model">builder.res.config.settings.field</field>
+            <field name="arch" type="xml">
+                <form string="Field">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="setting_field_type"/>
+                                <field name="ttype"
+                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])]}"/>
+                            </group>
+                            <group>
+                                <field name="name"
+                                       attrs="{'required': [('setting_field_type', '=', 'other')], 'invisible': [('setting_field_type', 'not in', ['other'])], }"/>
+                                <field name="field_description"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Module" attrs="{'invisible': [('setting_field_type', 'not in', ['module'])]}">
+                                <group>
+                                    <group>
+                                        <field name="toggle_module_id"/>
+                                        <field name="toggle_module_name"
+                                               attrs="{'required': [('setting_field_type', 'in', ['module'])]}"/>
+                                    </group>
+                                    <group>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Groups" attrs="{'invisible': [('setting_field_type', 'not in', ['group'])]}">
+                                <field name="group_ids" domain="[('module_id', '=', module_id)]" attrs="{'required': [('setting_field_type', 'in', ['group'])]}"/>
+                            </page>
+                            <page string="Implied Group"
+                                  attrs="{'invisible': [('setting_field_type', 'not in', ['group'])]}" >
+                                <group>
+                                    <group string="Implied Group">
+                                        <field name="group_type"/>
+                                        <field name="group_system_group_id"
+                                               attrs="{'invisible': [('group_type', 'not in', 'system')]}"/>
+                                        <field name="group_group_id"
+                                               attrs="{'invisible': [('group_type', 'not in', 'module')]}"/>
+                                        <field name="group_name"
+                                               attrs="{'required': [('setting_field_type', 'in', ['group'])]}"/>
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </page>
+                            <page string="Default" attrs="{'invisible': [('setting_field_type', 'not in', ['default'])]}">
+                                <group>
+                                    <group>
+                                        <field name="default_type"/>
+                                        <field name="default_system_model_id"
+                                               attrs="{'invisible': [('default_type', 'not in', 'system')]}"/>
+                                        <field name="default_model_id"
+                                               attrs="{'invisible': [('default_type', 'not in', 'module')]}"/>
+                                        <field name="default_model"
+                                               attrs="{'required': [('setting_field_type', 'in', ['default'])]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="default_system_model_field_id"
+                                               attrs="{'invisible': [('default_type', 'not in', 'system')]}"/>
+                                        <field name="default_model_field_id"
+                                               attrs="{'invisible': [('default_type', 'not in', 'module')]}"/>
+                                        <field name="default_field_name"
+                                               attrs="{'required': [('setting_field_type', 'in', ['default'])]}"/>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="General" attrs="{'invisible': [('setting_field_type', 'not in', ['other'])]}">
+                                <group>
+                                    <group>
+                                        <field name="required"/>
+                                        <field name="readonly"/>
+                                        <field name="index"/>
+                                        <field name="select_level"
+                                               attrs="{'readonly': [('ttype','in',['binary', 'serialized'])], 'invisible': [('ttype','in',['binary', 'serialized'])]}"/>
+                                        <field name="translate"
+                                               attrs="{'readonly': [('ttype','not in',['char','html', 'text'])], 'invisible': [('ttype','not in',['char','html', 'text'])]}"/>
+                                    </group>
+                                    <group>
+                                        <field name="related"/>
+                                        <field name="size"
+                                               attrs="{'readonly': [('ttype','not in',['char','reference'])], 'invisible': [('ttype','not in',['char','reference'])]}"/>
+
+                                        <label for="decimal_digits"
+                                               attrs="{'invisible': [('ttype','not in',['float'])]}"/>
+                                        <div attrs="{'invisible': [('ttype','not in',['float'])]}">
+                                            <field name="decimal_digits"
+                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                   placeholder="Digits" class="oe_inline"
+                                                   style="width: 20%"/>
+                                            <field name="decimal_precision"
+                                                   attrs="{'readonly': [('ttype','not in',['float'])]}"
+                                                   placeholder="Precision" class="oe_inline"
+                                                   style="width: 20%"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Relation"
+                                  attrs="{'invisible': [('setting_field_type', 'not in', ['other']), ('ttype', 'not in', ['many2one','one2many','many2many'])]}">
+                                <group>
+                                    <group>
+                                        <field name="relation_model_id"
+                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])],'readonly': [('ttype','!=','one2many'), ('ttype','!=','many2one'), ('ttype','!=','many2many')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                        <field name="relation" readonly="1"
+                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                        <field name="relation_field"
+                                               attrs="{'required': [('ttype','=','one2many')], 'readonly': [('ttype','!=','one2many')], 'invisible': [('ttype', 'not in', ['one2many'])]}"/>
+
+                                        <field name="auto_join"
+                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                        <field name="delegate"
+                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                    </group>
+                                    <group>
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="domain"
+                                               attrs="{'readonly': [('relation','=','')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                        <field name="on_delete"
+                                               attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>
+                                    </group>
+                                    <group>
+
+                                    </group>
+                                </group>
+                            </page>
+                            <!--<page string="Options"
+                                  attrs="{'invisible': [('ttype', 'not in', ['selection'])]}">
+                                <field name="option_ids" nolabel="1" mode="tree"
+                                       attrs="{'required': [('ttype', 'in', ['selection'])]}">
+                                    <tree name="Options" editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="value"/>
+                                        <field name="name"/>
+                                    </tree>
+                                </field>
+                            </page>-->
+                            <!--<page string="Groups" attrs="{'invisible': [('setting_field_type', 'not in', ['other', 'group'])]}">
+                                <field name="group_ids" domain="[('module_id', '=', module_id)]"/>
+                            </page>-->
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_res_config_settings_field">
+            <field name="name">Fields</field>
+            <field name="res_model">builder.res.config.settings.field</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Fields -->
+    </data>
+</openerp>

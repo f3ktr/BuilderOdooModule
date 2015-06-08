@@ -1,0 +1,8 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+    {% for asset in assets %}
+            {{ macros.builder_web_asset(asset) }}
+    {% endfor %}
+{% endblock %}

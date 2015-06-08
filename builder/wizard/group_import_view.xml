@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="builder_res_groups_import_wizard_form_view">
+            <field name="name">builder.res.groups.import.wizard.form</field>
+            <field name="model">builder.res.groups.import.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Group Import">
+                    <group>
+                        <group>
+                            <field name="set_inherited" />
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="group_ids" />
+                    </group>
+                    <footer>
+                        <button name="action_import" string="Import" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_res_groups_import_wizard">
+            <field name="name">Group Import</field>
+            <field name="res_model">builder.res.groups.import.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

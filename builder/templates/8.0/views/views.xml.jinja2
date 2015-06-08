@@ -1,0 +1,8 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+    {% for view in models %}
+            {{ macros.builder_ir_ui_view(view) }}
+    {% endfor %}
+{% endblock %}

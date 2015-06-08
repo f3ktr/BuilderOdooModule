@@ -1,0 +1,8 @@
+{%- extends 'xml/base.xml.jinja2' %}
+{% import 'macros.jinja2' as macros %}
+
+{% block content %}
+    {%- for i in range(records) -%}
+        {{ macros.builder_ir_model_demo_data(model, i)|indent(8) }}
+    {%- endfor %}
+{% endblock %}

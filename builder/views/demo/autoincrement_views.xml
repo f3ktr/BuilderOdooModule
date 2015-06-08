@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Random String -->
+
+        <record model="ir.ui.view" id="builder_ir_model_demo_generator_autoincrement_form_view">
+            <field name="name">builder.ir.model.demo.generator.autoincrement.form</field>
+            <field name="model">builder.ir.model.demo.generator.autoincrement</field>
+            <field name="arch" type="xml">
+                <form string="Autoincrement Generator" version="7.0">
+                    <group>
+                        <group>
+                            <field name="field_ids" widget="many2many_tags" domain="[['ttype', 'in', ['int', 'float']], ['model_id', '=', model_id]]"/>
+                            <field name="allow_nulls" />
+                        </group>
+                        <group>
+                            <field name="target_fields_type" invisible="1"/>
+                            <field name="model_id" invisible="1"/>
+                            <field name="module_id" invisible="1"/>
+                            <field name="subclass_model" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="start_number"/>
+                            <field name="increment"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_save" string="Save" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_model_demo_generator_autoincrement">
+            <field name="name">Autoincrement Generator</field>
+            <field name="res_model">builder.ir.model.demo.generator.autoincrement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- Random String -->
+    </data>
+</openerp>

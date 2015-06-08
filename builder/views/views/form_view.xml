@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="view_builder_views_form">
+            <field name="name">builder.views.form</field>
+            <field name="model">builder.views.form</field>
+            <field name="arch" type="xml">
+                <form string="View Generator">
+                    <group>
+                        <group>
+                            <field name="model_id" invisible="1"/>
+                            <field name="model_name" invisible="1"/>
+                            <field name="model_inherit_type" invisible="1"/>
+                            <field name="type" invisible="1"/>
+                            <field name="name"/>
+                            <field name="xml_id"/>
+                        </group>
+                        <group>
+                            <field name="special_states_field_id" invisible="1"/>
+                            <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Options" attrs="{'invisible': [('inherit_view', '=', True)]}">
+                            <group>
+                                <group string="Status Bar">
+                                    <field name="show_status_bar"/>
+                                    <field name="states_clickable"
+                                           attrs="{'invisible': ['|', ('show_status_bar', '=', False), ('special_states_field_id', '=', False)]}"/>
+                                    <field name="visible_states"
+                                           attrs="{'invisible': ['|', ('show_status_bar', '=', False), ('special_states_field_id', '=', False)]}"/>
+                                </group>
+                                <group string="Actions">
+                                    <field name="attr_create"
+                                           attrs="{'invisible': [('inherit_view', '=', True)], 'readonly': [('inherit_view', '=', True)]}"/>
+                                    <field name="attr_edit"
+                                           attrs="{'invisible': [('inherit_view', '=', True)], 'readonly': [('inherit_view', '=', True)]}"/>
+                                    <field name="attr_delete"
+                                           attrs="{'invisible': [('inherit_view', '=', True)], 'readonly': [('inherit_view', '=', True)]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Fields" attrs="{'invisible': [('inherit_view', '=', True)]}">
+                            <field name="field_ids" nolabel="1" domain="[('model_id', '=', model_id)]">
+                                <tree string="Fields"
+                                      context="{'default_special_states_field_id': parent.special_states_field_id, 'default_model_id': model_id}">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="field_id"/>
+                                    <field name="widget"/>
+                                    <field name="required"/>
+                                    <field name="invisible"/>
+                                    <field name="readonly"/>
+                                    <field name="states"/>
+                                    <field name="page"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Actions" attrs="{'invisible': ['|', ('show_status_bar', '=', False), ('inherit_view', '=', True)]}">
+                            <field name="statusbar_button_ids" nolabel="1">
+                                <tree string="Actions">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="type"/>
+                                    <field name="states"/>
+                                    <field name="highlighted"/>
+                                </tree>
+                                <form string="Buttons">
+                                    <group>
+                                        <group>
+                                            <field name="id" invisible="1"/>
+                                            <field name="name"/>
+                                            <field name="type"/>
+                                            <field name="method_name"
+                                                   attrs="{'readonly': [('type', 'not in', ['object', 'state'])], 'invisible': [('type', 'not in', ['object', 'state'])], 'required': [('type', 'in', ['object', 'state'])]}"/>
+                                            <label for="action_ref"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])], 'required': [['type', 'in', ['action']]]}"/>
+                                            <div attrs="{'invisible': [('type', 'not in', ['action'])], 'required': [['type', 'in', ['action']]]}">
+                                                <field name="action_ref" class="oe_inline"/>
+                                                <button name="%(act_builder_ir_action_lookup_wizard)d"
+                                                        class="oe_link oe_edit_only"
+                                                        type="action"
+                                                        context="{'target_field': 'action_ref', 'default_lookup_mode': 'ref'}">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </div>
+
+                                            <!--<field name="action_ref" attrs="{'readonly': [('type', 'not in', ['action'])], 'invisible': [('type', 'not in', ['action'])], 'required': [('type', 'in', ['action'])]}"/>-->
+                                        </group>
+                                        <group>
+                                            <!--<field name="sequence"/>-->
+                                            <field name="states"/>
+                                            <field name="highlighted"/>
+                                            <field name="domain"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])]}"/>
+                                            <field name="context"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])]}"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Buttons" attrs="{'invisible': [('inherit_view', '=', True)]}">
+                            <field name="button_ids" nolabel="1">
+                                <tree string="Buttons">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="type"/>
+                                    <field name="states"/>
+                                </tree>
+                                <form string="Buttons">
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="type"/>
+
+                                            <field name="method_name"
+                                                   attrs="{'invisible': [('type', 'not in', ['object'])], 'required': [('type', 'in', ['object'])]}"/>
+                                            <label for="action_ref"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])], 'required': [['type', 'in', ['action']]]}"/>
+                                            <div attrs="{'invisible': [('type', 'not in', ['action'])], 'required': [['type', 'in', ['action']]]}">
+                                                <field name="action_ref" class="oe_inline"/>
+                                                <button name="%(act_builder_ir_action_lookup_wizard)d"
+                                                        class="oe_link oe_edit_only" type="action"
+                                                        context="{'target_field': 'action_ref', 'default_lookup_mode': 'ref'}">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            </div>
+
+                                            <!--<field name="action_ref" attrs="{'readonly': [('type', 'not in', ['action'])], 'invisible': [('type', 'not in', ['action'])], 'required': [('type', 'in', ['action'])]}"/>-->
+                                        </group>
+                                        <group>
+                                            <field name="icon"/>
+                                            <field name="field_id"
+                                                   domain="[['model_id', '=', parent.model_id], ['ttype', 'in', ['integer', 'float', 'one2many', 'many2many']]]"/>
+                                            <field name="widget" attrs="{'invisible': [['field_id', '=', False]]}"/>
+                                            <field name="states"/>
+                                            <field name="domain"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])]}"/>
+                                            <field name="context"
+                                                   attrs="{'invisible': [('type', 'not in', ['action'])]}"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Inherit" attrs="{'invisible': [('inherit_view', '=', False)]}">
+                            <group>
+                                <group>
+                                    <field name="inherit_view_id" options="{'no_create': True, 'no_open': True}"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'readonly': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)]}"
+                                           domain="[('model', '=', model_name), ('type', '=', type)]"/>
+                                    <field name="inherit_view_ref"
+                                           attrs="{'invisible': ['|', ('inherit_view', '=', False), ('model_inherit_type', '=', False)], 'required': [('inherit_view', '=', True), ('model_inherit_type', 'not in', [False])]}"/>
+                                </group>
+                                <group>
+
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="inherit_change_ids">
+                                        <tree string="Changes">
+                                            <field name="inherit_view_type"/>
+                                            <field name="inherit_view_target"/>
+                                            <field name="inherit_view_position"/>
+                                        </tree>
+                                        <form string="Changes">
+                                            <group>
+                                                <group>
+                                                    <field name="inherit_view_type"/>
+                                                    <field name="inherit_view_target"/>
+                                                    <field name="inherit_view_position"/>
+                                                </group>
+                                                <group>
+                                                    <field name="inherit_view_attribute"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_attribute_value"
+                                                           attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                    <field name="inherit_view_field"
+                                                           domain="[['model_id', '=', parent.model_id]]"
+                                                           attrs="{'invisible': [['inherit_view_position', '=', 'attribute']]}"/>
+                                                </group>
+                                            </group>
+                                        </form>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                    <footer>
+                        <button name="action_save" string="Save" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_builder_views_form_field">
+            <field name="name">builder.views.form.field</field>
+            <field name="model">builder.views.form.field</field>
+            <field name="arch" type="xml">
+                <form string="Fields">
+                    <group>
+                        <group>
+                            <field name="special_states_field_id" invisible="1"/>
+                            <field name="model_id" invisible="1"/>
+                            <field name="field_id" domain="[('model_id', '=', model_id)]"
+                                   options="{'no_create': True}"/>
+                            <field name="field_ttype" invisible="1"/>
+                            <field name="widget"/>
+                            <field name="widget_options" attrs="{'invisible': [('widget', '=', False)]}"/>
+                            <field name="states"
+                                   attrs="{'readonly': [('special_states_field_id', '=', False)], 'invisible': [('special_states_field_id', '=', False)]}"/>
+                            <field name="page"/>
+                            <field name="domain"
+                                   attrs="{'invisible': [('field_ttype', 'not in', ['many2one', 'one2many', 'many2many'])]}"/>
+                        </group>
+                        <group>
+                            <field name="nolabel"/>
+                            <field name="string" attrs="{'invisible': [('nolabel', '=', True)]}"/>
+                            <field name="required"/>
+                            <field name="required_condition" attrs="{'invisible': [('required', '=', False)]}"/>
+                            <field name="invisible"/>
+                            <field name="invisible_condition" attrs="{'invisible': [('invisible', '=', False)]}"/>
+                            <field name="readonly"/>
+                            <field name="readonly_condition" attrs="{'invisible': [('readonly', '=', False)]}"/>
+                        </group>
+                    </group>
+                    <group attrs="{'invisible': [('field_ttype', 'not in', ['one2many', 'many2many'])]}">
+                        <group>
+                            <field name="related_field_view_type"/>
+                            <field name="related_field_mode"/>
+                            <field name="related_field_tree_editable"
+                                   attrs="{'invisible': ['|', ('field_ttype', 'not in', ['one2many', 'many2many']), '|', ('related_field_mode', 'not in', ['tree']), ('related_field_view_type', 'not in', ['default'])]}"/>
+                        </group>
+                        <group>
+                            <field name="related_field_form_ref" options="{'no_create': True}"
+                                   attrs="{'required': [('related_field_view_type', '=', 'defined')], 'invisible': [('related_field_view_type', 'not in', ['defined'])], 'readonly': [('related_field_view_type', 'not in', ['defined'])]}"/>
+                            <field name="related_field_tree_ref" options="{'no_create': True}"
+                                   attrs="{'required': [('related_field_view_type', '=', 'defined')], 'invisible': [('related_field_view_type', 'not in', ['defined'])], 'readonly': [('related_field_view_type', 'not in', ['defined'])]}"/>
+                        </group>
+                    </group>
+                    <!--<group attrs="{'invisible': [('field_ttype', 'not in', ['one2many', 'many2many'])]}">-->
+                    <!--<field name="related_field_arch" widget="ace" mode="xml" theme="tomorrow" style="min-height:150px" attrs="{'required': [('related_field_view_type', '=', 'custom')], 'invisible': [('related_field_view_type', 'not in', ['custom'])], 'readonly': [('related_field_view_type', 'not in', ['custom'])]}" />-->
+                    <!--</group>-->
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_wizard_views_form">
+            <field name="name">Form Wizard</field>
+            <field name="res_model">builder.views.form</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

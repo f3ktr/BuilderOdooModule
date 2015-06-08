@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="builder_ir_ui_view_tree">
+            <field name="name">builder.ir.ui.view.tree</field>
+            <field name="model">builder.ir.ui.view</field>
+            <field name="arch" type="xml">
+                <tree string="View">
+                    <field name="model_id"/>
+                    <field name="type"/>
+                    <field name="xml_id"/>
+                    <field name="inherit_id"/>
+                    <button name="action_open_view" type="object" string="Configure"
+                            class="oe_button oe_form_button oe_link"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="builder_ir_ui_view_form">
+            <field name="name">builder.ir.ui.view.form</field>
+            <field name="model">builder.ir.ui.view</field>
+            <field name="arch" type="xml">
+                <form string="View Generator">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="model_id" domain="[('module_id', '=', context.get('default_module_id'))]"/>
+                                <field name="model_inherit_type" invisible="1"/>
+                                <field name="model_name" invisible="1"/>
+                                <field name="name"/>
+                                <field name="xml_id"/>
+                            </group>
+                            <group>
+                                <field name="type"/>
+                                <field name="inherit_view" attrs="{'invisible': [('model_inherit_type', '=', False)]}"/>
+                                <field name="subclass_model" invisible="1"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string="Inherit" attrs="{'invisible': [('inherit_view', '=', False)]}">
+                                <group>
+                                    <group>
+                                        <field name="inherit_view_id" options="{'no_create': True, 'no_open': True}"
+                                               domain="[('model', '=', model_name), ('type', '=', type)]"/>
+                                        <field name="inherit_view_ref"
+                                               attrs="{'invisible': [('inherit_view', '=', False), ], 'required': [('inherit_view', '=', True),]}"/>
+                                    </group>
+                                    <group>
+
+                                    </group>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="inherit_change_ids">
+                                            <tree string="Changes">
+                                                <field name="inherit_view_type"/>
+                                                <field name="inherit_view_target"/>
+                                                <field name="inherit_view_position"/>
+                                            </tree>
+                                            <form string="Changes">
+                                                <group>
+                                                    <group>
+                                                        <field name="inherit_view_type"/>
+                                                        <field name="inherit_view_target"/>
+                                                        <field name="inherit_view_position"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="inherit_view_attribute"
+                                                               attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                        <field name="inherit_view_attribute_value"
+                                                               attrs="{'invisible': [['inherit_view_position', '!=', 'attribute']]}"/>
+                                                        <field name="inherit_view_field"
+                                                               domain="[['model_id', '=', parent.model_id]]"
+                                                               attrs="{'invisible': [['inherit_view_position', '=', 'attribute']]}"/>
+                                                    </group>
+                                                </group>
+                                            </form>
+                                        </field>
+                                    </group>
+                                </group>
+                            </page>
+                            <page string="Groups">
+                                <field name="group_ids"
+                                       domain="[('module_id', '=', context.get('default_module_id'))]"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="act_builder_ir_ui_view">
+            <field name="name">Views</field>
+            <field name="res_model">builder.ir.ui.view</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+        </record>
+    </data>
+</openerp>
