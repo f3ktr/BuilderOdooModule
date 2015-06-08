@@ -76,6 +76,7 @@ This module aims to help in the development of new modules
         'wizard/module_import_view.xml',
         'wizard/module_export_view.xml',
         'wizard/model_import_view.xml',
+        'wizard/group_import_view.xml',
 
         'views/menu_view.xml',
         'views/module_view.xml',

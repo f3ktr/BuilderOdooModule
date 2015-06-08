@@ -17,7 +17,7 @@
             <field name="name">builder.res.groups.form</field>
             <field name="model">builder.res.groups</field>
             <field name="arch" type="xml">
-                <form string="Groups" version="7.0">
+                <form string="Groups">
                     <sheet>
                         <group>
                             <group>

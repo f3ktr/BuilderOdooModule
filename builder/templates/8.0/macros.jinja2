@@ -695,6 +695,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.res.groups #}
 {% macro builder_res_groups(group) %}
+    {% if not group.inherited -%}
     <record id="{{ group.xml_id }}" model="res.groups">
         <field name="name">{{ group.name }}</field>
         {% if group.category_type == 'custom' -%}
@@ -706,6 +707,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
         {%- endif %}
         <!-- <field name="users" eval="[(4, ref('base.user_root'))]"/> -->
     </record>
+    {%- endif %}
 
 {% endmacro %}
 

@@ -47,6 +47,7 @@ class Groups(osv.osv):
         'xml_id': fields.char('XML ID', required=True),
         'name': fields.char('Name', required=True, translate=True),
         # 'users': fields.many2many('res.users', 'res_groups_users_rel', 'gid', 'uid', 'Users'),
+        'inherited': fields.boolean('Inherited', default=False),
         'model_access': fields.one2many('builder.ir.model.access', 'group_id', 'Access Controls', copy=True),
         'rule_groups': fields.many2many('builder.ir.rule', 'builder_rule_group_rel', 'group_id', 'rule_group_id', 'Rules', domain=[('global', '=', False)]),
         'menu_access': fields.many2many('builder.ir.ui.menu', 'builder_ir_ui_menu_group_rel', 'gid', 'menu_id', 'Access Menu'),

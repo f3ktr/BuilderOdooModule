@@ -1,16 +1,19 @@
 __author__ = 'one'
 
-from . import module_import
-from . import module_export
-from . import module_generate
-from . import model_import
-from . import model_lookup_wizard
-from . import menu_lookup_wizard
-from . import action_lookup_wizard
-from . import module_data_import
-from . import website_asset_bulk_add
-from . import website_page_import
-from . import model_access_generate_wizard
-from . import demo_creator_wizard
-from . import website_media_item_bulk_add
+from . import (
+    module_import,
+    module_export,
+    module_generate,
+    model_import,
+    model_lookup_wizard,
+    menu_lookup_wizard,
+    action_lookup_wizard,
+    module_data_import,
+    website_asset_bulk_add,
+    website_page_import,
+    model_access_generate_wizard,
+    demo_creator_wizard,
+    website_media_item_bulk_add,
+    group_import
+)
 # from . import model_view_wizard

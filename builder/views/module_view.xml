@@ -223,6 +223,9 @@
                                         </field>
                                     </page>
                                     <page string="Groups">
+                                        <div class="oe_right oe_button_box" name="buttons">
+                                            <button class="oe_inline oe_stat_button" string="Import Groups" name="%(act_builder_res_groups_import_wizard)d" type="action" icon="fa-reply" context="{}"/>
+                                        </div>
                                         <field name="group_ids" nolabel="1" context="{'default_module_id': active_id}" />
                                     </page>
                                     <page string="ACLs">
