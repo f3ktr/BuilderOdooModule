@@ -89,22 +89,23 @@ class Module(models.Model):
         comodel_name='builder.ir.module.dependency',
         inverse_name='module_id',
         string='Dependencies',
+        copy=True
     )
 
-    model_ids = fields.One2many('builder.ir.model', 'module_id', 'Models')
-    view_ids = fields.One2many('builder.ir.ui.view', 'module_id', 'Views')
-    menu_ids = fields.One2many('builder.ir.ui.menu', 'module_id', 'Menus')
-    group_ids = fields.One2many('builder.res.groups', 'module_id', 'Groups')
-    model_access_ids = fields.One2many('builder.ir.model.access', 'module_id', 'ACLs')
-    rule_ids = fields.One2many('builder.ir.rule', 'module_id', 'Rules')
-    cron_job_ids = fields.One2many('builder.ir.cron', 'module_id', 'Cron Jobs')
-    action_ids = fields.One2many('builder.ir.actions.actions', 'module_id', 'Actions')
-    action_window_ids = fields.One2many('builder.ir.actions.act_window', 'module_id', 'Window Actions')
-    action_url_ids = fields.One2many('builder.ir.actions.act_url', 'module_id', 'URL Actions')
-    workflow_ids = fields.One2many('builder.workflow', 'module_id', 'Workflows')
-    backend_asset_ids = fields.One2many('builder.web.asset', 'module_id', 'Assets')
+    model_ids = fields.One2many('builder.ir.model', 'module_id', 'Models', copy=True)
+    view_ids = fields.One2many('builder.ir.ui.view', 'module_id', 'Views', copy=True)
+    menu_ids = fields.One2many('builder.ir.ui.menu', 'module_id', 'Menus', copy=True)
+    group_ids = fields.One2many('builder.res.groups', 'module_id', 'Groups', copy=True)
+    model_access_ids = fields.One2many('builder.ir.model.access', 'module_id', 'ACLs', copy=True)
+    rule_ids = fields.One2many('builder.ir.rule', 'module_id', 'Rules', copy=True)
+    cron_job_ids = fields.One2many('builder.ir.cron', 'module_id', 'Cron Jobs', copy=True)
+    action_ids = fields.One2many('builder.ir.actions.actions', 'module_id', 'Actions', copy=True)
+    action_window_ids = fields.One2many('builder.ir.actions.act_window', 'module_id', 'Window Actions', copy=True)
+    action_url_ids = fields.One2many('builder.ir.actions.act_url', 'module_id', 'URL Actions', copy=True)
+    workflow_ids = fields.One2many('builder.workflow', 'module_id', 'Workflows', copy=True)
+    backend_asset_ids = fields.One2many('builder.web.asset', 'module_id', 'Assets', copy=True)
 
-    data_file_ids = fields.One2many('builder.data.file', 'module_id', 'Data Files')
+    data_file_ids = fields.One2many('builder.data.file', 'module_id', 'Data Files', copy=True)
     snippet_bookmarklet_url = fields.Char('Link', compute='_compute_snippet_bookmarklet_url')
 
     @api.model
@@ -114,6 +115,12 @@ class Module(models.Model):
     _defaults = {
         'author': _get_default_author
     }
+
+    @api.one
+    def copy(self, default=None):
+        default = dict(default or {})
+        default['shortdesc'] = _('%s (copy)') % self.shortdesc
+        return super(Module, self).copy(default)
 
     @api.onchange('shortdesc')
     def _compute_name(self):
@@ -545,7 +552,7 @@ class DataFile(models.Model):
     extension = fields.Char('Extension', compute='_compute_stats', store=True)
     size = fields.Integer('Size', compute='_compute_stats', store=True)
     content = fields.Binary('Content')
-    media_item_ids = fields.One2many('builder.website.media.item', 'file_id', 'Media Files')
+    media_item_ids = fields.One2many('builder.website.media.item', 'file_id', 'Media Files', copy=True)
 
     @api.one
     @api.depends('media_item_ids.file_id')

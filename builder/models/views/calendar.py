@@ -36,7 +36,7 @@ class CalendarView(models.Model):
     attr_display = fields.Char('Display Format',
                                help='The display format which will be used to display the event where fields are between "[" and "]"')
 
-    field_ids = fields.One2many('builder.views.calendar.field', 'view_id', 'Items')
+    field_ids = fields.One2many('builder.views.calendar.field', 'view_id', 'Items', copy=True)
 
     _defaults = {
         'type': 'calendar',

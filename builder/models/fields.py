@@ -125,8 +125,8 @@ class IrFields(models.Model):
                               "For example: [('color','=','red')]")
     selectable = fields.Boolean('Selectable', default=1)
     group_ids = fields.Many2many('builder.res.groups', 'builder_ir_model_fields_group_rel', 'field_id', 'group_id', string='Groups')
-    option_ids = fields.One2many('builder.ir.model.fields.option', 'field_id', 'Options')
-    states_ids = fields.One2many('builder.ir.model.fields.state', 'field_id', 'States')
+    option_ids = fields.One2many('builder.ir.model.fields.option', 'field_id', 'Options', copy=True)
+    states_ids = fields.One2many('builder.ir.model.fields.state', 'field_id', 'States', copy=True)
 
     allow_compute = fields.Boolean('Compute')
     compute_method_name = fields.Char('Compute Method Name')

@@ -17,7 +17,7 @@ class GraphView(models.Model):
     attr_type = fields.Selection([('bar', 'Bar'), ('pie', 'Pie'), ('line', 'Line'), ('pivot', 'Pivot')], 'Type')
     attr_stacked = fields.Boolean('Stacked')
     attr_orientation = fields.Selection([('horizontal', 'Horizontal'), ('vertical', 'Vertical')], 'Orientation')
-    field_ids = fields.One2many('builder.views.graph.field', 'view_id', 'Items')
+    field_ids = fields.One2many('builder.views.graph.field', 'view_id', 'Items', copy=True)
 
     _defaults = {
         'type': 'graph',

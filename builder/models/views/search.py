@@ -15,7 +15,7 @@ class SearchView(models.Model):
     }
 
     view_id = fields.Many2one('builder.ir.ui.view', string='View', required=True, ondelete='cascade')
-    field_ids = fields.One2many('builder.views.search.field', 'view_id', 'Search Items')
+    field_ids = fields.One2many('builder.views.search.field', 'view_id', 'Search Items', copy=True)
 
     _defaults = {
         'type': 'search',

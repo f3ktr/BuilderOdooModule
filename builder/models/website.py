@@ -15,7 +15,7 @@ class BackendAssets(models.Model):
     attr_id = fields.Char(string='XML ID')
     attr_priority = fields.Integer('Priority', default=10)
 
-    item_ids = fields.One2many('builder.web.asset.item', 'asset_id', 'Items')
+    item_ids = fields.One2many('builder.web.asset.item', 'asset_id', 'Items', copy=True)
 
 
 class WebAssetItem(models.Model):
@@ -37,7 +37,7 @@ class WebsiteAssets(models.Model):
     attr_customize_show = fields.Boolean('Customize Show')
     attr_inherit_id = fields.Char('Inherit Asset')
     attr_priority = fields.Integer('Priority', default=10)
-    item_ids = fields.One2many('builder.website.asset.item', 'asset_id', 'Items')
+    item_ids = fields.One2many('builder.website.asset.item', 'asset_id', 'Items', copy=True)
 
 
 class AssetItem(models.Model):
@@ -127,7 +127,7 @@ class Theme(models.Model):
     font_name = fields.Char("Font Name")
     font_attr = fields.Char("Font", help="ex: Times New Roman")
     type = fields.Selection([('layout', 'Layout'),('color', 'Color'), ('font', 'Font'), ('other', 'Other')], string='Type', required=True, default='layout')
-    item_ids = fields.One2many('builder.website.theme.item', 'theme_id', 'Items')
+    item_ids = fields.One2many('builder.website.theme.item', 'theme_id', 'Items', copy=True)
 
 
 class ThemeAssetItem(models.Model):
@@ -255,13 +255,13 @@ class WebsiteSnippet(models.Model):
 class Module(models.Model):
     _inherit = 'builder.ir.module.module'
 
-    website_media_item_ids = fields.One2many('builder.website.media.item', 'module_id', 'Media Items')
+    website_media_item_ids = fields.One2many('builder.website.media.item', 'module_id', 'Media Items', copy=True)
     # website_media_item_ids = fields.Many2many('builder.data.file', 'website_media_item_file_rel', 'module_id', 'file_id', 'Media Items', domain=[('is_image', '=', True)])
-    website_menu_ids = fields.One2many('builder.website.menu', 'module_id', 'Menu')
-    website_asset_ids = fields.One2many('builder.website.asset', 'module_id', 'Assets')
-    website_theme_ids = fields.One2many('builder.website.theme', 'module_id', 'Themes')
-    website_page_ids = fields.One2many('builder.website.page', 'module_id', 'Pages')
-    website_snippet_ids = fields.One2many('builder.website.snippet', 'module_id', 'Snippets')
+    website_menu_ids = fields.One2many('builder.website.menu', 'module_id', 'Menu', copy=True)
+    website_asset_ids = fields.One2many('builder.website.asset', 'module_id', 'Assets', copy=True)
+    website_theme_ids = fields.One2many('builder.website.theme', 'module_id', 'Themes', copy=True)
+    website_page_ids = fields.One2many('builder.website.page', 'module_id', 'Pages', copy=True)
+    website_snippet_ids = fields.One2many('builder.website.snippet', 'module_id', 'Snippets', copy=True)
 
 
 

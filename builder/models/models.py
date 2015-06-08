@@ -20,11 +20,11 @@ class IrModel(models.Model):
     osv_memory = fields.Boolean('Transient',
                                 help="This field specifies whether the model is transient or not (i.e. if records are automatically deleted from the database or not)")
     field_ids = fields.One2many('builder.ir.model.fields', 'model_id', 'Fields', required=True, copy=True)
-    relation_field_ids = fields.One2many('builder.ir.model.fields', 'relation_model_id', 'Referenced By Fields')
+    relation_field_ids = fields.One2many('builder.ir.model.fields', 'relation_model_id', 'Referenced By Fields', copy=True)
     # inherit_model = fields.Char('Inherit', compute='_compute_inherit_model')
 
-    inherit_model_ids = fields.One2many('builder.ir.model.inherit', 'model_id', 'Inherit')
-    inherits_model_ids = fields.One2many('builder.ir.model.inherits', 'model_id', 'Inherits')
+    inherit_model_ids = fields.One2many('builder.ir.model.inherit', 'model_id', 'Inherit', copy=True)
+    inherits_model_ids = fields.One2many('builder.ir.model.inherits', 'model_id', 'Inherits', copy=True)
 
     is_inherited = fields.Boolean('Inherited', compute='_compute_inherited', store=True)
     inherit_type = fields.Selection(
@@ -33,8 +33,8 @@ class IrModel(models.Model):
 
     access_ids = fields.One2many('builder.ir.model.access', 'model_id', 'Access', copy=True)
 
-    view_ids = fields.One2many('builder.ir.ui.view', 'model_id', 'Views')
-    method_ids = fields.One2many('builder.ir.model.method', 'model_id', 'Models')
+    view_ids = fields.One2many('builder.ir.ui.view', 'model_id', 'Views', copy=True)
+    method_ids = fields.One2many('builder.ir.model.method', 'model_id', 'Models', copy=True)
 
     to_ids = fields.One2many('builder.ir.model.fields', 'relation_model_id', 'Forward Models',
                              domain=[('ttype', 'in', ['many2one', 'one2many', 'many2many']),
@@ -77,7 +77,8 @@ class IrModel(models.Model):
         comodel_name='builder.ir.model.fields',
         inverse_name='model_id',
         string='Order',
-        domain=[('use_to_order', '=', True)]
+        domain=[('use_to_order', '=', True)],
+        copy=True
     )
 
     status_bar_button_ids = fields.One2many(
@@ -85,6 +86,7 @@ class IrModel(models.Model):
         inverse_name='model_id',
         domain=[('type', '=', 'object')],
         string='Status Bar Buttons',
+        copy=True
     )
 
     button_ids = fields.One2many(
@@ -92,6 +94,7 @@ class IrModel(models.Model):
         inverse_name='model_id',
         domain=[('type', '=', 'object')],
         string='View Buttons',
+        copy=True
     )
 
     @property

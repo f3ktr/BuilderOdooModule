@@ -92,7 +92,7 @@ class IrUiMenu(models.Model):
     complete_name = fields.Char('Complete Name', compute='_compute_complete_name')
     morder = fields.Integer('Order')
     sequence = fields.Integer('Sequence')
-    child_ids = fields.One2many('builder.ir.ui.menu', 'parent_id', 'Child Ids')
+    child_ids = fields.One2many('builder.ir.ui.menu', 'parent_id', 'Child Ids', copy=True)
     # group_ids = fields.Many2many('builder.res.groups', 'builder_ir_ui_menu_group_rel', 'menu_id', 'gid', 'Groups', help="If you have groups, the visibility of this menu will be based on these groups. "\
     #             "If this field is empty, Odoo will compute visibility based on the related object's read access.")
     parent_menu_id = fields.Many2one('ir.ui.menu', 'System Menu', ondelete='set null')

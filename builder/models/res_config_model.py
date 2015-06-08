@@ -137,4 +137,5 @@ class Module(models.Model):
         comodel_name='builder.res.config.settings',
         inverse_name='module_id',
         string='Settings',
+        copy=True
     )

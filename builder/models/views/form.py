@@ -22,9 +22,9 @@ class FormView(models.Model):
     show_status_bar = fields.Boolean('Show Status Bar', default=False)
     visible_states = fields.Char('Visible States')
 
-    statusbar_button_ids = fields.One2many('builder.views.form.statusbar.button', 'view_id', 'Status Bar Buttons')
-    button_ids = fields.One2many('builder.views.form.button', 'view_id', 'Buttons')
-    field_ids = fields.One2many('builder.views.form.field', 'view_id', 'Items')
+    statusbar_button_ids = fields.One2many('builder.views.form.statusbar.button', 'view_id', 'Status Bar Buttons', copy=True)
+    button_ids = fields.One2many('builder.views.form.button', 'view_id', 'Buttons', copy=True)
+    field_ids = fields.One2many('builder.views.form.field', 'view_id', 'Items', copy=True)
 
     @api.onchange('inherit_view_id')
     def onchange_inherit_view_id(self):

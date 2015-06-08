@@ -43,7 +43,7 @@ class GanttView(models.Model):
         default='month'
     )
 
-    field_ids = fields.One2many('builder.views.gantt.field', 'view_id', 'Items')
+    field_ids = fields.One2many('builder.views.gantt.field', 'view_id', 'Items', copy=True)
 
     _defaults = {
         'type': 'gantt',

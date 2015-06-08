@@ -10,10 +10,10 @@ class Workflow(models.Model):
     name = fields.Char('Name', required=True)
     model_id = fields.Many2one('builder.ir.model', 'Model', ondelete='cascade')
     on_create = fields.Boolean('On Create', default=True)
-    activities = fields.One2many('builder.workflow.activity', 'wkf_id', 'Activities')
+    activities = fields.One2many('builder.workflow.activity', 'wkf_id', 'Activities', copy=True)
 
-    def copy(self, values):
-        raise Warning(_("Duplicating workflows is not possible, please create a new workflow"))
+    #def copy(self, values):
+    #    raise Warning(_("Duplicating workflows is not possible, please create a new workflow"))
 
 
 class WorkflowActivity(models.Model):

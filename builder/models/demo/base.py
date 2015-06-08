@@ -118,6 +118,7 @@ class IrModel(models.Model):
         comodel_name='builder.ir.model.demo.generator',
         inverse_name='model_id',
         string='Demo Data',
+        copy=True,
     )
     demo_xml_id_sample = fields.Text(compute='_compute_demo_xml_id_sample', store=True)
 
@@ -154,4 +155,5 @@ class IrModule(models.Model):
         comodel_name='builder.ir.model.demo.generator',
         inverse_name='module_id',
         string='Demo Data',
+        copy=True,
     )

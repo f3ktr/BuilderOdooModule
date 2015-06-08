@@ -85,7 +85,7 @@ class ModelDataAttribute(models.Model):
     change_ids = fields.One2many(
         comodel_name=b'builder.model.data.change',
         inverse_name='attribute_id',
-        string='Filters',
+        string='Filters', copy=True
     )
 
     @api.onchange('name')
@@ -144,7 +144,7 @@ class ModelData(models.Model):
     attribute_ids = fields.One2many(
         comodel_name=b'builder.model.data.attribute',
         inverse_name='model_id',
-        string='Attributes',
+        string='Attributes', copy=True
     )
 
     result_text = fields.Text('XML', compute='_compute_result', store=True)
@@ -233,4 +233,4 @@ class Module(models.Model):
     _name = b'builder.ir.module.module'
     _inherit = [b'builder.ir.module.module']
 
-    data_ids = fields.One2many(b'builder.model.data', b'module_id', 'Data')
+    data_ids = fields.One2many(b'builder.model.data', b'module_id', 'Data', copy=True)

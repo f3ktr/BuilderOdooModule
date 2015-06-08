@@ -19,7 +19,7 @@ class TreeView(models.Model):
     attr_create = fields.Boolean('Allow Create', default=True)
     attr_edit = fields.Boolean('Allow Edit', default=True)
     attr_delete = fields.Boolean('Allow Delete', default=True)
-    field_ids = fields.One2many('builder.views.tree.field', 'view_id', 'Fields')
+    field_ids = fields.One2many('builder.views.tree.field', 'view_id', 'Fields', copy=True)
     attr_toolbar = fields.Boolean('Show Toolbar', default=False)
     attr_fonts = fields.Char('Fonts', help='Font definition. Ex: bold:message_unread==True')
     attr_colors = fields.Char('Colors',

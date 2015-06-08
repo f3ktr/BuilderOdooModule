@@ -117,7 +117,7 @@ class ir_actions_act_window(osv.osv):
             help="View type: Tree type to use for the tree view, set to 'tree' for a hierarchical tree view, or 'form' for a regular list view"),
         'usage': fields.char('Action Usage',
             help="Used to filter menu and home actions from the user form."),
-        'view_ids': fields.one2many('ir.actions.act_window.view', 'act_window_id', 'Views'),
+        'view_ids': fields.one2many('ir.actions.act_window.view', 'act_window_id', 'Views', copy=True),
         'views': fields.function(_views_get_fnc, type='binary', string='Views',
                help="This function field computes the ordered list of views that should be enabled " \
                     "when displaying the result of an action, federating view mode, views and " \
