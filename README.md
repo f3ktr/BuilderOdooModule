@@ -2,19 +2,19 @@
 
 #### Screenshots
 * Creation of a new module
-![Module Info](https://github.com/slmoebius/builder/blob/master/static/description/module_info.png)
+![Module Info](https://github.com/slmoebius/builder/blob/master/builder/static/description/module_info.png)
 
 * Manage multiple items of your module such as models, views, groups and many others
-![Backend](https://github.com/slmoebius/builder/blob/master/static/description/backend.png)
+![Backend](https://github.com/slmoebius/builder/blob/master/builder/static/description/backend.png)
 
 * Posibility of view or create your models and fields in a graphical interface
-![Designer](https://github.com/slmoebius/builder/blob/master/static/description/designer.png)
+![Designer](https://github.com/slmoebius/builder/blob/master/builder/static/description/designer.png)
 
 * View wizards allow you to create a view easily. Options are restricted to avoid most errors
-![View Wizard](https://github.com/slmoebius/builder/blob/master/static/description/view_wizards.png)
+![View Wizard](https://github.com/slmoebius/builder/blob/master/builder/static/description/view_wizards.png)
 
 * Peek of what to expect from our website section!
-![Website](https://github.com/slmoebius/builder/blob/master/static/description/website.png)
+![Website](https://github.com/slmoebius/builder/blob/master/builder/static/description/website.png)
 
 
 ## Installation
