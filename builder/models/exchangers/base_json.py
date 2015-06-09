@@ -142,7 +142,7 @@ class JSONExchanger(models.Model):
 
     @api.model
     def get_extension(self):
-        return 'obj1'
+        return 'builder'
 
     @api.model
     def get_export_module_filename(self, module):
