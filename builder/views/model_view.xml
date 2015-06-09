@@ -63,6 +63,7 @@
                                                 <field name="name"/>
                                                 <field name="field_description"/>
                                                 <field name="is_inherited" invisible="1"/>
+                                                <field name="module_id" invisible="1"/>
                                                 <field name="redefine" attrs="{'invisible': [['is_inherited', '=', False]], }"/>
                                             </group>
                                             <group>
