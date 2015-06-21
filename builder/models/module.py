@@ -83,7 +83,7 @@ class Module(models.Model):
                                     # ('builder.ir.actions.act_url', 'URL'),
     ], 'After Install Action')
 
-    models_count = fields.Integer("Models Count", compute='_compute_models_count', store=False)
+    models_count = fields.Integer("Models Count", compute='_compute_models_count', store=False, search=True)
 
     dependency_ids = fields.One2many(
         comodel_name='builder.ir.module.dependency',

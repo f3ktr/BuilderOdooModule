@@ -45,7 +45,7 @@ class ViewSelector(models.TransientModel):
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
     model_id = fields.Many2one('builder.ir.model', 'Model', ondelete='cascade', required=True)
-    model_name = fields.Char('Model Name', related='model_id.name', store=False)
+    model_name = fields.Char('Model Name', related='model_id.name')
     model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type')
     special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
                                               related='model_id.special_states_field_id')
@@ -150,7 +150,7 @@ class View(models.Model):
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='CASCADE')
     model_id = fields.Many2one('builder.ir.model', ondelete='cascade')
     model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type', store=False)
-    model_name = fields.Char('Model Name', related='model_id.name', store=False)
+    model_name = fields.Char('Model Name', related='model_id.name')
     special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
                                               related='model_id.special_states_field_id')
     model_groups_date_field_ids = fields.One2many('builder.ir.model.fields', string='Has Date Fields',

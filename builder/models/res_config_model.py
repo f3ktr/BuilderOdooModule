@@ -52,22 +52,22 @@ class SettingModelField(models.Model):
             ('other', 'Normal Field'),
         ], 'Setting Type', default='other', required=True)
 
-    toggle_module_id = fields.Many2one('ir.module.module', 'Module', store=False)
+    toggle_module_id = fields.Many2one('ir.module.module', 'Module', store=False, search=True)
     toggle_module_name = fields.Char('Module Name')
 
     default_type = fields.Selection([('module', 'Module'), ('system', 'System')], 'Default Type')
-    default_system_model_id = fields.Many2one('ir.model', 'System Model', store=False)
+    default_system_model_id = fields.Many2one('ir.model', 'System Model', store=False, search=True)
     default_model_id = fields.Many2one('builder.ir.model', 'Builder Model')
     default_model = fields.Char('Model')
     default_field_name = fields.Char('Field Name')
-    default_system_model_field_id = fields.Many2one('ir.model.fields', 'System Field', store=False,
+    default_system_model_field_id = fields.Many2one('ir.model.fields', 'System Field', store=False, search=True,
                                                     domain="[('model_id', '=', default_system_model_id)]",
                                                     change_default=True)
     default_model_field_id = fields.Many2one('builder.ir.model.fields', 'Builder Field',
                                              domain="[('model_id', '=', default_model_id)]", change_default=True)
 
     group_type = fields.Selection([('module', 'Module'), ('system', 'System')], 'Group Type')
-    group_system_group_id = fields.Many2one('res.groups', 'System Group', store=False)
+    group_system_group_id = fields.Many2one('res.groups', 'System Group', store=False, search=True)
     group_group_id = fields.Many2one('builder.res.groups', 'Builder Group')
     group_name = fields.Char('Implied Group')
 
