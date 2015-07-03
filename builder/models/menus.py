@@ -119,7 +119,6 @@ class IrUiMenu(models.Model):
 
     group_ids = fields.Many2many('builder.res.groups', 'builder_ir_ui_menu_group_rel', 'menu_id', 'gid', string='Groups', help="If this field is empty, the menu applies to all users. Otherwise, the view applies to the users of those groups only.")
 
-
     @api.onchange('action_system')
     def onchange_action_system(self):
         if self.action_system:
@@ -155,27 +154,24 @@ class IrUiMenu(models.Model):
 
         return super(IrUiMenu, self).write(vals)
 
-
-
     @api.one
     def _compute_complete_name(self):
         self.complete_name = self._get_full_name_one()
 
     @api.multi
     def _get_full_name_one(self, level=6):
-        if level<=0:
+        if level <= 0:
             return '...'
         parent_path = ''
         if self.parent_id:
             parent_path = self.parent_id._get_full_name_one(level-1) + MENU_ITEM_SEPARATOR
         elif self.parent_ref:
-            parent_path = _('[INHERITED]') + MENU_ITEM_SEPARATOR
             if self.parent_menu_id:
                 parent_path = '[{name}]'.format(name=self.parent_menu_id.complete_name) + MENU_ITEM_SEPARATOR
             else:
                 parent_path = '[{ref}]'.format(ref=self.parent_ref) + MENU_ITEM_SEPARATOR
 
-        return parent_path + self.name
+        return (parent_path + self.name) if self.name else False
 
     @api.one
     def name_get(self):
@@ -183,6 +179,10 @@ class IrUiMenu(models.Model):
 
     def _rec_message(self, cr, uid, ids, context=None):
         return _('Error ! You can not create recursive Menu.')
+
+    @property
+    def real_xml_id(self):
+        return self.xml_id if '.' in self.xml_id else '{module}.{xml_id}'.format(module=self.module_id.name, xml_id=self.xml_id)
 
     _constraints = [
         (osv.osv._check_recursion, _rec_message, ['parent_id'])

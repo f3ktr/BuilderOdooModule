@@ -5,6 +5,7 @@ import random
 
 from openerp import models, api, fields, _
 
+
 class GeneratorInterface(models.AbstractModel):
     _name = 'builder.ir.model.demo.generator.base'
     _description = 'Generator Interface'
@@ -123,9 +124,9 @@ class IrModel(models.Model):
     demo_xml_id_sample = fields.Text(compute='_compute_demo_xml_id_sample', store=True)
 
     @api.one
-    @api.depends('demo_records')
+    @api.depends('demo_records', 'model')
     def _compute_demo_xml_id_sample(self):
-        tmpl = '{model}_'.format(model=self.model.lower().replace('.', '_')) + '{id}'
+        tmpl = '{model}_'.format(model=self.model.lower().replace('.', '_')) + '{id}' if self.model else 'model_'
         self.demo_xml_id_sample = pickle.dumps([tmpl.format(id=i) for i in xrange(self.demo_records)])
 
     @api.multi

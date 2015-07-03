@@ -76,7 +76,6 @@ class Module(models.Model):
     menus_by_module = fields.Text(string='Menus')
     reports_by_module = fields.Text(string='Reports')
     views_by_module = fields.Text(string='Views')
-    demo = fields.Boolean('Has Demo Data')
 
     post_install_action = fields.Reference([
                                     ('builder.ir.actions.act_window', 'Window'),

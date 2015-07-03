@@ -1,4 +1,4 @@
-from openerp.addons.builder.models.fields import snake_case
+from ..fields import snake_case
 from openerp import models, fields, api
 from .base import FIELD_WIDGETS_ALL
 
@@ -29,7 +29,6 @@ class TreeView(models.Model):
     _defaults = {
         'type': 'tree',
         'subclass_model': lambda s, c, u, cxt=None: s._name,
-        'inherit_view_xpath': '//tree'
     }
 
     @api.model
@@ -53,9 +52,12 @@ class TreeView(models.Model):
         if not len(self.field_ids):
             field_list = []
             for field in model_id.field_ids:
-                if field.ttype not in ['binary', 'one2many', 'many2many']:
-                    field_list.append({'field_id': field.id, 'field_ttype': field.ttype, 'model_id': model_id.id,
-                                       'special_states_field_id': model_id.special_states_field_id.id})
+                if field.ttype in ['binary', 'one2many', 'many2many']:
+                    continue
+                if field.is_inherited and not self.env.context.get('add_inherited_fields', True):
+                    continue
+                field_list.append({'field_id': field.id, 'field_ttype': field.ttype, 'model_id': model_id.id,
+                                   'special_states_field_id': model_id.special_states_field_id.id})
 
             self.field_ids = field_list
 

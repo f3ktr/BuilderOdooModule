@@ -1,9 +1,10 @@
 {%- include 'python_file_header.py.jinja2' ignore missing %}
-{% import 'macros.jinja2' as macros %}
+{%- import 'macros.jinja2' as macros %}
 from openerp import models, fields, api, tools, _
 # from openerp.osv import fields as fields_old
 # import openerp.addons.decimal_precision as dp
-{% for model in models %}
 
+
+{% for model in models -%}
 {{ macros.builder_ir_model(model) }}
-{%- endfor -%}
+{% endfor -%}

@@ -7,6 +7,7 @@
             <field name="model">builder.res.groups</field>
             <field name="arch" type="xml">
                 <tree string="Groups">
+                    <field name="sequence" widget="handle"/>
                     <field name="xml_id"/>
                     <field name="full_name"/>
                 </tree>

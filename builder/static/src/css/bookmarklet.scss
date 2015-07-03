@@ -1,12 +1,27 @@
 #odooIframe {
   position: fixed;
-  top: 0;
-  right: 0;
-  float: right;
   width: 400px;
   height: 430px;
   z-index: 9999;
   border: solid 1px #000000;
+
+  &.top {
+    top: 0
+  }
+
+  &.down {
+    bottom: 0;
+  }
+
+  &.left {
+    left: 0;
+    float: left;
+  }
+
+  &.right {
+    right: 0;
+    float: right;
+  }
 
   & iframe {
     visibility: visible!important;
@@ -14,21 +29,6 @@
   }
 }
 
-.bookmarklet-gear {
-  display: none;
-
-}
-
 .bookmarklet-active {
   border: 1px solid #ffff00;
-  position: relative;
-
-  & .bookmarklet-gear {
-    border: none;
-    display: block;
-    float: right;
-    left: 0;
-    right: 0;
-    position: absolute;
-  }
 }

@@ -21,19 +21,65 @@
 
                 </head>
                 <body>
+                    <div id="options-modal" class="modal">
+                        <div class="modal-header">
+                            <a class="close" data-dismiss="modal">×</a>
+                            <h3>Options</h3>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-snippet-options" class="form-snippet form-horizontal">
+                                <div class="pull-left">
+                                    <label class="radio">
+                                        <input type="radio" name="position-vertical" id="position-top" value="top"
+                                               checked="checked"/>
+                                        Top
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="position-vertical" id="position-down" value="down"/>
+                                        Down
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="position-horizontal" id="position-right" value="right"
+                                               checked="True"/>
+                                        Right
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="position-horizontal" id="position-left" value="left"/>
+                                        Left
+                                    </label>
+                                </div>
+                                <div class="pull-right">
+                                    <label class="checkbox">
+                                        <input id="inline-images" type="checkbox" value="inline-images"
+                                               checked="checked"/>
+                                        Inline Images
+                                    </label>
+                                    <label class="checkbox">
+                                        <input id="copy-css" type="checkbox" value="copy-css" checked="checked"/>
+                                        Copy CSS
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                      <button type="button" class="close" data-dismiss="alert">×</button>
+                      Is important to set <a class="btn btn-success" data-toggle="modal" href="#options-modal" >Options</a> <strong>before</strong> copying any content! And you can select the parent and siblings of the active element by hitting <strong>CTRL + ARROWS</strong>
+                    </div>
+
                     <form id="form-snippet" class="form-snippet" action="save" method="POST">
                         <h2 class="form-snippet-heading">Snippet HTML</h2>
                         <input id="name" name="name" type="text" placeholder="Name" class="form-control"/>
                         <input id="url" name="url" type="hidden" class="form-control"/>
                         <input id="xpath" name="xpath" type="hidden" class="form-control"/>
-                        <textarea rows="6" id="html" name="html"></textarea>
-                        <label class="checkbox">
-                            <input id="copy-css" type="checkbox" value="copy-css" checked="checked"/>
-                            Copy CSS
-                        </label>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
+                        <textarea rows="6" id="html" name="html"/>
+                        <div class="form-actions">
+                            <button class="btn btn-large btn-primary" type="submit">Save</button>
+                            <a class="btn btn-large btn-success" data-toggle="modal" href="#options-modal" >Options</a>
+                        </div>
                     </form>
                     <script type="text/javascript" src="/web/static/lib/jquery/jquery.js"/>
+                    <script type="text/javascript" src="/web/static/lib/bootstrap/js/bootstrap.min.js"/>
                     <script type="text/javascript" src="/builder/static/src/js/snippet_form.js"/>
                 </body>
             </html>

@@ -1,26 +1,15 @@
 import logging
-from openerp.fields import Selection
-import types
-from openerp.addons.base.ir.ir_model import _get_fields_type as _base_field_types
+
+from .utils import get_field_types
+
 from openerp.exceptions import except_orm
-from openerp.osv import fields  as fields_old
-
-__author__ = 'one'
-
 from openerp import models, api, fields, _
 
 
-_logger = logging.getLogger(__name__)
+__author__ = 'one'
 
-# class EnvSelection(Selection):
-# def get_values(self, env):
-#         """ return a list of the possible values """
-#         selection = self.selection
-#         if isinstance(selection, basestring):
-#             selection = getattr(env[self.model_name], selection)(context=env.context)
-#         elif callable(selection):
-#             selection = selection(env[self.model_name], context=env.context)
-#         return [value for value, _ in selection]
+
+_logger = logging.getLogger(__name__)
 
 
 def snake_case(name, prefix=None, suffix=None):
@@ -42,26 +31,8 @@ class IrFields(models.Model):
     _description = 'Fields'
     _rec_name = 'name'
 
-    @api.model
-    def _get_fields_type_selection(self):
-        context = {}
-        # Avoid too many nested `if`s below, as RedHat's Python 2.6
-        # break on it. See bug 939653.
-        return sorted([
-            (k, k) for k, v in fields_old.__dict__.iteritems()
-            if type(v) == types.TypeType and \
-            issubclass(v, fields_old._column) and \
-            v != fields_old._column and \
-            not v._deprecated and \
-            # not issubclass(v, fields_old.function)])
-            not issubclass(v, fields_old.function) and \
-            (not context.get('from_diagram', False) or (
-                context.get('from_diagram', False) and (k in ['one2many', 'many2one', 'many2many'])))
-
-        ])
-
-    module_id = fields.Many2one('builder.ir.module.module', 'Module', related='model_id.module_id', ondelete='cascade')
     model_id = fields.Many2one('builder.ir.model', 'Model', select=1, ondelete='cascade')
+    module_id = fields.Many2one('builder.ir.module.module', 'Module', related='model_id.module_id')
     special_states_field_id = fields.Many2one('builder.ir.model.fields', related='model_id.special_states_field_id',
                                               string='States Field')
 
@@ -90,7 +61,7 @@ class IrFields(models.Model):
 
     field_description = fields.Char('Field Label')
     related = fields.Char('Related')
-    ttype = fields.Selection(_get_fields_type_selection, 'Field Type', required=True)
+    ttype = fields.Selection(get_field_types, 'Field Type', required=True)
     relation_ttype = fields.Selection([('many2one', 'many2one'), ('one2many', 'one2many'), ('many2many', 'many2many')],
                                       'Field Type', compute='_compute_relation_ttype',
                                       fnct_inv='_relation_type_set_inverse', store=False, search=True)
@@ -112,7 +83,7 @@ class IrFields(models.Model):
                                                      'related fields)')
 
     help = fields.Text('Help')
-    delegate = fields.Boolean('Delegate', default=True, help=''' set it to ``True`` to make fields of the target model
+    delegate = fields.Boolean('Delegate', default=False, help=''' set it to ``True`` to make fields of the target model
         accessible from the current model (corresponds to ``_inherits``)''')
     auto_join = fields.Boolean('Auto Join', help='Whether JOINs are generated upon search through that field (boolean, by default ``False``')
     decimal_digits = fields.Char('Decimal Digits', )
@@ -168,7 +139,7 @@ class IrFields(models.Model):
 
     @property
     def groups(self):
-        return ','.join([group.xml_id for group in self.group_ids])
+        return ','.join([group.real_xml_id for group in self.group_ids])
 
     @property
     def define(self):
@@ -328,7 +299,6 @@ class IrFields(models.Model):
             raise except_orm(_('Error'),
                              _("The Selection Options expression is must be in the [('key','Label'), ...] format!"))
         return True
-
 
     @api.one
     def ensure_one_rec_name(self):

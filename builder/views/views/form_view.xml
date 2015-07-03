@@ -229,7 +229,7 @@
                     </group>
                     <group attrs="{'invisible': [('field_ttype', 'not in', ['one2many', 'many2many'])]}">
                         <group>
-                            <field name="related_field_view_type"/>
+                            <field name="related_field_view_type" attrs="{'required': [('field_ttype', 'in', ['one2many', 'many2many'])]}"/>
                             <field name="related_field_mode"/>
                             <field name="related_field_tree_editable"
                                    attrs="{'invisible': ['|', ('field_ttype', 'not in', ['one2many', 'many2many']), '|', ('related_field_mode', 'not in', ['tree']), ('related_field_view_type', 'not in', ['default'])]}"/>

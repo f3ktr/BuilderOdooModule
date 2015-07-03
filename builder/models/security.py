@@ -12,7 +12,7 @@ class Groups(osv.osv):
     _name = "builder.res.groups"
     _description = "Access Groups"
     _rec_name = 'full_name'
-    _order = 'name'
+    _order = 'sequence, name'
 
     def _get_full_name(self, cr, uid, ids, field, arg, context=None):
         res = {}
@@ -48,6 +48,7 @@ class Groups(osv.osv):
         'name': fields.char('Name', required=True, translate=True),
         # 'users': fields.many2many('res.users', 'res_groups_users_rel', 'gid', 'uid', 'Users'),
         'inherited': fields.boolean('Inherited', default=False),
+        'sequence': fields.integer('Sequence'),
         'model_access': fields.one2many('builder.ir.model.access', 'group_id', 'Access Controls', copy=True),
         'rule_groups': fields.many2many('builder.ir.rule', 'builder_rule_group_rel', 'group_id', 'rule_group_id', 'Rules', domain=[('global', '=', False)]),
         'menu_access': fields.many2many('builder.ir.ui.menu', 'builder_ir_ui_menu_group_rel', 'gid', 'menu_id', 'Access Menu'),
@@ -90,6 +91,10 @@ class Groups(osv.osv):
         if self.category_id:
             data = self.env['ir.model.data'].search([('model', '=', 'ir.module.category'), ('res_id', '=', self.category_id.id)])
             self.category_ref = "{module}.{id}".format(module=data.module, id=data.name) if data.id else False
+
+    @property
+    def real_xml_id(self):
+        return self.xml_id if self.inherited else '{module}.{xml_id}'.format(module=self.module_id.name, xml_id=self.xml_id)
 
 
 class IrModelAccess(osv.osv):

@@ -2,7 +2,7 @@
 {% import 'macros.jinja2' as macros %}
 
 {% block content %}
-    {% for view in models %}
+    {% for view in views %}
             {{ macros.builder_ir_ui_view(view) }}
     {% endfor %}
 {% endblock %}

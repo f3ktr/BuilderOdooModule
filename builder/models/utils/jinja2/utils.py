@@ -4,7 +4,7 @@ from StringIO import StringIO
 
 
 def groups_attribute(groups):
-    return 'groups="{list}"'.format(list=','.join([i.xml_id for i in groups])) if len(groups) else ''
+    return 'groups="{list}"'.format(list=','.join([i.real_xml_id for i in groups])) if len(groups) else ''
 
 
 def field_options(options):

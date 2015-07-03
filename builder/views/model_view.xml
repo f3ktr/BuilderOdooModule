@@ -8,6 +8,7 @@
             <field name="model">builder.ir.model</field>
             <field name="arch" type="xml">
                 <tree string="Model Description">
+                    <field name="sequence" widget="handle"/>
                     <field name="model"/>
                     <field name="name"/>
                     <field name="osv_memory"/>
@@ -116,12 +117,12 @@
                                                   attrs="{'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}">
                                                 <group>
                                                     <group>
-                                                        <field name="relation_model_id"
-                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])],'readonly': [('ttype','!=','one2many'), ('ttype','!=','many2one'), ('ttype','!=','many2many')], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
-                                                        <field name="relation" readonly="1"
+                                                        <field name="relation_model_id" domain="[['module_id', '=', parent.module_id]]"
+                                                               attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
+                                                        <field name="relation"
                                                                attrs="{'required': [('ttype','in',['many2one','one2many','many2many'])], 'invisible': [('ttype', 'not in', ['many2one','one2many','many2many'])]}"/>
                                                         <field name="relation_field"
-                                                               attrs="{'required': [('ttype','=','one2many')], 'readonly': [('ttype','!=','one2many')], 'invisible': [('ttype', 'not in', ['one2many'])]}"/>
+                                                               attrs="{'required': [('ttype','=','one2many')], 'invisible': [('ttype', 'not in', ['one2many'])]}"/>
 
                                                         <field name="auto_join"
                                                                attrs="{'readonly': [('ttype','!=','many2one')], 'invisible': [('ttype', 'not in', ['many2one'])]}"/>

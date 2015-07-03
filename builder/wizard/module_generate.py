@@ -10,7 +10,7 @@ class ModuleGenerate(models.TransientModel):
 
     generator = fields.Selection(_get_generators, 'Version', required=True)
 
-    @api.one
+    @api.model
     def _get_default_exporter(self):
         generators = self.env['builder.generator.base'].get_generators()
         if generators:

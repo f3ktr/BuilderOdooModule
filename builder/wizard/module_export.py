@@ -10,7 +10,7 @@ class ModuleImport(models.TransientModel):
 
     export_type = fields.Selection(_get_export_types, 'Format', required=True)
 
-    @api.one
+    @api.model
     def _get_default_exporter(self):
         exporters = self.env['builder.exchanger.base'].get_exchangers()
         if exporters:

@@ -1,8 +1,8 @@
-{%- extends 'xml/base.xml.jinja2' %}
-{% import 'macros.jinja2' as macros %}
+{%- extends 'xml/base.xml.jinja2' -%}
+{% import 'macros.jinja2' as macros -%}
 
-{% block content %}
-    {% for menu in menus %}
+{% block content -%}
+    {%- for menu in menus %}
         {{ macros.builder_ir_ui_menu(menu) }}
-    {% endfor %}
-{% endblock %}
+    {% endfor -%}
+{% endblock -%}

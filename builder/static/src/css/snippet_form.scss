@@ -4,7 +4,7 @@ body {
 
 .form-snippet {
   max-width: 330px;
-  padding: 15px;
+  padding: 0px 15px 0px 15px;
   margin: 0 auto;
 
   & .form-snippet-heading,
@@ -41,4 +41,8 @@ body {
   & input.error[type="text"], & textarea.error {
     border-color: red;
   }
+}
+
+#options-modal {
+  background: #ffffff;
 }

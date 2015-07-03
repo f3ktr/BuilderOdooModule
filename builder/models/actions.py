@@ -24,6 +24,10 @@ class actions(osv.osv):
         'usage': lambda *a: False,
     }
 
+    @property
+    def real_xml_id(self):
+        return self.xml_id if '.' in self.xml_id else '{module}.{xml_id}'.format(module=self.module_id.name, xml_id=self.xml_id)
+
 
 class ir_actions_act_url(osv.osv):
     _name = 'builder.ir.actions.act_url'

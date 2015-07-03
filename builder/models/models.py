@@ -6,10 +6,11 @@ from openerp import models, fields, api, _
 class IrModel(models.Model):
     _name = 'builder.ir.model'
     _description = "Models"
-    _order = 'model'
+    _order = 'sequence, model'
 
     _rec_name = 'model'
 
+    sequence = fields.Integer('Sequence')
     module_id = fields.Many2one('builder.ir.module.module', 'Module', required=True, select=1, ondelete='cascade')
     name = fields.Char('Description', required=True)
     model = fields.Char('Model', required=True, select=1)

@@ -1,6 +1,5 @@
-from openerp.addons.builder.models.fields import snake_case
+from ..fields import snake_case
 from openerp import models, fields, api, _
-from .base import FIELD_WIDGETS_ALL
 
 __author__ = 'one'
 
@@ -41,7 +40,6 @@ class CalendarView(models.Model):
     _defaults = {
         'type': 'calendar',
         'subclass_model': lambda s, c, u, cxt=None: s._name,
-        'inherit_view_xpath': '//calendar'
     }
 
     @api.onchange('attr_date_start_field_id')

@@ -91,7 +91,7 @@ class {{ class_name }}(models.TransientModel):
 
 
 {# generate builder.ir.model #}
-{% macro builder_ir_model(model) %}
+{%- macro builder_ir_model(model) -%}
 {%- if model.define %}
 {%- set class_name = model.model | replace(".", " ") | replace("_", " ") | title | replace(" ","") -%}
 class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}models.Model{% endif %}):
@@ -103,31 +103,32 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
     _order = '{{ model.order_string }}'
     {% endif -%}
     {% if model.inherit_model_ids -%}
-    _inherit = [{% for inherit in model.inherit_model_ids -%}
+    _inherit = [
+        {% for inherit in model.inherit_model_ids -%}
         {% if inherit.system_model_id.model -%}
         '{{ inherit.system_model_id.model }}',
         {% endif -%}
         {% if inherit.module_model_id.model -%}
         '{{ inherit.module_model_id.model }}',
         {% endif -%}
-        {% endfor -%}
+        {% endfor %}
     ]
     {% endif -%}
     {% if model.inherits_model_ids -%}
-    _inherits = {{'{'}} {% for inherits in model.inherits_model_ids -%}
+    _inherits = {{'{'}}
+        {% for inherits in model.inherits_model_ids -%}
         {% if inherits.system_model_id.model -%}
         '{{ inherits.system_model_id.model }}' : '{{ inherits.field_name }}',
         {% endif -%}
         {% if inherits.module_model_id.model -%}
         '{{ inherits.module_model_id.model }}' : '{{ inherits.field_id }}',
         {% endif -%}
-        {% endfor -%}
+        {% endfor %}
     {{'}'}}
     {% endif -%}
     {% if model.name -%}
     _description = '{{ model.name }}'{% else %}_description = _(_doc_)
     {% endif %}
-
     {% for field in model.field_ids -%}
     {{ builder_ir_model_field(field) }}
     {%- endfor %}
@@ -166,71 +167,72 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
     {% endfor -%}
     {% for button in model.button_ids -%}
     {{ builder_ir_model_button(button) }}
-    {% endfor -%}
+    {%- endfor %}
+
 {% endif -%}
-{% endmacro %}
+{%- endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_status_bar_button(button) %}
+{% macro builder_ir_model_status_bar_button(button) -%}
     @api.multi
     def {{ button.method_name }}(self):
         raise NotImplementedError
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_button(button) %}
+{% macro builder_ir_model_button(button) -%}
     @api.multi
     def {{ button.method_name }}(self):
         raise NotImplementedError
-{% endmacro %}
+{% endmacro -%}
 
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_field_compute(method_name, fields) %}
+{% macro builder_ir_model_field_compute(method_name, fields) -%}
     @api.one
     def {{ method_name }}(self):
         {% for field in fields -%}
         self.{{ field }} = False
         {% endfor -%}
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_field_inverse(method_name, fields) %}
+{% macro builder_ir_model_field_inverse(method_name, fields) -%}
     @api.one
     def {{ method_name }}(self):
         {% for field in fields -%}
         # self. = self.{{ field }}
         {% endfor -%}
         pass
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_field_search(method_name, fields) %}
+{% macro builder_ir_model_field_search(method_name, fields) -%}
     def {{ method_name }}(self, operator, value):
         return [
         {% for field in fields -%}
             ('{{ field }}', operator, value)
         {% endfor -%}
         ]
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_field_default(method_name, fields) %}
+{% macro builder_ir_model_field_default(method_name, fields) -%}
     @api.model
     def {{ method_name }}(self):
         return False
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.method #}
-{% macro builder_ir_model_method(method) %}
+{% macro builder_ir_model_method(method) -%}
     {% if method.type == 'simple_model' %}
     @api.model
-    def {{ method.name }}(self, {{ method.arguments }}):
+    def {{ method.name }}(self{% if method.arguments %}, {{ method.arguments }}{% endif %}):
         raise NotImplementedError
     {% elif method.type == 'simple_instance' %}
     @api.one
-    {% if method.use_cache %}@api.depends({{ ','.join(method.field_names) }}){% endif %}
-    def {{ method.name }}(self, {{ method.arguments }}):
+    {% if method.use_cache %}@api.depends({{ ','.join(method.field_names) }}){% endif -%}
+    def {{ method.name }}(self{% if method.arguments %}, {{ method.arguments }}{% endif %}):
         raise NotImplementedError
     {% elif method.type == 'onchange' %}
     @api.onchange({{ ','.join(method.field_names) }})
@@ -241,8 +243,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
     def {{ method.name }}(self):
         raise NotImplementedError
     {% endif %}
-
-{% endmacro %}
+{% endmacro -%}
 
 {# generate builder.ir.model.field #}
 {% macro builder_ir_model_field(field) -%}
@@ -293,27 +294,27 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 {% endmacro %}
 
 {# generate builder.ir.ui.menu #}
-{% macro builder_ir_ui_menu(menu) %}
-    <menuitem id="{{ menu.xml_id }}" name="{{ menu.name }}"  {% if menu.sequence %}sequence="{{ menu.sequence }}"{% endif %}
-        {%- if menu.parent_type == 'module' %}
-            parent="{{ menu.parent_id.xml_id }}"
-        {%- elif menu.parent_type == 'system' %}
-            parent="{{ menu.parent_ref }}"
-        {%- endif -%}
-        {%- if menu.action_type == 'module' %}
-            action="{{ menu.action_module.xml_id }}"
-        {%- elif menu.action_type == 'system' %}
-            action="{{ menu.action_system_ref }}"
-        {%- endif -%}
-        {%- if menu.group_ids %}
-            {{ menu.group_ids|groups }}
-        {%- endif -%}
-        />
-{% endmacro %}
+{% macro builder_ir_ui_menu(menu) -%}
+        <menuitem id="{{ menu.real_xml_id }}" name="{{ menu.name }}"  {% if menu.sequence %}sequence="{{ menu.sequence }}"{% endif %}
+            {%- if menu.parent_type == 'module' %}
+                parent="{{ menu.parent_id.real_xml_id }}"
+            {%- elif menu.parent_type == 'system' %}
+                parent="{{ menu.parent_ref }}"
+            {%- endif -%}
+            {%- if menu.action_type == 'module' %}
+                action="{{ menu.action_module.real_xml_id }}"
+            {%- elif menu.action_type == 'system' %}
+                action="{{ menu.action_system_ref }}"
+            {%- endif -%}
+            {%- if menu.group_ids %}
+                {{ menu.group_ids|groups }}
+            {%- endif -%}
+            />
+{% endmacro -%}
 
 {# generate builder.ir.ui.view #}
 {% macro builder_ir_ui_view(view) %}
-    <record model="ir.ui.view" id="{{ view.xml_id }}">
+    <record model="ir.ui.view" id="{{ view.real_xml_id }}">
         <field name="name">{{ view.name }}</field>
         <field name="model">{{ view.model_id.model }}</field>
         {% if view.type == 'tree' and view.field_parent_id %}
@@ -610,60 +611,60 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 
 {# generate builder.ir.actions.act_window #}
-{% macro builder_ir_actions_act_window(action) %}
-    <record model="ir.actions.act_window" id="{{ action.xml_id }}">
-        {% if action.name %}
-        <field name="name">{{ action.name }}</field>
-        {% endif %}
-        {% if action.model_id.model %}
-        <field name="res_model">{{ action.model_id.model }}</field>
-        {% endif %}
-        {% if action.src_model %}
-        <field name="src_model">{{ action.src_model }}</field>
-        {% endif %}
-        {% if action.domain %}
-        <field name="domain">{{ action.domain }}</field>
-        {% endif %}
-        {% if action.context and action.context!='{}' %}
-        <field name="context">{{ action.context }}</field>
-        {% endif %}
-        {% if action.view_id %}
-        <field name="view_ids" ref="{{ action.view_id }}"/>
-        {% endif %}
-        {% if action.view_mode %}
-        <field name="view_mode">{{ action.view_mode }}</field>
-        {% endif %}
-        {% if action.view_type %}
-        <field name="view_type">{{ action.view_type }}</field>
-        {% endif %}
-        {% if action.usage %}
-        <field name="usage">{{ action.usage }}</field>
-        {% endif %}
-        {% if action.target and (target != 'current') %}
-        <field name="target">{{ action.target }}</field>
-        {% endif %}
-        {% if action.search_view_id %}
-        <field name="search_view" ref="{{ action.search_view_id }}"/>
-        {% endif %}
-        {% if action.limit and action.limit != 80 %}
-        <field name="limit">{{ action.limit }}</field>
-        {% endif %}
-        {% if action.auto_refresh %}
-        <field name="auto_refresh">{{ action.auto_refresh }}</field>
-        {% endif %}
-        {% if not action.auto_search %}
-        <field name="auto_search">{{ action.auto_search }}</field>
-        {% endif %}
-        {% if action.multi %}
-        <field name="multi">{{ action.multi }}</field>
-        {% endif %}
-        {% if action.show_help -%}
-        <field name="help" type="html">
-            {{ action.help }}
-        </field>
-        {% endif %}
-    </record>
-{% endmacro %}
+{% macro builder_ir_actions_act_window(action) -%}
+        <record model="ir.actions.act_window" id="{{ action.real_xml_id }}">
+            {% if action.name -%}
+            <field name="name">{{ action.name }}</field>
+            {% endif -%}
+            {% if action.model_id.model -%}
+            <field name="res_model">{{ action.model_id.model }}</field>
+            {% endif -%}
+            {% if action.src_model -%}
+            <field name="src_model">{{ action.src_model }}</field>
+            {% endif -%}
+            {% if action.domain -%}
+            <field name="domain">{{ action.domain }}</field>
+            {% endif -%}
+            {% if action.context and action.context!='{}' -%}
+            <field name="context">{{ action.context }}</field>
+            {% endif -%}
+            {% if action.view_id -%}
+            <field name="view_ids" ref="{{ action.view_id.real_xml_id }}"/>
+            {% endif -%}
+            {% if action.view_mode -%}
+            <field name="view_mode">{{ action.view_mode }}</field>
+            {% endif -%}
+            {% if action.view_type -%}
+            <field name="view_type">{{ action.view_type }}</field>
+            {% endif -%}
+            {% if action.usage -%}
+            <field name="usage">{{ action.usage }}</field>
+            {% endif -%}
+            {% if action.target and (target != 'current') -%}
+            <field name="target">{{ action.target }}</field>
+            {% endif -%}
+            {% if action.search_view_id -%}
+            <field name="search_view" ref="{{ action.search_view_id.real_xml_id }}"/>
+            {% endif -%}
+            {% if action.limit and action.limit != 80 -%}
+            <field name="limit">{{ action.limit }}</field>
+            {% endif -%}
+            {% if action.auto_refresh -%}
+            <field name="auto_refresh">{{ action.auto_refresh }}</field>
+            {% endif -%}
+            {% if not action.auto_search -%}
+            <field name="auto_search">{{ action.auto_search }}</field>
+            {% endif -%}
+            {% if action.multi -%}
+            <field name="multi">{{ action.multi }}</field>
+            {% endif -%}
+            {% if action.show_help -%}
+            <field name="help" type="html">
+                {{ action.help }}
+            </field>
+            {%- endif %}
+        </record>
+{% endmacro -%}
 
 {# generate builder.ir.module.category #}
 {% macro builder_ir_module_category(module) %}
@@ -686,7 +687,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
       {% if not rule.groups -%}
         <field name="global" eval="True"/>
       {% else %}
-        <field name="groups" eval="[{%- for group in rule.groups -%}(4, ref('{{ rule.module_id.name }}.{{ group.xml_id }}')),{%- endfor -%}]" />
+        <field name="groups" eval="[{%- for group in rule.groups -%}(4, ref('{{ group.real_xml_id }}')),{%- endfor -%}]" />
       {% endif %}
        <field name="domain_force">{{ rule.domain }}</field>
     </record>
@@ -696,8 +697,9 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 {# generate builder.res.groups #}
 {% macro builder_res_groups(group) %}
     {% if not group.inherited -%}
-    <record id="{{ group.xml_id }}" model="res.groups">
+    <record id="{{ group.real_xml_id }}" model="res.groups">
         <field name="name">{{ group.name }}</field>
+        <field name="category_id" ref="module_category_{{ group.module_id.name }}"/>
         {% if group.category_type == 'custom' -%}
         <field name="category_id" ref="module_category_connector"/>
         {%- elif group.category_type == 'system' -%}
@@ -705,6 +707,9 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
         {%- elif group.category_type == 'module' -%}
         <field name="category_id" ref="module_category_{{ module.name }}"/>
         {%- endif %}
+        {% if group.implied_ids -%}
+        <field name="implied_ids" eval="[{% for g in group.implied_ids %}(4, ref('{{ g.real_xml_id }}')), {% endfor %}]"/>
+        {% endif %}
         <!-- <field name="users" eval="[(4, ref('base.user_root'))]"/> -->
     </record>
     {%- endif %}
@@ -713,7 +718,7 @@ class {{ class_name }}({% if model.osv_memory %}models.TransientModel{% else %}m
 
 {# generate builder.ir.model.access #}
 {% macro builder_ir_model_access(access) -%}
-access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed }}_{{ access.group_id.xml_id|dot2dashed }},{{ access.name }},{{ access.model_id.module_id.name }}.{{ access.model_id.model|dot2dashed }},{{ access.group_id.module_id.name }}.{{ access.group_id.xml_id }},{{ access.perm_read|int }},{{ access.perm_write|int }},{{ access.perm_create|int }},{{ access.perm_unlink|int }}
+access_{{ access.model_id.module_id.name }}_{{ access.model_id.model|dot2dashed }}_{{ access.group_id.real_xml_id }},{{ access.name }},{{ access.model_id.module_id.name }}.model_{{ access.model_id.model|dot2dashed }},{{ access.group_id.real_xml_id }},{{ access.perm_read|int }},{{ access.perm_write|int }},{{ access.perm_create|int }},{{ access.perm_unlink|int }}
 {% endmacro -%}
 
 

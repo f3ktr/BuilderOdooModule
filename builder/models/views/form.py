@@ -1,4 +1,4 @@
-from openerp.addons.builder.models.fields import snake_case
+from ..fields import snake_case
 from openerp.exceptions import ValidationError
 from openerp import models, fields, api, _
 from .base import FIELD_WIDGETS_ALL
@@ -56,9 +56,7 @@ class FormView(models.Model):
 
     _defaults = {
         'type': 'form',
-        'custom_arch': False,
         'subclass_model': lambda s, c, u, cxt=None: s._name,
-        'inherit_view_xpath': '//form'
     }
 
     @api.onchange('model_id')
@@ -72,7 +70,9 @@ class FormView(models.Model):
         if not len(self.field_ids):
             field_list = []
             for field in self.model_id.field_ids:
-                if field.name in ['state'] or field.is_inherited:
+                if field.name in ['state']:
+                    continue
+                if field.is_inherited and not self.env.context.get('add_inherited_fields', True):
                     continue
                 field_list.append({'field_id': field.id, 'widget': DEFAULT_WIDGETS_BY_TYPE.get(field.ttype), 'field_ttype': field.ttype, 'model_id': self.model_id.id, 'special_states_field_id': self.model_id.special_states_field_id.id})
 
@@ -148,7 +148,7 @@ class FormField(models.Model):
     view_id = fields.Many2one('builder.views.form', string='View', ondelete='cascade')
     page = fields.Char('Page')
 
-    related_field_view_type = fields.Selection([('default', 'Default'), ('defined', 'Defined'), ('custom', 'Custom')], 'View Type', required=True, default='default')
+    related_field_view_type = fields.Selection([('default', 'Default'), ('defined', 'Defined'), ('custom', 'Custom')], 'View Type', default='default')
     related_field_form_ref = fields.Char('Form View ID')
     related_field_tree_ref = fields.Char('Tree View ID')
     domain = fields.Char('Domain')
@@ -173,10 +173,9 @@ class FormField(models.Model):
     states = fields.Char('States')
 
     @api.one
-    @api.depends('field_id.ttype', 'view_id')
+    @api.depends('field_id.ttype')
     def _compute_field_type(self):
-        if self.field_id:
-            self.field_ttype = self.field_id.ttype
+        self.field_ttype = self.field_id.ttype
 
     @property
     def has_attrs(self):

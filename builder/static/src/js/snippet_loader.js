@@ -29,6 +29,64 @@ if (window.jQuery) {
     }
 
     script(window.odooUrl + '/builder/static/lib/jquery.js', function () {
+        var path = [];
+        var index = false;
+        var preservePath = false;
+
+        script(window.odooUrl + '/builder/static/lib/jquery.js');
+        script(window.odooUrl + '/web/static/lib/jquery.hotkeys/jquery.hotkeys.js', function (){
+            $(document).bind('keydown', 'ctrl+up', function (){
+                console.log(index, path.length);
+                var $active = $('.bookmarklet-active');
+                if ($active){
+                    preservePath = true;
+                    path = [$active.parent().click()].concat(path);
+                    preservePath = false;
+                    index = 0;
+                }
+                return false;
+            });
+            $(document).bind('keydown', 'ctrl+down', function (){
+                console.log(index, path.length);
+                var $current = path[index];
+                if (index < path.length - 1){
+                    index++;
+                    $current = path[index];
+                }
+                if ($current){
+                    preservePath = true;
+                    $current.click();
+                    preservePath = false;
+                }
+                return false;
+            });
+            $(document).bind('keydown', 'ctrl+left', function (){
+                var $current = path[index];
+                if ($current){
+                    $current = $current.prev();
+                    path[index] = $current;
+                    path = path.slice(0, index+1);
+                    preservePath = true;
+                    $current.click();
+                    preservePath = false;
+                }
+                return false;
+            });
+            $(document).bind('keydown', 'ctrl+right', function (){
+                var $current = path[index];
+                if ($current){
+                    $current = $current.next();
+                    path[index] = $current;
+                    path = path.slice(0, index+1);
+                    preservePath = true;
+                    $current.click();
+                    preservePath = false;
+                }
+                return false;
+            });
+
+        });
+        script(window.odooUrl + '/builder/static/lib/jquery.getStyleObject.js');
         function loadCss(url) {
             $('<link />').attr({
                 "rel": "stylesheet",
@@ -40,7 +98,7 @@ if (window.jQuery) {
         function iframe(url, callback) {
             var iframe = $('#odooIframe');
             if (!iframe.length) {
-                iframe = $('<iframe/>').attr('id', 'odooIframe').appendTo('body');
+                iframe = $('<iframe/>').attr('id', 'odooIframe').appendTo('body').addClass('top right');
             }
             iframe.on('load', callback);
             iframe.attr('src', url);
@@ -51,12 +109,20 @@ if (window.jQuery) {
         var options = {
             css: {
                 copy: true
+            },
+            images: {
+                inline: true
+            },
+            position: {
+                vertical: 'top',
+                horizontal: 'right'
             }
         };
 
         var channels = {
             'site.options': function (data, event) {
                 options = $.extend(options, data.options);
+                $(odoo).removeClass('top down left right').addClass(options.position.vertical + ' ' + options.position.horizontal)
             }
         };
 
@@ -176,20 +242,28 @@ if (window.jQuery) {
 
             var $fixed = $(this);
             $('.bookmarklet-active').removeClass('bookmarklet-active');
-            $fixed.addClass('bookmarklet-active');
+
             applyCssInline($fixed);
             $fixed.find('*').each(function () {
                 applyCssInline($(this));
             });
 
-            if ($fixed.is('img:not(.processed)')) {
-                $fixed.attr('src', getBase64Image($fixed[0])).addClass('processed');
+            if (options.images.inline) {
+                if ($fixed.is('img:not(.processed)')) {
+                    $fixed.attr('src', getBase64Image($fixed[0])).addClass('processed');
+                }
+
+                $fixed.find('img:not(.processed)').each(function () {
+                    var $this = $(this);
+                    $this.attr('src', getBase64Image(this)).addClass('processed');
+                });
             }
 
-            $fixed.find('img:not(.processed)').each(function () {
-                var $this = $(this);
-                $this.attr('src', getBase64Image(this)).addClass('processed');
-            });
+            $fixed.addClass('bookmarklet-active');
+            if (!preservePath){
+                path = [$fixed];
+                index = 0;
+            }
 
             publish({
                 channel: 'snippet.html.set',
@@ -197,6 +271,8 @@ if (window.jQuery) {
                 content: this.outerHTML,
                 url: window.location.href
             });
+
+            return false;
 
         });
     });

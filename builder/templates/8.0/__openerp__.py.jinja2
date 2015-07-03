@@ -1,7 +1,7 @@
 {%- include 'python_file_header.py.jinja2' ignore missing %}
 # noinspection PyStatementEffect
 {
-    "name" : "{{ module.name }}",
+    "name" : "{{ module.shortdesc }}",
     {% if module.installed_version %}"version" : "{{ module.installed_version }}",{% endif %}
     {% if module.author %}"author" : "{{ module.author }}",{% endif %}
     {% if module.website %}"website" : "{{ module.website }}",{% endif %}
@@ -10,7 +10,7 @@
     "description": """
 {{ module.shortdesc }}
 ====================================
-{{ module.summary | default('') }}
+{{ module.summary if module.summary else '' }}
                     """,
     "depends" : {{ module.dependencies_as_list() }},
     "data" : [

@@ -20,20 +20,27 @@
         }
     }, false);
 
-    $('#copy-css').change(function (){
+    $('#form-snippet-options').submit(function (){
+        return false
+    }).change(function (){
+        var $this = $(this);
         publish({
             channel: 'site.options',
             options: {
                 css: {
-                    copy: $(this).is(':checked')
+                    copy: $this.find('#copy-css').is(':checked')
+
+                },
+                images: {
+                    inline : $this.find('#copy-css').is(':checked')
+                },
+                position: {
+                    vertical : $this.find('input[name="position-vertical"]:checked').val(),
+                    horizontal : $this.find('input[name="position-horizontal"]:checked').val()
                 }
             }
         });
     });
-
-    /*
-    * TODO: when snippet contains images, replace them with its base64 data
-    * */
 
     $('#form-snippet').submit(function (event){
         var has_errors = false;

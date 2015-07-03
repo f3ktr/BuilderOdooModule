@@ -45,7 +45,8 @@ class ViewSelector(models.TransientModel):
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade')
     model_id = fields.Many2one('builder.ir.model', 'Model', ondelete='cascade', required=True)
-    model_name = fields.Char('Model Name', related='model_id.name')
+    model_name = fields.Char('Model Name', related='model_id.name', store=False)
+    add_inherited_fields = fields.Boolean('Add Inherited Fields', default=True)
     model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type')
     special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
                                               related='model_id.special_states_field_id')
@@ -121,6 +122,7 @@ class ViewSelector(models.TransientModel):
                 'default_model_id': self.model_id.id,
                 'default_special_states_field_id': self.special_states_field_id.id,
                 'default_module_id': self.model_id.module_id.id,
+                'add_inherited_fields': self.add_inherited_fields,
                 'default_inherit_view': self.inherit_view,
                 'default_inherit_view_id': self.inherit_view_id.id,
                 'default_inherit_view_ref': self.inherit_view_ref,
@@ -150,7 +152,7 @@ class View(models.Model):
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='CASCADE')
     model_id = fields.Many2one('builder.ir.model', ondelete='cascade')
     model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type', store=False)
-    model_name = fields.Char('Model Name', related='model_id.name')
+    model_name = fields.Char('Model Name', related='model_id.name', store=False)
     special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
                                               related='model_id.special_states_field_id')
     model_groups_date_field_ids = fields.One2many('builder.ir.model.fields', string='Has Date Fields',
@@ -203,6 +205,10 @@ class View(models.Model):
     def action_save(self):
         return {'type': 'ir.actions.act_window_close'}
 
+    @property
+    def real_xml_id(self):
+        return self.xml_id if '.' in self.xml_id else '{module}.{xml_id}'.format(module=self.module_id.name, xml_id=self.xml_id)
+
 
 class InheritViewChange(models.Model):
     _name = 'builder.ir.ui.view.inherit.change'
@@ -231,7 +237,7 @@ class AbstractViewField(models.AbstractModel):
     view_id = fields.Many2one('builder.ir.ui.view', string='Name', ondelete='cascade')
     sequence = fields.Integer('Sequence')
     field_id = fields.Many2one('builder.ir.model.fields', string='Field', required=True, ondelete='cascade')
-    field_ttype = fields.Char(string='Field Type', compute='_compute_field_type')
+    field_ttype = fields.Char(string='Field Type', compute='_compute_field_ttype')
     model_id = fields.Many2one('builder.ir.model', related='view_id.model_id', string='Model')
     special_states_field_id = fields.Many2one('builder.ir.model.fields',
                                               related='view_id.model_id.special_states_field_id', string='States Field')
@@ -239,6 +245,6 @@ class AbstractViewField(models.AbstractModel):
     string = fields.Char('String')
 
     @api.one
-    def _compute_field_type(self):
-        if self.field_id:
-            self.field_ttype = self.field_id.ttype
+    @api.depends('field_id.ttype')
+    def _compute_field_ttype(self):
+        self.field_ttype = self.field_id.ttype

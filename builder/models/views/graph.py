@@ -1,4 +1,4 @@
-from openerp.addons.builder.models.fields import snake_case
+from ..fields import snake_case
 from openerp import models, fields, api
 
 __author__ = 'one'
@@ -22,7 +22,6 @@ class GraphView(models.Model):
     _defaults = {
         'type': 'graph',
         'subclass_model': lambda s, c, u, cxt=None: s._name,
-        'inherit_view_xpath': '//graph'
     }
 
     @api.model

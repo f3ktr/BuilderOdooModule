@@ -1,4 +1,4 @@
-from openerp.addons.builder.models.fields import snake_case
+from ..fields import snake_case
 from openerp import models, fields, api, _
 from .base import FIELD_WIDGETS_ALL
 
@@ -48,7 +48,6 @@ class GanttView(models.Model):
     _defaults = {
         'type': 'gantt',
         'subclass_model': lambda s, c, u, cxt=None: s._name,
-        'inherit_view_xpath': '//gantt'
     }
 
     @api.model

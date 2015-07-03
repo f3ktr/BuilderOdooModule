@@ -21,31 +21,52 @@ class GeneratorV8(models.TransientModel):
         demo_data = []
         model_packages = []
 
-        if has_models:
-            py_packages.append('models')
-            model_packages.append('models')
-
-            module_data.append('views/views.xml')
-            module_data.append('views/actions.xml')
-            module_data.append('views/menu.xml')
-
+        if len(module.rule_ids) or len(module.group_ids):
+            module_data.append('security/security.xml')
             zip_file.write_template(
-                'views/menu.xml',
-                'views/menus.xml.jinja2',
-                {'module': module, 'menus': module.menu_ids}
+                'security/security.xml',
+                'security/security.xml.jinja2', {
+                    'module': module,
+                    'rules': module.rule_ids,
+                    'groups': module.group_ids,
+                })
+
+        if len(module.model_access_ids):
+            module_data.append('security/ir.model.access.csv')
+            zip_file.write_template(
+                'security/ir.model.access.csv',
+                'security/ir.model.access.csv.jinja2', {
+                    'module': module,
+                    'model_access': module.model_access_ids,
+                })
+
+        if module.view_ids:
+            module_data.append('views/views.xml')
+            zip_file.write_template(
+                'views/views.xml',
+                'views/views.xml.jinja2',
+                {'views': module.view_ids}
             )
 
+        if module.action_window_ids:
+            module_data.append('views/actions.xml')
             zip_file.write_template(
                 'views/actions.xml',
                 'views/actions.xml.jinja2',
                 {'module': module}
             )
 
+        if module.menu_ids:
+            module_data.append('views/menu.xml')
             zip_file.write_template(
-                'views/views.xml',
-                'views/views.xml.jinja2',
-                {'models': module.view_ids}
+                'views/menu.xml',
+                'views/menus.xml.jinja2',
+                {'module': module, 'menus': module.menu_ids}
             )
+
+        if has_models:
+            py_packages.append('models')
+            model_packages.append('models')
 
             zip_file.write_template(
                 'models/models.py',
@@ -67,25 +88,6 @@ class GeneratorV8(models.TransientModel):
                     'records': model.demo_records
                 }
             )
-
-        if len(module.rule_ids) or len(module.group_ids):
-            module_data.append('security/security.xml')
-            zip_file.write_template(
-                'security/security.xml',
-                'security/security.xml.jinja2', {
-                    'module': module,
-                    'rules': module.rule_ids,
-                    'groups': module.group_ids,
-                })
-
-        if len(module.model_access_ids):
-            module_data.append('security/ir.model.access.csv')
-            zip_file.write_template(
-                'security/ir.model.access.csv',
-                'security/ir.model.access.csv.jinja2', {
-                    'module': module,
-                    'model_access': module.model_access_ids,
-                })
 
         if len(module.cron_job_ids):
             module_data.append('data/cron.xml')

@@ -126,7 +126,6 @@
                             </page>
                             <page string="Technical Data">
                                 <group col="4">
-                                    <field name="demo"/>
                                     <field name="application"/>
                                     <field name="auto_install"/>
                                     <field name="post_install_action"/>
@@ -177,6 +176,7 @@
                                         </div>
                                         <field name="model_ids" editable="bottom" context="{'default_module_id': active_id}">
                                             <tree string="Models" context="{'default_module_id': active_id}">
+                                                <field name="sequence" widget="handle"/>
                                                 <field name="id" invisible="1"/>
                                                 <field name="special_states_field_id" invisible="1"/>
                                                 <field name="model"/>
