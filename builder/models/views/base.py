@@ -151,7 +151,7 @@ class View(models.Model):
 
     module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='CASCADE')
     model_id = fields.Many2one('builder.ir.model', ondelete='cascade')
-    model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type', store=False)
+    model_inherit_type = fields.Selection([('mixed', 'Mixed'), ('class', 'Class'), ('prototype', 'Prototype'), ('delegation', 'Delegation')], 'Inherit Type', related='model_id.inherit_type', store=False, search=True)
     model_name = fields.Char('Model Name', related='model_id.name', store=False)
     special_states_field_id = fields.Many2one('builder.ir.model.fields', 'States Field',
                                               related='model_id.special_states_field_id')

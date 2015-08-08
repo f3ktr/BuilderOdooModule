@@ -48,7 +48,7 @@
                         </group>
                         <notebook>
                             <page string="Fields">
-                                <field name="field_ids">
+                                <field name="field_ids" context="{'default_module_id': module_id}">
                                     <tree string="Fields Description">
                                         <field name="position" widget="handle"/>
                                         <field name="name"/>
