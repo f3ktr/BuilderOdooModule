@@ -94,6 +94,8 @@ This module aims to help in the development of new modules
         'views/snippet_templates.xml',
         'views/designer/website_page_designer.xml',
         'views/designer/designer_snippets.xml',
+
+        'security/ir.model.access.csv',
     ],
     'test': [
         'test/test_demo.yml',
