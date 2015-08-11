@@ -20,7 +20,7 @@ class WorkflowActivity(models.Model):
     _name = 'builder.workflow.activity'
     _order = "name"
 
-    module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade', related='wkf_id.module_id', store=True)
+    module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade', related='wkf_id.module_id')
     wkf_id = fields.Many2one('builder.workflow', 'Workflow', required=True, ondelete='cascade')
     name = fields.Char('Name', required=True)
     split_mode = fields.Selection([('XOR', 'Xor'), ('OR','Or'), ('AND','And')], 'Split Mode', size=3, default='XOR')
@@ -72,7 +72,7 @@ class WorkflowTransition(models.Model):
 
     _order = 'sequence,id'
 
-    module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade', related='wkf_id.module_id', store=True)
+    module_id = fields.Many2one('builder.ir.module.module', 'Module', ondelete='cascade', related='wkf_id.module_id')
     sequence = fields.Integer('Sequence', default=10)
     signal = fields.Char('Signal (Button Name)',
                          help="When the operation of transition comes from a button pressed in the client form, "\
