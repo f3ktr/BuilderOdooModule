@@ -15,7 +15,7 @@ class ZipFile(object):
     def write_template(self, filename, template, d, **kwargs):
         if not self.jinja_env:
             raise ValueError('Jinja2 Environment is not set')
-        self.write(filename, self.jinja_env.get_template(template).render(d), **kwargs)
+        self.write(filename, self.jinja_env.get_template(template).render(d).encode('UTF-8'), **kwargs)
 
     def write(self, filename, content, external_attr=2175008768, compress_type=None):
         info = zipfile.ZipInfo(filename)
